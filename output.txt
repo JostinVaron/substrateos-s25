@@ -1,21 +1,40 @@
-=== BRIDGE RUN 2026-11-16T22:12:57Z (v4) ===
-=== MISION-A30-R2-VISIBLE — test GPU que SI se ve en pantalla 2026-11-16T22:12:57Z ===
---- 1. lanzando glxgears CON GPU en login persistente, ventana al frente ---
-login_pid=7870
---- 2. esperando ventana de engranajes (max 20 s) ---
---- 3. trayendola al frente y midiendo GPU REAL del proceso ---
-pid glxgears (host-visible)=7870
---- 4. kgsl fds del proceso en vivo (prueba dura) ---
-intento 1: kgsl_fds=0
-intento 2: kgsl_fds=0
-intento 3: kgsl_fds=0
-intento 4: kgsl_fds=0
-intento 5: kgsl_fds=0
---- 5. fps en vivo desde el log ---
-120.031 FPS
-105.848 FPS
---- 6. shell y estado ---
+=== BRIDGE RUN 2026-11-16T22:18:40Z (v4) ===
+=== MISION-A31 — integridad post-tests + preparacion para instalar apps 2026-11-16T22:18:40Z ===
+--- 1. INTEGRIDAD: session GNOME ---
 SHELL_VIVO
-VEREDICTO: ENGRANAJES_ABIERTOS_CON_GPU — la ventana queda GIRANDO en pantalla. kgsl_fds del proceso arriba (>=1 = GPU fisica). Confirma visualmente; para cerrar: proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'DISPLAY=:0 xdotool search --class glxgears windowclose'
-=== MISION-A30-R2-VISIBLE COMPLETE ===
+ventanas_abiertas=0
+  dimensions:    2000x1200 pixels (529x317 millimeters)
+--- 2. INTEGRIDAD: procesos huerfanos de los tests ---
+GLXGEARS_AUN_VIVE (mal)
+CALC_AUN_VIVA
+logins proot activos: 3
+--- 3. INTEGRIDAD: salud del shell (sin crash en el log) ---
+21:13:22.4791              Adwaita[ 7533]: WARNING: The resource style-dark.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
+21:13:22.4797              Adwaita[ 7533]: WARNING: The resource style-hc.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
+21:13:29.5858          cc-hostname[ 7533]: WARNING: Failed to get property 'Chassis': GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.hostname1 was not provided by any .service files
+21:13:29.6010                 GLib[ 7533]:CRITICAL: g_strv_contains: assertion 'str != NULL' failed
+21:13:35.0857 cc-multitasking-panel[ 7533]: WARNING: Failed to determine if save/restore is supported: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.gnome.SessionManager was not provided by any .service files
+0
+--- 4. INTEGRIDAD: carga y memoria ahora ---
+ 22:18:42 up 2 min,  0 users,  load average: 0.12, 0.07, 0.02
+               total        used        free      shared  buff/cache   available
+Mem:            10Gi       8.0Gi       1.7Gi        93Mi       1.5Gi       2.9Gi
+Swap:          4.0Gi       4.0Gi        60Ki
+--- 5. TERRENO: espacio en disco del contenedor ---
+/dev/block/dm-97  219G  184G   36G  84% /
+/data/data/com.termux/files/usr/tmp  219G  184G   36G  84% /tmp
+--- 6. TERRENO: salud de dpkg/apt (auditoria, sin cambios) ---
+audit_ok
+128
+--- 7. TERRENO: actualizando listas de paquetes (apt update, seguro) ---
+Get:13 http://ports.ubuntu.com/ubuntu-ports resolute-updates/universe arm64 Packages [473 kB]
+Fetched 2127 kB in 9s (245 kB/s)
+Reading package lists...
+--- 8. TERRENO: que hay ya instalado (resumen) ---
+1890
+/usr/sbin/synaptic
+/usr/bin/apt
+/usr/bin/snap
+VEREDICTO: INTEGRIDAD_Y_TERRENO_MEDIDOS — datos arriba; nada destructivo ejecutado (solo apt update de listas). Listos para instalar apps.
+=== MISION-A31 COMPLETE ===
 === EXIT=0 ===
