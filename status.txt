@@ -1,4 +1,4 @@
 loop: v4 (pid 28572)
-ts: 2026-11-16T21:46:23Z
-estado: idle
-mision: esperando comandos
+ts: 2026-11-16T21:48:45Z
+estado: corriendo
+mision: MISION-PING
