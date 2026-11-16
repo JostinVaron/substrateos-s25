@@ -1,0 +1,1 @@
+canal del bridge migrado a substrateos-s25 — esperando el reporte de la mision A27 (auto-migracion)
