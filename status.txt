@@ -1,0 +1,4 @@
+loop: (pendiente de migrar)
+ts: 2026-11-16T21:40:00Z
+estado: migrando
+mision: A27 en camino
