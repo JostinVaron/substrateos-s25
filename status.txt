@@ -1,4 +1,4 @@
-loop: (pendiente de migrar)
-ts: 2026-11-16T21:40:00Z
-estado: migrando
-mision: A27 en camino
+loop: v4 (pid 28572)
+ts: 2026-11-16T21:46:16Z
+estado: idle
+mision: esperando comandos
