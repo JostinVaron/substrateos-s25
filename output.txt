@@ -1,29 +1,35 @@
-=== BRIDGE RUN 2026-11-16T22:03:26Z (v4) ===
-=== MISION-A29-CALC — abrir la Calculadora en tu Ubuntu 2026-11-16T22:03:26Z ===
---- 0. precondiciones ---
-X :0 viva?
-X_OK
-sesion viva (pid shell): 3714
-bus de sesion: unix:path=/tmp/dbus-5OM6CBNLuL,guid=53b9528a700ec2e23f8a7ab96afb71b5
+=== BRIDGE RUN 2026-11-16T22:06:47Z (v4) ===
+=== MISION-A29-R2 — Calculadora con login proot persistente 2026-11-16T22:06:47Z ===
+--- 0. causa raiz de R1 ---
+proot usa --kill-on-exit: la calc lanzada como hija de un login efimero murio al salir el bash -c. R2 usa login persistente (setsid) con la calc en exec.
 --- 1. ventanas antes ---
---- 2. lanzando gnome-calculator (receta GTK4 segura del repo) ---
-calc_pid=24977
---- 3. verificacion: proceso + ventana ---
-pgrep: pattern that searches for process name longer than 15 characters will result in zero matches
-Try `pgrep -f' option to match against the complete command line.
-ventanas:
-VENTANA_CALC_NO_VISTA
---- 4. captura con colores (evidencia de UI pintada) ---
-colores=143908
---- 5. cerrando la Calculadora limpio (xdotool) ---
-ventana no encontrada por nombre; cerrando por pid exacto
-pgrep: pattern that searches for process name longer than 15 characters will result in zero matches
-Try `pgrep -f' option to match against the complete command line.
-pgrep: pattern that searches for process name longer than 15 characters will result in zero matches
-Try `pgrep -f' option to match against the complete command line.
-CALC_CERRADA_OK
---- 6. el shell sobrevivio? ---
+--- 2. lanzando login PERSISTENTE con la calc en foreground ---
+login_persistente_pid=29807
+--- 3. esperando ventana (max 30 s, xdotool/wmctrl) ---
+ventana detectada a los ~2 s
+--- 4. verificacion con instrumentos corregidos ---
+todas las ventanas (wmctrl -l):
+0x00c00004  0 localhost Calculator
+VENTANA_CALC_ID=12582914
+titulo: gnome-calculator
+Window 12582914
+  Position: 0,0 (screen: 0)
+  Geometry: 1x1
+VENTANA_ACTIVADA_TRAER_AL_FRENTE
+--- 5. log de la calc (si fallo, el por que esta aqui) ---
+MESA-EGL: warning: DRI3 error: Could not get DRI3 device
+MESA-EGL: warning: Ensure your X server supports DRI3 to get accelerated rendering
+
+(gnome-calculator:29813): Adwaita-WARNING **: 22:06:50.580: The resource style-dark.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
+
+(gnome-calculator:29813): Adwaita-WARNING **: 22:06:50.581: The resource style-hc.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
+
+(gnome-calculator:29813): IBUS-WARNING **: 22:06:51.033: Unable to connect to ibus: Could not connect: No such file or directory
+--- 6. captura de evidencia ---
+colores=139181
+--- 7. el shell sobrevivio? ---
 SHELL_VIVO
-VEREDICTO: CALC_CONTROL_OK — abriste, viste y cerraste una app GTK4 en la sesion viva; el shell sobrevivio. Control del Ubuntu demostrado sin dano.
-=== MISION-A29-CALC COMPLETE ===
+VEREDICTO: CALC_ABIERTA_EN_PANTALLA — la Calculadora queda ABIERTA para verificacion visual humana. NO se declara exito total hasta que el dueno confirme verla.
+para cerrarla despues: proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'DISPLAY=:0 xdotool search --class calc windowclose'
+=== MISION-A29-R2 COMPLETE ===
 === EXIT=0 ===
