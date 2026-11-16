@@ -1,23 +1,37 @@
-=== BRIDGE RUN 2026-11-16T23:17:51Z (v4) ===
-=== MISION-A43-VSCODE-GUARDIAN-OFF — apagar el guardian que reabre VS Code 2026-11-16T23:17:51Z ===
---- 1. localizar guardian (verificar identidad antes de matar) ---
-guardian_pids=26788 26797 
-  PID COMMAND
-26788 /data/data/com.termux/files/usr/bin/proot --kill-on-exit --link2symlink --sysvipc --
-26797 bash /tmp/vskeep.sh
---- 2. matar guardian PRIMERO (para que no reanime) ---
-guardian_pid_26788 terminado
-guardian_pid_26797 terminado
-GUARDIAN_MUERTO_CONFIRMADO
---- 3. cerrar ventana de VS Code de forma limpia (xdotool, nunca pkill -f) ---
---- 4. procesos code restantes (pids exactos verificados) ---
-code_pids=
-CODE_LIMPIO
---- 5. verificacion final (nada resucita) ---
-0x02000005  0 localhost Resources
-GUARDIO_SIGUE_MUERTO_TRAS_10s
+=== BRIDGE RUN 2026-11-16T23:24:26Z (v4) ===
+=== MISION-A44-RAM-PURGE — purgar solo residuos mios, escritorio intacto 2026-11-16T23:24:26Z ===
+--- 1. RAM antes ---
                total        used        free      shared  buff/cache   available
-Mem:            10Gi       7.3Gi       1.4Gi        96Mi       2.5Gi       3.6Gi
-VEREDICTO: guardian apagado para siempre. VS Code ya NO se reabre solo; se lanza unicamente cuando el usuario lo abra (icono del dock ya parchado con wrapper seguro).
-=== MISION-A43-VSCODE-GUARDIAN-OFF COMPLETE ===
+Mem:            10Gi       7.7Gi       835Mi        95Mi       2.5Gi       3.2Gi
+--- 2. top 8 consumidores dentro del proot (RSS) ---
+USER 0MB COMMAND 
+aid_u0_+ 151MB gnome-shell 
+aid_u0_+ 102MB zenity --info --title=ArtCraft Launcher --text=ArtCraft aun no esta instalado.\n\nColoca el ins
+aid_u0_+ 97MB /data/data/com.termux/files/usr/libexec/opencode/opencode.bin serve --service 
+aid_u0_+ 69MB com.termux 
+aid_u0_+ 61MB termux-x11 com.termux.x11 :0 
+aid_u0_+ 50MB /usr/bin/resources 
+aid_u0_+ 23MB python3 server.py 
+aid_u0_+ 9MB ollama serve 
+--- 3. residuo: firefox de los tests (cierre gracil via xdotool) ---
+firefox_ya_no_esta_abierto
+--- 4. residuos: glxgears/calc/weston (pids exactos); code solo si es huerfano sin ventana ---
+guardian_sigue_muerto_ok
+--- 5. caches de apt ---
+7.5K	/var/cache/apt/archives
+apt_cache_limpiado
+autoremove_exit=0
+Processing triggers for shared-mime-info (2.4-5build3) ...
+Processing triggers for fontconfig (2.17.1-3ubuntu1) ...
+--- 6. drop_caches (puede no aplicar en proot) ---
+/tmp/purge.sh: line 33: /proc/sys/vm/drop_caches: Permission denied
+drop_no_permitido_en_proot
+--- 7. RAM despues ---
+               total        used        free      shared  buff/cache   available
+Mem:            10Gi       7.8Gi       1.1Gi       102Mi       2.3Gi       3.0Gi
+--- 8. consumidor mas pesado restante (tu escritorio, se espera) ---
+aid_u0_+  3714  8.5  1.3 6847232 151864 ?      Sl    2023  11:19 gnome-shell
+FIN_INNER
+VEREDICTO: purga de residuos de misiones aplicada. Escritorio y sesion NO tocados. Ver RAM antes/despues arriba. Si el telefono sigue apretado, la presion principal esta en el lado Android (multitarea WTM + tablet), fuera del alcance del proot.
+=== MISION-A44-RAM-PURGE COMPLETE ===
 === EXIT=0 ===
