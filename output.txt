@@ -1,62 +1,79 @@
-=== BRIDGE RUN 2026-11-16T23:39:15Z (v4) ===
-=== MISION-A46-ARTCRAFT-INSTALL — launcher OFICIAL aarch64, el correcto 2026-11-16T23:39:15Z ===
---- 1. descubrir assets reales del release v0.19.2 via API (sin inventar) ---
-assets_encontrados:
-"artcraft-launcher-0.19.2-linux-aarch64.AppImage"
-"artcraft-launcher-0.19.2-linux-aarch64.AppImage.asc"
-"artcraft-launcher-0.19.2-linux-aarch64.AppImage.zsync"
-"artcraft-launcher-0.19.2-linux-aarch64.AppImage.zsync.asc"
-"artcraft-launcher-0.19.2-linux-aarch64.deb"
-"artcraft-launcher-0.19.2-linux-aarch64.deb.asc"
-"artcraft-launcher-0.19.2-linux-aarch64.flatpak"
-"artcraft-launcher-0.19.2-linux-aarch64.flatpak.asc"
-"artcraft-launcher-0.19.2-linux-aarch64.rpm"
-"artcraft-launcher-0.19.2-linux-aarch64.rpm.asc"
-"artcraft-launcher-0.19.2-linux-riscv64.deb"
-"artcraft-launcher-0.19.2-linux-riscv64.deb.asc"
-"artcraft-launcher-0.19.2-linux-riscv64.rpm"
-"artcraft-launcher-0.19.2-linux-riscv64.rpm.asc"
-"artcraft-launcher-0.19.2-linux-x86_64.AppImage"
-"artcraft-launcher-0.19.2-linux-x86_64.AppImage.asc"
-"artcraft-launcher-0.19.2-linux-x86_64.AppImage.zsync"
-"artcraft-launcher-0.19.2-linux-x86_64.AppImage.zsync.asc"
-"artcraft-launcher-0.19.2-linux-x86_64.deb"
-"artcraft-launcher-0.19.2-linux-x86_64.deb.asc"
-deb_aarch64=https://github.com/storytold/craft-launcher/releases/download/v0.19.2/artcraft-launcher-0.19.2-linux-aarch64.deb
-appimage_aarch64=https://github.com/storytold/craft-launcher/releases/download/v0.19.2/artcraft-launcher-0.19.2-linux-aarch64.AppImage
---- 2. descargar .deb aarch64 oficial ---
-  % Total    % Received % Xferd  Average Speed  Time    Time    Time   Current
-                                 Dload  Upload  Total   Spent   Left   Speed
-  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0                              0  0      0   0      0   0      0      0      0                              0
-  0      0   0      0   0      0      0      0                              0100 12.98M 100 12.98M   0      0  9.69M      0   00:01   00:01              0100 12.98M 100 12.98M   0      0  9.68M      0   00:01   00:01              0100 12.98M 100 12.98M   0      0  9.68M      0   00:01   00:01              0
-descarga_ok bytes=13614746
---- 3. instalar (apt resuelve dependencias) ---
-install_exit=0
-Processing triggers for gnome-menus (3.38.1-1ubuntu1) ...
-Processing triggers for bamfdaemon (0.5.6+22.04.20220217-0ubuntu6) ...
-Rebuilding /usr/share/applications/bamf-2.index...
---- 4. binario oficial presente? ---
-/usr/local/bin/artcraft-launcher
-artcraft-launcher 0.19.2
---- 5. colision: renombrar MI script, no tapar al oficial ---
-mi_script_renombrado_a_artcraft-helper
---- 6. repuntar icono del dock al launcher OFICIAL con GPU wrapper ---
-Exec=substrate-gpu-run artcraft-launcher
---- 7. prueba GUI: lanzar, esperar ventana, capturar, CERRAR LIMPIO (sin residuos) ---
-ventana_a_los_2s id=0x00c00002 nombre='ArtCraft Launcher'
-colores=61619
+=== BRIDGE RUN 2026-11-16T23:47:37Z (v4) ===
+=== MISION-A47-ARTCRAFT-CRASH-DIAG — por que crashea el catalogo 2026-11-16T23:47:37Z ===
+--- 1. log oficial del launcher (crash previo del usuario) ---
+-rw-------+ 1 root root  216 Nov 16 23:46 artcraft-launcher.1.log
+-rw-------+ 1 root root 3423 Nov 16 23:46 artcraft-launcher.2.log
+-rw-------+ 1 root root 1894 Nov 16 23:46 artcraft-launcher.log
+== ultimas 25 lineas de /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log ==
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
+== lineas con panic/error/fatal/warn en todo el log ==
+--- 2. reproducir: lanzar con GPU (como el dock) y vigilar 90 s ---
+pid=16307
+...vivo a los 20s, ventanas: 1
+...vivo a los 40s, ventanas: 1
+...vivo a los 60s, ventanas: 1
+...vivo a los 80s, ventanas: 1
+SOBREVIVIO_90s (sin crash en esta pasada)
+--- 3. log de la GUI de esta pasada ---
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
+--- 4. diagnostico A/B: mismo launcher con render SOFTWARE (si el GL es el asesino, este sobrevive) ---
+...software vivo a los 20s
+...software vivo a los 40s
+...software vivo a los 60s
+...software vivo a los 80s
+SOBREVIVIO_SOFTWARE_90s
+senal: el problema es el GL/GPU path
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<Cleanup>
+--- 5. salud final ---
 SHELL_VIVO
-ventana_cerrada_limpia
-[2026-11-16T23:39:35Z INFO  artcraft_launcher] ArtCraft Launcher 0.19.2, log file /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log
-MESA-LOADER: failed to retrieve device information
-[2026-11-16T23:39:35Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:39:35Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:39:35Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:39:36Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:39:36Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:39:36Z DEBUG ureq_proto::client] Call<Prepare>
-SIN_RESIDUOS
+               total        used        free      shared  buff/cache   available
+Mem:            10Gi       7.5Gi       2.2Gi        92Mi       1.5Gi       3.4Gi
 FIN_INNER
-VEREDICTO: ver arriba. Si install_ok y ventana detectada: launcher oficial instalado; el usuario lo abre desde el dock cuando quiera (vive dentro de su sesion GNOME). Si SIN_ASSET: no se invento nada, reportar.
-=== MISION-A46-ARTCRAFT-INSTALL COMPLETE ===
+VEREDICTO: el porque real del crash esta arriba (exit code + log + resultado A/B GPU-vs-software). Con eso se elige la cura: flags al wrapper o icono de dock, NO a ciegas.
+=== MISION-A47-ARTCRAFT-CRASH-DIAG COMPLETE ===
 === EXIT=0 ===
