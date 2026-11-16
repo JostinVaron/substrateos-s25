@@ -1,33 +1,25 @@
-=== BRIDGE RUN 2026-11-16T22:42:22Z (v4) ===
-=== MISION-A36-VSCODE — limpiar trampa + instalar VS Code completo 2026-11-16T22:42:22Z ===
---- 1. TRAMPA firefox: simulacion de borrado (nunca a ciegas) ---
-  -firefox
-paquetes_a_remover=1 criticos=0
-TRAMPA_ELIMINADA
-firefox_ii_restantes=0
---- 2. repo oficial Microsoft (clave GPG + sources arm64) ---
-gpg_size=640
-update_exit=0
-code:
-  Installed: (none)
-  Candidate: 1.146.0-1794340783
-  Version table:
---- 3. instalando code ---
-install_exit=0
-Processing triggers for desktop-file-utils (0.28-1build1) ...
-Processing triggers for gnome-menus (3.38.1-1ubuntu1) ...
-Processing triggers for man-db (2.13.1-1build1) ...
-Processing triggers for shared-mime-info (2.4-5build3) ...
-VERSION:
+=== BRIDGE RUN 2026-11-16T22:53:37Z (v4) ===
+=== MISION-A37-VSCODE-FIX — diagnosticar, CURAR y abrir VS Code en vivo 2026-11-16T22:53:37Z ===
+--- 1a. reproducir el fallo del dock: code como root sin flags ---
 You are trying to start Visual Studio Code as a super user which isn't recommended. If this was intended, please add the argument `--no-sandbox` and specify an alternate user data directory using the `--user-data-dir` argument.
---- 4. lanzador proot-safe (directiva del repo) ---
-LANZADOR_OK (vscode-proot.desktop con flags proot)
---- 5. salud final ---
-audit_ok
-/dev/block/dm-97  219G  185G   35G  85% /
-               total        used        free      shared  buff/cache   available
-Mem:            10Gi       7.7Gi       787Mi       111Mi       2.8Gi       3.2Gi
-FIN_INNER
-VEREDICTO: ver arriba — trampa evaluada/eliminada sin colateral y VS Code arm64 oficial instalado con lanzador proot-safe. Proximo: abrirlo en la sesion viva y login GitHub para funciones agenticas (Copilot).
-=== MISION-A36-VSCODE COMPLETE ===
+--- 1b. la cura: flags completos que Electron exige a root en proot ---
+version_con_cura=arm64
+--- 1c. wrapper permanente /usr/local/bin/vscode-proot ---
+wrapper_creado
+--- 1d. parchar el icono del dock (code.desktop del paquete, respaldo previo) ---
+code.desktop NO ENCONTRADO
+--- 1e. limpieza de residuos de tests (pids exactos, nunca pkill -f) ---
+residuos_restantes=glx:0 calc:0
+FIN_FIX
+--- 2. lanzamiento en sesion viva (login persistente, patron Calculadora) ---
+login_persistente_pid=11712
+--- 3. esperando ventana (max 60 s; Electron tarda en primer arranque) ---
+--- 4. verificacion (instrumentos, no promesas) ---
+ventanas:
+0x00c00016  0 localhost Fancy Pants Adventure | Works On Mobile | Play At Friv® 🕹️ — Mozilla Firefox
+colores=105401
+SHELL_VIVO
+--- 5. log de arranque (si algo fallo, el porque esta aqui) ---
+VEREDICTO: VSCODE_NO_ARRANCO — leer seccion 5, no especular.
+=== MISION-A37-VSCODE-FIX COMPLETE ===
 === EXIT=0 ===
