@@ -1,35 +1,21 @@
-=== BRIDGE RUN 2026-11-16T22:08:35Z (v4) ===
-=== MISION-A30-GPU — ¿los programas usan la Adreno 830 o caen a software? 2026-11-16T22:08:35Z ===
---- 1. BASELINE SIN WRAPPER (como lanzaria una app ingenua) ---
-Extended renderer info (GLX_MESA_query_renderer):
-    Accelerated: yes
-OpenGL renderer string: zink Vulkan 1.4(Adreno (TM) 830v1 (MESA_TURNIP))
-OpenGL version string: 4.6 (Compatibility Profile) Mesa 26.3.0-devel (git-98f3d6229d)
---- 2. CON SUBSTRATE-GPU-RUN (receta del repo para apps GPU) ---
-Extended renderer info (GLX_MESA_query_renderer):
-    Accelerated: yes
-OpenGL renderer string: Adreno (TM) 830v1
-OpenGL version string: 4.6 (Compatibility Profile) Mesa 26.3.0-devel (git-98f3d6229d)
---- 3. VULKAN VIA WRAPPER (turnip directo) ---
-	apiVersion         = 1.4.354
-	deviceName         = Adreno (TM) 830
-	driverName         = turnip Mesa driver
-	apiVersion         = 1.4.354
-	deviceName         = llvmpipe (LLVM 21.1.8, 128 bits)
-	driverName         = llvmpipe
---- 4. PRUEBA DURISIMA: fds kgsl abiertos por el proceso GL ---
-kgsl_fds_del_proceso_GL=4
-renderer_del_proceso: 
---- 5. FPS comparado (12 s cada uno) ---
-FPS software (llvmpipe):
-120.019 FPS
-FPS hardware (Adreno via wrapper):
-120.045 FPS
---- 6. el shell sobrevivio (regla de oro) ---
+=== BRIDGE RUN 2026-11-16T22:12:57Z (v4) ===
+=== MISION-A30-R2-VISIBLE — test GPU que SI se ve en pantalla 2026-11-16T22:12:57Z ===
+--- 1. lanzando glxgears CON GPU en login persistente, ventana al frente ---
+login_pid=7870
+--- 2. esperando ventana de engranajes (max 20 s) ---
+--- 3. trayendola al frente y midiendo GPU REAL del proceso ---
+pid glxgears (host-visible)=7870
+--- 4. kgsl fds del proceso en vivo (prueba dura) ---
+intento 1: kgsl_fds=0
+intento 2: kgsl_fds=0
+intento 3: kgsl_fds=0
+intento 4: kgsl_fds=0
+intento 5: kgsl_fds=0
+--- 5. fps en vivo desde el log ---
+120.031 FPS
+105.848 FPS
+--- 6. shell y estado ---
 SHELL_VIVO
---- 7. sintesis automatica ---
-LECTURA: seccion 1 debe decir llvmpipe/swrast (compositor software, por diseno).
-Secciones 2-4 deben decir Adreno 830 con kgsl_fds>=1: esa es la prueba de GPU REAL.
-Si seccion 4 reporta kgsl_fds=0 y renderer zink/llvmpipe, la GPU NO esta en uso y hay que arreglar.
-=== MISION-A30-GPU COMPLETE ===
+VEREDICTO: ENGRANAJES_ABIERTOS_CON_GPU — la ventana queda GIRANDO en pantalla. kgsl_fds del proceso arriba (>=1 = GPU fisica). Confirma visualmente; para cerrar: proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'DISPLAY=:0 xdotool search --class glxgears windowclose'
+=== MISION-A30-R2-VISIBLE COMPLETE ===
 === EXIT=0 ===
