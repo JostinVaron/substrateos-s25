@@ -1,0 +1,127 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# gnome49-stop - Detiene la sesion GNOME Shell 49 X11 (deja el servidor X vivo).
+# Kills SOLO por PID exacto / cmdline anclado. Nunca pkill -f.
+set -u
+RT="$PREFIX/tmp/rt-dex"
+say() { printf '%s\n' "$*"; }
+
+# Nunca matar al shell que invoca este script, a sus ancestros ni a la
+# infraestructura de Termux/OpenCode/SSH/tmux.
+SELF=$$
+SELF_PGID=$(ps -o pgid= -p $$ 2>/dev/null | tr -d ' ')
+is_protected() {
+  local p=$1 cur i=0 pg c
+  [ "$p" = "$SELF" ] && return 0
+  [ "$p" = "$PPID" ] && return 0
+  cur=$p
+  while [ "${cur:-0}" -gt 1 ] && [ "$i" -lt 25 ]; do
+    [ "$cur" = "$PPID" ] && return 0
+    cur=$(ps -o ppid= -p "$cur" 2>/dev/null | tr -d ' ')
+    cur=${cur:-0}
+    case "$cur" in ''|*[!0-9]*) cur=0 ;; esac
+    i=$((i+1))
+  done
+  pg=$(ps -o pgid= -p "$p" 2>/dev/null | tr -d ' ')
+  [ -n "$pg" ] && [ "$pg" = "$SELF_PGID" ] && return 0
+  case "$(ps -o comm= -p "$p" 2>/dev/null)" in
+    com.termux|com.termux.api|com.termux.widget|termux-x11|sshd|tmux|runsvdir|runsv|svlogd)
+      return 0 ;;
+  esac
+  c=$(tr '\0' ' ' 2>/dev/null < "/proc/$p/cmdline" || true)
+  case "$c" in
+    *opencode*|*opencode.bin*|*libexec/opencode*)
+      return 0 ;;
+  esac
+  return 1
+}
+
+# 1) Helper polkitd (proot propio)
+if [ -f "$RT/polkitd-helper.pid" ]; then
+  hp=$(cat "$RT/polkitd-helper.pid" 2>/dev/null || true)
+  if [ -n "${hp:-}" ] && [ -d "/proc/$hp" ] && ! is_protected "$hp"; then
+    hc=$(tr '\0' ' ' 2>/dev/null < "/proc/$hp/cmdline" || true)
+    case "$hc" in *polkitd*) kill -9 "$hp" 2>/dev/null && say "[S] helper polkitd detenido ($hp)" ;; esac
+  fi
+fi
+
+# 2) Apps en proots propios (editor/xclock/glxgears)
+for p in $(ps -eo pid=,comm= | awk '$2=="proot"{print $1}'); do
+  is_protected "$p" && continue
+  cmd=$(tr '\0' ' ' 2>/dev/null < "/proc/$p/cmdline") || continue
+  case "$cmd" in
+    *ubuntu-gnome*gnome-text-editor*|*ubuntu-gnome*xclock*|*ubuntu-gnome*glxgears*)
+      kill -9 "$p" 2>/dev/null && say "[S] app proot detenido ($p)" ;;
+    *ubuntu-gnome*pipewire*|*ubuntu-gnome*wireplumber*|*exec\ pipewire*|*exec\ wireplumber*)
+      kill -9 "$p" 2>/dev/null && say "[S] proot de audio detenido ($p)" ;;
+  esac
+done
+
+# 2b) Proot padre de ESTA sesion (kill-on-exit limpia sus tracees)
+for p in $(ps -eo pid=,comm= 2>/dev/null | awk '$2=="proot"{print $1}'); do
+  is_protected "$p" && continue
+  cmd=$(tr '\0' ' ' 2>/dev/null < "/proc/$p/cmdline") || continue
+  case "$cmd" in
+    *ubuntu-gnome*session49.sh*)
+      kill -9 "$p" 2>/dev/null && say "[S] proot de sesion detenido ($p)" ;;
+  esac
+done
+
+# 2c) Buses/helpers de ESTA sesion que hayan quedado reparentados a init.
+# Se comprueba XDG_RUNTIME_DIR para no tocar buses de Termux ni de otras apps.
+for q in /proc/[0-9]*; do
+  p=${q#/proc/}
+  [ "$p" = "$$" ] && continue
+  is_protected "$p" && continue
+  envf="$q/environ"
+  [ -r "$envf" ] || continue
+  tr '\0' '\n' 2>/dev/null < "$envf" | grep -qx 'XDG_RUNTIME_DIR=/tmp/rt-dex' || continue
+  cmd=$(tr '\0' ' ' 2>/dev/null < "$q/cmdline") || continue
+  case "$cmd" in
+    dbus-daemon*--nofork*--session*|dbus-daemon*at-spi*|\
+    dbus-run-session*|bash\ /tmp/rt-dex/session-inner.sh*|\
+    *gnome-control-center-global-shortcuts-provider*)
+      kill -9 "$p" 2>/dev/null && say "[S] bus/helper de sesion detenido ($p)"
+      ;;
+  esac
+done
+
+# 3) Grupo de procesos de session49.sh (si quedo visible)
+for p in $(ps -eo pid=,args= | awk '$2=="bash" && $3=="/tmp/rt-dex/session49.sh"{print $1}'); do
+  is_protected "$p" && continue
+  pg=$(ps -o pgid= -p "$p" 2>/dev/null | tr -d ' ')
+  [ -n "$pg" ] && [ "$pg" != "$SELF_PGID" ] && { kill -9 "-$pg" 2>/dev/null && say "[S] grupo $pg detenido"; }
+done
+
+# 4) Restos fuera del grupo (enumeracion /proc, patrones anclados)
+for q in /proc/[0-9]*; do
+  p=${q#/proc/}
+  [ "$p" = "$$" ] && continue
+  is_protected "$p" && continue
+  cmd=$(tr '\0' ' ' 2>/dev/null < "$q/cmdline") || continue
+  case "$cmd" in
+    # Solo los buses de ESTA sesion (no tocar dbus de Termux/otros).
+    dbus-daemon*--address=unix:path=/tmp/dbus-*|dbus-daemon*rt-dex*|\
+    dbus-run-session*rt-dex*|\
+    xdg-desktop-portal*|/usr/libexec/xdg-desktop-portal*|\
+    gvfsd*|/usr/libexec/gvfs*|at-spi*|/usr/libexec/at-spi*|\
+    ibus-daemon*|/usr/libexec/ibus-*|\
+    nautilus*|/usr/bin/nautilus*|/usr/local/bin/nautilus*|\
+    *org.gnome.NautilusPreviewer*|*ding.js*|*org.gnome.Shell.Notifications*|\
+    mutter-x11-frames*|*gnome-control-center-global-shortcuts-provider*|\
+    /usr/libexec/gsd-*|/usr/libexec/upowerd*|/usr/libexec/colord*|/usr/libexec/geoclue*|\
+    /usr/libexec/power-profiles-daemon*|/usr/libexec/evolution-*|\
+    /usr/lib/polkit-1/polkitd*|gnome-shell*|/usr/libexec/gnome-shell*|\
+    /usr/libexec/gnome-keyring-daemon*|gnome-keyring-daemon*|\
+    fake-login1.py*|python3\ /usr/local/share/substrate/fake-login1.py*|\
+      nm-stub.py*|python3\ /usr/local/share/substrate/nm-stub.py*|\
+    xclock*|gnome-text-editor*|gnome-calculator*|gnome-terminal*|glxgears*|\
+    *polkitd\ --no-debug*)
+      kill -9 "$p" 2>/dev/null && say "[S] resto detenido ($p)"
+      ;;
+  esac
+done
+
+# Limpieza de estado volatil de la sesion (logs y evidencia se conservan).
+rm -f "$RT"/*.pid "$RT/session-bus.addr" "$RT/bus" \
+      "$RT/system-bus49" "$RT/gnome-shell-disable-extensions" 2>/dev/null || true
+say "[S] Sesion GNOME 49 detenida. El servidor X (:0) sigue vivo."

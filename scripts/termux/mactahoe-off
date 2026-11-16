@@ -1,0 +1,24 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# mactahoe-off - vuelve a Yaru-dark y desactiva MacTahoe (reversible)
+set -u
+echo "[Mactahoe-off] restaurando Yaru-dark..."
+proot-distro login ubuntu-gnome --shared-tmp -- bash -c '
+export HOME=/home/dexuser
+dbus-run-session -- bash -c "
+  dconf write /org/gnome/desktop/interface/gtk-theme \"\\\"Yaru-dark\\\"\"
+  dconf write /org/gnome/desktop/interface/icon-theme \"\\\"Yaru-dark\\\"\"
+  dconf write /org/gnome/shell/enabled-extensions \"['snapd-search-provider@canonical.com']\"
+  dconf write /org/gnome/shell/extensions/user-theme/name \"\\\"\\\"\"
+  dconf write /org/gnome/desktop/background/picture-uri \"\\\"file:///usr/share/backgrounds/gnome/amber-l.jxl\\\"\"
+  dconf write /org/gnome/desktop/background/picture-uri-dark \"\\\"file:///usr/share/backgrounds/gnome/amber-d.jxl\\\"\"
+  dconf write /org/gnome/shell/extensions/dash-to-dock/dock-position \"\\\"LEFT\\\"\"
+  dconf write /org/gnome/shell/extensions/dash-to-dock/extend-height true
+  dconf write /org/gnome/shell/extensions/dash-to-dock/apply-custom-theme false
+"
+echo "  dconf restaurado"
+# quitar override de libadwaita
+rm -rf /home/dexuser/.config/gtk-4.0/{gtk.css,gtk-dark.css,gtk-Light.css,gtk-Dark.css,assets,windows-assets}
+echo "  gtk-4.0 override eliminado"
+'
+echo "[Mactahoe-off] Hecho. Reinicia la sesion: gnome49 --restart"
+echo "[Mactahoe-on] Para volver a MacTahoe: ejecuta de nuevo los dconf de activacion"

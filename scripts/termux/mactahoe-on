@@ -1,0 +1,33 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# mactahoe-on - re-activa MacTahoe (tras un mactahoe-off)
+set -u
+echo "[Mactahoe-on] activando MacTahoe..."
+proot-distro login ubuntu-gnome --shared-tmp -- bash -c '
+export HOME=/home/dexuser
+dbus-run-session -- bash -c "
+  dconf write /org/gnome/desktop/interface/gtk-theme \"\\\"MacTahoe-Dark\\\"\"
+  dconf write /org/gnome/desktop/interface/icon-theme \"\\\"MacTahoe-dark\\\"\"
+  dconf write /org/gnome/shell/enabled-extensions \"['user-theme@gnome-shell-extensions.gcampax.github.com', 'snapd-search-provider@canonical.com']\"
+  dconf write /org/gnome/shell/extensions/user-theme/name \"\\\"MacTahoe-Dark\\\"\"
+  dconf write /org/gnome/desktop/background/picture-uri \"\\\"file:///home/dexuser/.local/share/backgrounds/MacTahoe-day.jpeg\\\"\"
+  dconf write /org/gnome/desktop/background/picture-uri-dark \"\\\"file:///home/dexuser/.local/share/backgrounds/MacTahoe-night.jpeg\\\"\"
+  dconf write /org/gnome/shell/extensions/dash-to-dock/dock-position \"\\\"BOTTOM\\\"\"
+  dconf write /org/gnome/shell/extensions/dash-to-dock/extend-height false
+  dconf write /org/gnome/shell/extensions/dash-to-dock/apply-custom-theme true
+"
+# re-crear override libadwaita (recompilar)
+SRC=/tmp/rt-dex/MacTahoe-gtk-theme/src
+DEST=/home/dexuser/.config/gtk-4.0
+if [ -d "$SRC" ]; then
+  sassc "$SRC/main/gtk-4.0/gtk-Light.scss" "$DEST/gtk-Light.css"
+  sassc "$SRC/main/gtk-4.0/gtk-Dark.scss" "$DEST/gtk-Dark.css"
+  ln -sf "$DEST/gtk-Dark.css" "$DEST/gtk.css"
+  ln -sf "$DEST/gtk-Dark.css" "$DEST/gtk-dark.css"
+  cp -r "$SRC/assets/gtk/common-assets/assets" "$DEST/"
+  cp -r "$SRC/assets/gtk/scalable" "$DEST/assets"
+  echo "  gtk-4.0 override re-creado"
+else
+  echo "  AVISO: fuente no encontrada; el override gtk-4.0 no se re-crea"
+fi
+'
+echo "[Mactahoe-on] Hecho. Reinicia: gnome49 --restart"

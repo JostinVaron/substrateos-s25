@@ -1,0 +1,14 @@
+#!/bin/bash
+# substrate-gpu-run - lanza una app con Mesa freedreno/kgsl (hardware).
+# Uso: substrate-gpu-run blender
+set -u
+export DISPLAY="${DISPLAY:-:0}"
+export HOME=/home/dexuser
+export USER=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex
+if [ -f /tmp/rt-dex/session-bus.addr ]; then
+  export DBUS_SESSION_BUS_ADDRESS="$(cat /tmp/rt-dex/session-bus.addr)"
+fi
+. /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null || true
+unset LIBGL_ALWAYS_SOFTWARE
+exec "$@"

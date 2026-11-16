@@ -1,0 +1,300 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# gnome49 - Abre/verifica la sesion GNOME Shell 49 X11 (Ubuntu 26.04 en proot)
+# Uso:
+#   gnome49           -> arranca si hace falta (idempotente) y verifica que la UI este viva
+#   gnome49 --restart -> reinicia la sesion desde cero
+#   gnome49 status    -> solo muestra el estado (no arranca nada)
+# Requisitos: Termux:X11 (la app se intenta abrir sola), proot-distro ubuntu-gnome.
+set -u
+RT="$PREFIX/tmp/rt-dex"
+BK="$HOME/.local/share/substrate/rt-dex"
+DISP=":0"
+RESTART=0
+STATUS=0
+
+case "${1:-}" in
+  "")                    ;;
+  --restart)             RESTART=1 ;;
+  status|--status)       STATUS=1 ;;
+  -h|--help)
+    printf '%s\n' \
+      "Uso: gnome49 [--restart|status]" \
+      "  (sin argumentos) arranca si hace falta" \
+      "  --restart        reinicia la sesion desde cero" \
+      "  status           solo muestra el estado"
+    exit 0 ;;
+  *)
+    printf 'Opcion desconocida: %s\nUso: gnome49 [--restart|status]\n' "$1" >&2
+    exit 2 ;;
+esac
+
+# /tmp se borra cuando Termux reinicia: restaurar scripts desde el respaldo persistente.
+mkdir -p "$RT"
+_had_scripts=1
+[ -f "$RT/restart49.sh" ] || _had_scripts=0
+[ -d "$BK" ] && cp -an "$BK"/. "$RT"/ 2>/dev/null || true
+if [ "$_had_scripts" = 0 ] && [ -f "$RT/restart49.sh" ]; then
+  printf '[S] Scripts de sesion restaurados desde %s\n' "$BK"
+fi
+if [ ! -f "$RT/restart49.sh" ]; then
+  printf '[S] ERROR: faltan scripts de sesion en %s y no hay respaldo en %s\n' "$RT" "$BK"
+  exit 1
+fi
+
+say() { printf '%s\n' "$*"; }
+
+pid_by_prefix() { # $1 = prefijo exacto del cmdline (case pattern)
+  for q in /proc/[0-9]*; do
+    c=$(tr '\0' ' ' 2>/dev/null < "$q/cmdline") || continue
+    case "$c" in "$1"*) echo "${q#/proc/}"; return 0;; esac
+  done
+  return 1
+}
+
+x_ok() {
+  proot-distro login ubuntu-gnome --shared-tmp -- \
+    bash -c "DISPLAY=$DISP timeout 4 xdpyinfo >/dev/null 2>&1"
+}
+
+x_dims() {
+  proot-distro login ubuntu-gnome --shared-tmp -- \
+    bash -c "DISPLAY=$DISP timeout 4 xdpyinfo 2>/dev/null | awk '/dimensions:/{print \$2; exit}'" 2>/dev/null
+}
+
+# Termux:X11 puede redimensionar la pantalla justo despues de conectar. Un
+# gnome-shell arrancando mientras cambia la resolucion puede morir. Esperamos
+# a que las dimensiones se repitan antes de lanzar la sesion.
+wait_x_stable() {
+  local a b i
+  a=$(x_dims)
+  [ -n "$a" ] || return 1
+  for i in 1 2 3 4 5; do
+    sleep 2
+    b=$(x_dims)
+    if [ -n "$b" ] && [ "$a" = "$b" ]; then return 0; fi
+    a=$b
+  done
+  return 1
+}
+
+ensure_x() {
+  if x_ok; then say "[X] Servidor :0 OK"; return 0; fi
+
+  say "[X] :0 no responde. Abriendo Termux:X11..."
+  if command -v cmd >/dev/null 2>&1; then
+    cmp=$(cmd package resolve-activity --brief com.termux.x11 2>/dev/null | tail -1)
+    [ -n "$cmp" ] && am start -n "$cmp" >/dev/null 2>&1
+  fi
+  if ! pid_by_prefix "termux-x11" >/dev/null; then
+    nohup termux-x11 "$DISP" >/dev/null 2>&1 &
+  fi
+  for _ in $(seq 1 15); do
+    sleep 1
+    x_ok && { say "[X] Servidor :0 OK"; return 0; }
+  done
+
+  say "[X] Sin respuesta: limpiando servidor atascado y reintentando..."
+  for p in $(pid_by_prefix "termux-x11"); do kill -9 "$p" 2>/dev/null; done
+  sleep 1
+  rm -f "$TMPDIR/.X11-unix/X0" 2>/dev/null || true
+  nohup termux-x11 "$DISP" >/dev/null 2>&1 &
+  for _ in $(seq 1 15); do
+    sleep 1
+    x_ok && { say "[X] Servidor :0 OK (reintento)"; return 0; }
+  done
+
+  say "[X] FALLO: abre la app Termux:X11 a mano y vuelve a ejecutar: gnome49"
+  return 1
+}
+
+# Devuelve el PID del gnome-shell de ESTA sesion. Si el pidfile quedo viejo,
+# lo reconstruye buscando un gnome-shell con XDG_RUNTIME_DIR=/tmp/rt-dex.
+session_pid() {
+  local p q c envf
+  p=$(cat "$RT/shell49.pid" 2>/dev/null || true)
+  if [ -n "$p" ] && [ -d "/proc/$p" ]; then
+    c=$(tr '\0' ' ' 2>/dev/null < "/proc/$p/cmdline" || true)
+    case "$c" in
+      gnome-shell|gnome-shell\ *) echo "$p"; return 0 ;;
+    esac
+  fi
+  for q in /proc/[0-9]*; do
+    c=$(tr '\0' ' ' 2>/dev/null < "$q/cmdline") || continue
+    case "$c" in gnome-shell|gnome-shell\ *) ;; *) continue ;; esac
+    envf="$q/environ"
+    [ -r "$envf" ] || continue
+    if tr '\0' '\n' < "$envf" 2>/dev/null | grep -qx 'XDG_RUNTIME_DIR=/tmp/rt-dex'; then
+      p=${q#/proc/}
+      echo "$p" > "$RT/shell49.pid" 2>/dev/null || true
+      echo "$p"
+      return 0
+    fi
+  done
+  return 1
+}
+
+session_alive() {
+  local p
+  p=$(session_pid) || return 1
+  [ -n "$p" ] && kill -0 "$p" 2>/dev/null
+}
+
+# El shell puede estar vivo pero sin ventana raiz de WM (pantalla en blanco/negra
+# con solo ventanas de apps). Esto verifica que _NET_SUPPORTING_WM_CHECK apunte
+# a una ventana valida de GNOME Shell.
+wm_ok() {
+  proot-distro login ubuntu-gnome --shared-tmp -- bash -c "
+    export DISPLAY=$DISP
+    id=\$(xprop -root -notype _NET_SUPPORTING_WM_CHECK 2>/dev/null | sed -n 's/.*# //p')
+    [ -n \"\$id\" ] || exit 1
+    xprop -id \"\$id\" -notype _NET_WM_NAME WM_NAME 2>/dev/null | grep -qi 'gnome'
+  " >/dev/null 2>&1
+}
+
+# Numero de colores de la captura (evidencia de que la UI se pinto).
+ui_colors() {
+  proot-distro login ubuntu-gnome --shared-tmp -- bash -c "
+    export DISPLAY=$DISP
+    scrot -o /tmp/rt-dex/ready.png >/dev/null 2>&1 || exit 1
+    identify -format '%k' /tmp/rt-dex/ready.png 2>/dev/null
+  " 2>/dev/null | tr -dc '0-9'
+}
+
+# --- 0) modo status: solo lectura ---
+if [ "$STATUS" = 1 ]; then
+  if x_ok; then
+    say "[X] Servidor :0 OK"
+  else
+    say "[X] Servidor :0 NO responde"
+    exit 1
+  fi
+  p=$(session_pid) || p=""
+  if [ -n "$p" ] && kill -0 "$p" 2>/dev/null; then
+    say "[S] Sesion activa: gnome-shell pid=$p"
+    if wm_ok; then
+      say "[W] WM: GNOME Shell OK"
+    else
+      say "[W] WM: NO (shell sin UI; usa: gnome49 --restart)"
+    fi
+    kg=$(ls -l "/proc/$p/fd" 2>/dev/null | grep -c kgsl)
+    say "    kgsl_fds=$kg"
+    say "[V] Ventanas visibles:"
+    proot-distro login ubuntu-gnome --shared-tmp -- \
+      bash -c "DISPLAY=$DISP wmctrl -l 2>/dev/null" | sed 's/^/    /' || true
+  else
+    say "[S] Sesion no activa"
+    exit 1
+  fi
+  exit 0
+fi
+
+# --- 1) mantener vivo el dispositivo ---
+termux-wake-lock 2>/dev/null || true
+
+# --- 1b) mantener pantalla disponible (mejor esfuerzo via adb wireless) ---
+if command -v adb >/dev/null 2>&1; then
+  (
+    timeout 6 adb -s 127.0.0.1:5555 shell settings put system screen_off_timeout 2147483647 >/dev/null 2>&1
+    timeout 6 adb -s 127.0.0.1:5555 shell svc power stayon true >/dev/null 2>&1
+  ) &
+fi
+
+# --- 2) servidor X ---
+ensure_x || exit 1
+if ! wait_x_stable; then
+  say "[X] AVISO: la resolucion de :0 no se estabilizo; sigo con cuidado"
+fi
+
+# --- 3) sesion ---
+: > "$RT/last-gnome49.log"
+if [ "$RESTART" = 1 ]; then
+  say "[S] Reiniciando sesion desde cero..."
+  bash "$RT/restart49.sh" >> "$RT/last-gnome49.log" 2>&1
+elif session_alive; then
+  say "[S] Sesion ya activa (gnome-shell pid $(session_pid))"
+  if ! wm_ok; then
+    say "[S] AVISO: el shell esta vivo pero sin UI. Reiniciando..."
+    bash "$RT/restart49.sh" >> "$RT/last-gnome49.log" 2>&1
+  fi
+  taskset -apc 6-7 "$(session_pid)" >/dev/null 2>&1 || true
+else
+  say "[S] Arrancando GNOME Shell 49 X11 (~35 s)..."
+  bash "$RT/restart49.sh" >> "$RT/last-gnome49.log" 2>&1
+fi
+
+# --- 4) esperar shell ---
+for _ in $(seq 1 45); do session_alive && break; sleep 1; done
+
+p=$(session_pid) || p=""
+if [ -z "$p" ] || ! kill -0 "$p" 2>/dev/null; then
+  say "[S] ERROR: gnome-shell no arranco. Ultimas lineas:"
+  tail -12 "$RT/last-gnome49.log" 2>/dev/null
+  say "Logs: $RT/session49-launch.log  $RT/shell49.log"
+  exit 1
+fi
+
+# --- 4b) esperar a que el shell sea realmente el WM (no solo un proceso vivo) ---
+for _ in $(seq 1 30); do
+  wm_ok && break
+  session_alive || break
+  sleep 1
+done
+
+if ! session_alive; then
+  say "[S] ERROR: gnome-shell murio durante el arranque. Ultimas lineas:"
+  tail -15 "$RT/shell49.log" 2>/dev/null
+  say "Logs: $RT/session49-launch.log  $RT/shell49.log"
+  exit 1
+fi
+if ! wm_ok; then
+  say "[S] ERROR: gnome-shell vivo pero sin WM/UI. NO se declara exito."
+  say "    Revisa $RT/shell49.log y ejecuta: gnome49 --restart"
+  exit 1
+fi
+
+# --- 4c) esperar a que la UI se pinte de verdad (no solo proceso/WM vivos) ---
+_colors=""
+_visual=0
+for _ in $(seq 1 30); do
+  _colors=$(ui_colors)
+  case "$_colors" in ''|*[!0-9]*) _colors="" ;; esac
+  if [ -n "$_colors" ] && [ "$_colors" -ge 10 ]; then
+    _visual=1
+    break
+  fi
+  session_alive || break
+  sleep 1
+done
+
+if ! session_alive; then
+  say "[S] ERROR: gnome-shell murio mientras pintaba la UI."
+  tail -15 "$RT/shell49.log" 2>/dev/null
+  say "Logs: $RT/session49-launch.log  $RT/shell49.log"
+  exit 1
+fi
+if [ "$_visual" != 1 ]; then
+  say "[S] ERROR: el shell esta vivo pero no pinta la UI (colores=${_colors:-?})."
+  say "    Revisa $RT/ready.png y $RT/shell49.log; luego: gnome49 --restart"
+  exit 1
+fi
+
+# --- 5) estado final ---
+kg=0
+for _ in $(seq 1 20); do
+  kg=$(ls -l "/proc/$p/fd" 2>/dev/null | grep -c kgsl)
+  [ "$kg" -ge 1 ] && break
+  sleep 1
+done
+sw=$(grep -cE 'swrast|llvmpipe' "/proc/$p/maps" 2>/dev/null || true)
+[ "$kg" -ge 1 ] || say "[S] AVISO: GPU (kgsl) aun no inicializada; revisa $RT/shell49.log"
+pol=$(proot-distro login ubuntu-gnome --shared-tmp -- \
+  bash -c 'export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/rt-dex/system-bus49; timeout 5 gdbus call --system --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus --method org.freedesktop.DBus.GetNameOwner org.freedesktop.PolicyKit1' 2>/dev/null | tr -d '\n')
+say ""
+say "OK: GNOME Shell 49 X11 activo y con UI"
+say "    pid=$p  kgsl_fds=$kg  swrast=$sw  colores=${_colors:-?}"
+say "    polkitd=$pol"
+say ""
+say "Captura:  proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'DISPLAY=:0 scrot -o /tmp/rt-dex/captura.png'"
+say "Estado:   gnome49 status"
+say "Parar:    gnome49-stop"
+say "Reiniciar: gnome49 --restart"
