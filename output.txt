@@ -1,25 +1,26 @@
-=== BRIDGE RUN 2026-11-16T22:53:37Z (v4) ===
-=== MISION-A37-VSCODE-FIX — diagnosticar, CURAR y abrir VS Code en vivo 2026-11-16T22:53:37Z ===
---- 1a. reproducir el fallo del dock: code como root sin flags ---
-You are trying to start Visual Studio Code as a super user which isn't recommended. If this was intended, please add the argument `--no-sandbox` and specify an alternate user data directory using the `--user-data-dir` argument.
---- 1b. la cura: flags completos que Electron exige a root en proot ---
-version_con_cura=arm64
---- 1c. wrapper permanente /usr/local/bin/vscode-proot ---
-wrapper_creado
---- 1d. parchar el icono del dock (code.desktop del paquete, respaldo previo) ---
-code.desktop NO ENCONTRADO
---- 1e. limpieza de residuos de tests (pids exactos, nunca pkill -f) ---
-residuos_restantes=glx:0 calc:0
-FIN_FIX
---- 2. lanzamiento en sesion viva (login persistente, patron Calculadora) ---
-login_persistente_pid=11712
---- 3. esperando ventana (max 60 s; Electron tarda en primer arranque) ---
---- 4. verificacion (instrumentos, no promesas) ---
-ventanas:
-0x00c00016  0 localhost Fancy Pants Adventure | Works On Mobile | Play At Friv® 🕹️ — Mozilla Firefox
-colores=105401
+=== BRIDGE RUN 2026-11-16T22:55:29Z (v4) ===
+=== MISION-A38-VSCODE-DIAG — por que no arranco + parche al icono real 2026-11-16T22:55:29Z ===
+--- 1. ¿sobrevivio el intento de A37? (procesos electron/code vivos) ---
+--- 2. log completo del intento de A37 ---
+[contenido vscode-live.log]:
+[fin log; bytes=0]
+--- 3. donde vive REALMENTE el icono del dock ---
+/usr/share/applications/com.microsoft.VSCode.UrlHandler.desktop
+/usr/share/applications/com.microsoft.VSCode.desktop
+com.microsoft.VSCode.UrlHandler.desktop
+com.microsoft.VSCode.desktop
+--- 4. parchear todos los .desktop de code que existan (respaldo previo) ---
+parcheado: /usr/share/applications/com.microsoft.VSCode.UrlHandler.desktop
+Exec=/usr/share/code/code --open-url %U
+parcheado: /usr/share/applications/com.microsoft.VSCode.desktop
+Exec=/usr/share/code/code %F
+Exec=/usr/share/code/code --new-window %F
+FIN_DIAG_INNER
+--- 5. relanzamiento con paciencia (hasta 180 s) y deteccion case-insensitive ---
+login_persistente_pid=15278
+--- 6. verificacion final ---
 SHELL_VIVO
---- 5. log de arranque (si algo fallo, el porque esta aqui) ---
-VEREDICTO: VSCODE_NO_ARRANCO — leer seccion 5, no especular.
-=== MISION-A37-VSCODE-FIX COMPLETE ===
+--- 7. log del relanzamiento ---
+VEREDICTO: AUN_NO_ARRANCA — el porque esta en secciones 1-2 y 7; NO especular, leer.
+=== MISION-A38-VSCODE-DIAG COMPLETE ===
 === EXIT=0 ===
