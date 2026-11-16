@@ -1,16 +1,898 @@
-=== BRIDGE RUN 2026-11-16T21:55:39Z (v4) ===
-=== MISION-DEMO-STREAM — demostracion en tiempo real 2026-11-16T21:55:39Z ===
-observa: una linea nueva cada 2 segundos
-linea 1/10 — 16:55:39
-linea 2/10 — 16:55:41
-linea 3/10 — 16:55:43
-linea 4/10 — 16:55:45
-linea 5/10 — 16:55:47
-linea 6/10 — 16:55:49
-linea 7/10 — 16:55:51
-linea 8/10 — 16:55:53
-linea 9/10 — 16:55:55
-linea 10/10 — 16:55:57
-VEREDICTO: STREAM_OK — acabas de ver al bridge trabajando en vivo
-=== MISION-DEMO-STREAM COMPLETE ===
+=== BRIDGE RUN 2026-11-16T21:59:15Z (v4) ===
+=== MISION-A28-RECON — reconocimiento del Ubuntu (SOLO LECTURA) 2026-11-16T21:59:15Z ===
+--- 0. guardas ---
+REGLA: mision de solo lectura. Ningun apt, kill, write o config change sera ejecutado.
+--- A. identidad del sistema ---
+PRETTY_NAME="Ubuntu 26.04.1 LTS"
+NAME="Ubuntu"
+VERSION_ID="26.04"
+VERSION="26.04.1 LTS (Resolute Raccoon)"
+Linux localhost 6.17.0-PRoot-Distro #1 SMP PREEMPT_DYNAMIC Fri, 10 Oct 2025 00:00:00 +0000 aarch64 GNU/Linux
+uid=0(root) gid=0(root) groups=0(root),3003(aid_inet),9997(aid_everybody),20345(aid_u0_a345_cache),50345(aid_all_a345)
+--- B. version GNOME y paquetes clave ---
+GNOME Shell 49.0
+gnome-session-canberra 0.30-18ubuntu3
+gnome-session-flashback 1:3.58.0-6ubuntu1
+gnome-shell-extension-manager 0.6.5-1
+gnome-shell-extension-user-theme 49.0-1
+gnome-shell-extensions-common 49.0-1
+pipewire:arm64 1.6.2-1ubuntu1.2
+pipewire-alsa:arm64 1.6.2-1ubuntu1.2
+pipewire-audio 1.6.2-1ubuntu1.2
+pipewire-bin 1.6.2-1ubuntu1.2
+pipewire-pulse 1.6.2-1ubuntu1.2
+weston 14.0.2-5
+xwayland 2:24.1.10-1
+--- C. sesion viva? ---
+3714 gnome-shell
+weston: NO detectado
+Xwayland: NO detectado
+--- D. entorno del proceso vivo ---
+gnome-shell pid=3714 uptime:       46:54
+DBUS_SESSION_BUS_ADDRESS=unix:path=/tmp/dbus-5OM6CBNLuL,guid=53b9528a700ec2e23f8a7ab96afb71b5
+DISPLAY=:0
+LIBGL_ALWAYS_SOFTWARE=1
+LIBGL_DRI3_DISABLE=1
+MESA_LOADER_DRIVER_OVERRIDE=swrast
+MESA_VK_WSI_PRESENT_MODE=immediate
+XDG_CURRENT_DESKTOP=ubuntu:GNOME
+XDG_RUNTIME_DIR=/tmp/rt-dex
+XDG_SESSION_TYPE=x11
+--- E. GPU en uso ---
+Extended renderer info (GLX_MESA_query_renderer):
+    Accelerated: yes
+    Dedicated video memory: 8334 MB
+    Currently available dedicated video memory: 8329 MB
+OpenGL renderer string: zink Vulkan 1.4(Adreno (TM) 830v1 (MESA_TURNIP))
+OpenGL version string: 4.6 (Compatibility Profile) Mesa 26.3.0-devel (git-98f3d6229d)
+	apiVersion         = 1.4.354
+	deviceType         = PHYSICAL_DEVICE_TYPE_INTEGRATED_GPU
+	deviceName         = Adreno (TM) 830
+	driverName         = turnip Mesa driver
+	apiVersion         = 1.4.354
+	deviceType         = PHYSICAL_DEVICE_TYPE_CPU
+	deviceName         = llvmpipe (LLVM 21.1.8, 128 bits)
+	driverName         = llvmpipe
+card0
+renderD128
+RENDER_NODES_PRESENTE
+--- F. tema y extensiones (MacTahoe) ---
+'Yaru-dark'
+'Yaru'
+@as []
+--- G. launchers y scripts de control ---
+total 169
+drwxr-xr-x+  3 root root 3452 Nov 16 20:48 .
+drwxr-xr-x+ 11 root root 3452 Sep 27 10:29 ..
+drwxr-xr-x+  2 root root 3452 Nov 13 07:30 __pycache__
+-rw-r--r--+  1 root root 3355 Nov 13 04:57 analiza.py
+-rwxr-xr-x+  1 root root  522 Nov 13 17:00 applet-session.sh
+-rwxr-xr-x+  1 root root  209 Nov 13 17:00 applet-session.sh.bak-pregpu
+-rwx--x--x+  1 root root  910 Nov 13 21:11 escritorio-clasico.sh
+-rwxr-xr-x+  1 root root 6569 Nov 13 05:55 fake-logind.py
+-rwxr-xr-x+  1 root root 4746 Nov 13 04:55 fb-session7.sh
+-rwxr-xr-x+  1 root root 1211 Nov 13 20:58 gnome-moderno.sh
+-rwxr-xr-x+  1 root root 1798 Nov 13 20:39 gnome-moderno.sh.bak-a12
+-rwxr-xr-x+  1 root root 1779 Nov 13 20:58 gnome-moderno.sh.bak-a16
+-rwxr-xr-x+  1 root root  318 Nov 13 04:06 gnome-system-monitor
+-rwxr-xr-x+  1 root root  190 Nov 13 07:21 gparted-root.sh
+-rwxr-xr-x+  1 root root  294 Nov 13 04:06 nautilus
+-rwxr-xr-x+  1 root root  625 Nov 13 07:09 plank-relaunch.sh
+-rwxr-xr-x+  1 root root  806 Nov 13 17:00 resurrect.sh
+-rwxr-xr-x+  1 root root  468 Nov 13 17:00 resurrect.sh.bak-pregpu
+-rwxr-xr-x+  1 root root 6380 Nov 13 05:36 session10.sh
+-rwxr-xr-x+  1 root root 6703 Nov 13 05:44 session11.sh
+-rwxr-xr-x+  1 root root 8644 Nov 13 05:55 session12.sh
+-rwxr-xr-x+  1 root root 9967 Nov 13 06:38 session13.sh
+-rwxr-xr-x+  1 root root 6181 Nov 13 05:15 session8.sh
+-rwxr-xr-x+  1 root root 6327 Nov 13 05:24 session9.sh
+-rwxr-xr-x+  1 root root  111 Nov 13 06:38 settings-gnome.sh
+-rwxr-xr-x+  1 root root  983 Nov 13 07:21 shell-diag.sh
+-rwxr-xr-x+  1 root root  976 Nov 13 07:00 shell-full.sh
+-rwxr-xr-x+  1 root root 1311 Nov 13 07:10 shell-full2.sh
+-rwxr-xr-x+  1 root root  748 Nov 13 18:12 start-escritorio.sh
+-rw-r--r--+  1 root root 1937 Nov 13 07:30 substrate-applet.py
+-rwxr-xr-x+  1 root root  543 Nov 13 19:28 substrate-flashback.sh
+-rwxr-xr-x+  1 root root  449 Nov 16 20:48 substrate-gpu-run
+-rwxr-xr-x+  1 root root  191 Nov 13 07:21 synaptic-root.sh
+### CONTENIDO /usr/local/bin/applet-session.sh ###
+#!/bin/bash
+R=/tmp/rt-dex
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=$R DISPLAY=:0 LANG=es_ES.UTF-8
+# TRANSPLANTE GPU (receta medida del macos, FENIX5/FENIX6):
+export LIBGL_ALWAYS_SOFTWARE=0 GALLIUM_DRIVER=freedreno MESA_LOADER_DRIVER_OVERRIDE=kgsl
+export FD_FORCE_KGSL=1 LIBGL_DRI3_DISABLE=1 GALLIUM_THREAD=true LP_NUM_THREADS=8
+export MESA_GL_VERSION_OVERRIDE=4.3 MESA_GLSL_VERSION_OVERRIDE=430 GSK_RENDERER=gl
+python3 /usr/local/bin/substrate-applet.py >>"$R/applet3.log" 2>&1 &
+wait
+### CONTENIDO /usr/local/bin/escritorio-clasico.sh ###
+#!/bin/bash
+export DISPLAY=:0 HOME=/home/dexuser
+. /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null
+export XDG_RUNTIME_DIR=/tmp/rt-dex
+mkdir -p /tmp/rt-dex && chmod 700 /tmp/rt-dex
+if [ -n "\$(pgrep -x metacity)" ] || pgrep -x metacity >/dev/null 2>&1; then pkill -x metacity 2>/dev/null; sleep 1; fi
+pkill -x gnome-panel 2>/dev/null; pkill -x plank 2>/dev/null; pkill -x nm-applet 2>/dev/null; sleep 1
+nohup dbus-launch --exit-with-session > /tmp/rt-dex/dbus-env 2>/dev/null
+. /tmp/rt-dex/dbus-env 2>/dev/null
+nohup metacity --replace >/tmp/rt-dex/metacity.log 2>&1 &
+sleep 4
+nohup gnome-panel --replace >/tmp/rt-dex/panel.log 2>&1 &
+sleep 3
+nohup plank >/tmp/rt-dex/plank.log 2>&1 &
+sleep 2
+nohup nm-applet >/tmp/rt-dex/nm-applet.log 2>&1 &
+sleep 3
+echo "CLASICO: metacity=$(pgrep -x metacity | wc -l) panel=$(pgrep -x gnome-panel | wc -l) plank=$(pgrep -x plank | wc -l) nm-applet=$(pgrep -x nm-applet | wc -l)"
+### CONTENIDO /usr/local/bin/fb-session7.sh ###
+#!/bin/bash
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex LANG=es_ES.UTF-8
+R=/tmp/rt-dex
+S="$R/fb7status"; A="$R/apply7.log"; T="$R/fb7apps.log"; L="$R/fb7.log"
+: > "$S"; : > "$A"; : > "$T"
+D=""
+for D0 in :0 :1 :2; do xdpyinfo -display "$D0" >/dev/null 2>&1 && D="$D0" && break; done
+[ -n "$D" ] || { echo X_MUERTO >> "$S"; exit 1; }
+export DISPLAY="$D"
+echo "DISPLAY=$D SESION_USUARIO=$(whoami)" >> "$S"
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1 GTK_USE_PORTAL=0
+echo "== layout + BARRA NEGRA escritos ANTES de arrancar el panel:" >> "$S"
+dconf reset -f /org/gnome/gnome-panel/layout/ 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/toplevel-id-list "['top-panel']" 2>>"$A" && echo LAYOUT_TOP_OK >> "$S"
+dconf write /org/gnome/gnome-panel/layout/object-id-list "['menu-bar', 'clock', 'systray']" 2>>"$A" && echo LAYOUT_OBJ_OK >> "$S"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/applet-id "'menu-bar'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/module-id "'org.gnome.gnome-panel.menu'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/pack-type "'start'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/toplevel-id "'top-panel'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/applet-id "'clock'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/module-id "'org.gnome.gnome-panel.clock'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/pack-type "'center'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/toplevel-id "'top-panel'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/applet-id "'notification-area'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/module-id "'org.gnome.gnome-panel.notification-area'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/pack-type "'end'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/toplevel-id "'top-panel'" 2>>"$A"
+echo SYSTRAY_EN_LUGAR_DE_INDICADORES >> "$S"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/type "'color'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/color "'#000000'" 2>>"$A"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/opacity "1.0" 2>>"$A" && echo NEGRO_ANTES_DEL_PANEL_OK >> "$S"
+gsettings set org.gnome.desktop.interface gtk-theme "Yaru-dark" 2>>"$A" && echo TEMA_DARK_OK >> "$S"
+gsettings set org.gnome.desktop.interface icon-theme "Yaru" 2>>"$A"
+gsettings set org.gnome.desktop.interface cursor-theme "Yaru" 2>>"$A"
+gsettings set org.gnome.desktop.wm.preferences theme "Yaru-dark" 2>>"$A"
+WALL=/usr/share/backgrounds/warty-final-ubuntu.png
+[ -f "$WALL" ] || WALL=$(ls /usr/share/backgrounds/*.png 2>/dev/null | head -1)
+gsettings set org.gnome.desktop.background picture-uri "file://$WALL" 2>>"$A"
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALL" 2>>"$A" || true
+gsettings set org.gnome.desktop.background picture-options "zoom" 2>>"$A" || true
+metacity --replace >"$L" 2>&1 &
+sleep 2
+gnome-flashback >>"$L" 2>&1 &
+gnome-panel >>"$L" 2>&1 &
+echo "== dock como dexuser:" >> "$S"
+LDIR="$HOME/.config/plank/dock1/launchers"
+mkdir -p "$LDIR"
+for DT in nautilus gnome-text-editor gnome-calculator evince eog xfce4-taskmanager synaptic; do
+  F="/usr/share/applications/$DT.desktop"
+  [ -f "$F" ] && printf '[PlankDockItemPreferences]\nType=1\nURI=file://%s\n' "$F" > "$LDIR/$DT.dockitem"
+done
+dconf write /net/launchpad/plank/docks/dock1/position "'left'" 2>>"$A"
+plank >>"$L" 2>&1 &
+sleep 20
+echo "== BATERIA DE APPS LANZADAS COMO USUARIO (el fix real):" >> "$S"
+for APP in nautilus gnome-control-center gnome-text-editor gnome-calculator eog evince file-roller baobab seahorse xfce4-taskmanager; do
+  BIN=$(command -v $APP 2>/dev/null)
+  [ -z "$BIN" ] && { echo "${APP}=NO_BIN" >> "$T"; continue; }
+  $BIN >/dev/null 2>&1 & P=$!
+### CONTENIDO /usr/local/bin/gnome-moderno.sh ###
+#!/bin/bash
+export DISPLAY=:0 HOME=/home/dexuser XDG_RUNTIME_DIR=/tmp/rt-dex
+. /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null
+mkdir -p /tmp/rt-dex && chmod 700 /tmp/rt-dex
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/rt-dex/dbus-system
+pkill -x gnome-shell 2>/dev/null; pkill -x weston 2>/dev/null; sleep 2
+rm -f /tmp/rt-dex/dbus-system /tmp/rt-dex/wayland-moderno
+nohup dbus-daemon --config-file=/tmp/rt-dex/dbus-system.conf >/tmp/rt-dex/dbus-system.log 2>&1 &
+echo $! > /tmp/rt-dex/dbus-system.pid
+sleep 3
+nohup python3 /tmp/rt-dex/fake-login1.py >/tmp/rt-dex/login1.log 2>&1 &
+echo $! > /tmp/rt-dex/login1.pid
+sleep 4
+nohup weston --backend=x11-backend.so --socket=wayland-moderno >/tmp/rt-dex/weston.log 2>&1 &
+echo $! > /tmp/rt-dex/weston.pid
+sleep 8
+nohup dbus-run-session -- env WAYLAND_DISPLAY=wayland-moderno XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_TYPE=wayland GDK_BACKEND=wayland XDG_SESSION_ID=s1 DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/rt-dex/dbus-system HOME=/home/dexuser XDG_RUNTIME_DIR=/tmp/rt-dex gnome-shell --wayland >/tmp/rt-dex/shell.log 2>&1 &
+echo $! > /tmp/rt-dex/shell.pid
+sleep 25
+if pgrep -x gnome-shell >/dev/null; then echo "gnome-shell moderno vivo"; else echo "gnome-shell murio"; fi
+### CONTENIDO /usr/local/bin/gparted-root.sh ###
+#!/bin/bash
+export XDG_CURRENT_DESKTOP=GNOME
+if [ -S /tmp/rt-dex/system-bus ]; then export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/rt-dex/system-bus; fi
+exec sudo -n "/usr/sbin/gparted" "$@"
+### CONTENIDO /usr/local/bin/plank-relaunch.sh ###
+#!/bin/bash
+R=/tmp/rt-dex
+LDIR=/home/dexuser/.config/plank/dock1/launchers
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=$R DISPLAY=:0 LANG=es_ES.UTF-8
+if [ -f "$R/session-bus.addr" ]; then export DBUS_SESSION_BUS_ADDRESS="$(cat "$R/session-bus.addr")"; fi
+plank >>"$R/plank15.log" 2>&1 &
+sleep 10
+pgrep -x plank >/dev/null && echo PLANK2_VIVO >>"$R/s15status.log" || { echo PLANK2_MUERTO >>"$R/s15status.log"; tail -6 "$R/plank15.log" >>"$R/s15status.log"; }
+N=$(grep -l "^Launcher=file://" "$LDIR"/*.dockitem 2>/dev/null | wc -l)
+echo "DOCKITEMS_CON_LAUNCHER=$N/9" >>"$R/s15status.log"
+wait
+### CONTENIDO /usr/local/bin/resurrect.sh ###
+#!/bin/bash
+R=/tmp/rt-dex
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=$R DISPLAY=:0 LANG=es_ES.UTF-8
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 NO_AT_BRIDGE=1
+# TRANSPLANTE GPU (receta medida del macos, FENIX5/FENIX6):
+export LIBGL_ALWAYS_SOFTWARE=0
+export GALLIUM_DRIVER=freedreno
+export MESA_LOADER_DRIVER_OVERRIDE=kgsl
+export FD_FORCE_KGSL=1
+export LIBGL_DRI3_DISABLE=1
+export GALLIUM_THREAD=true
+export LP_NUM_THREADS=8
+export MESA_GL_VERSION_OVERRIDE=4.3
+export MESA_GLSL_VERSION_OVERRIDE=430
+export GSK_RENDERER=gl
+metacity --replace >>"$R/res.log" 2>&1 &
+sleep 2
+gnome-flashback >>"$R/res.log" 2>&1 &
+gnome-panel >>"$R/res.log" 2>&1 &
+plank >>"$R/plank20.log" 2>&1 &
+sleep 8
+pgrep -x plank >/dev/null && echo RES_PLANK_VIVO >>"$R/res.log"
+wait
+### CONTENIDO /usr/local/bin/session10.sh ###
+#!/bin/bash
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex LANG=es_ES.UTF-8 TERM=xterm-256color
+R=/tmp/rt-dex
+S="$R/s10status.log"; T="$R/menu10.log"
+: > "$S"; : > "$T"
+export DISPLAY=:0
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1 GTK_USE_PORTAL=0
+dconf reset -f /org/gnome/gnome-panel/layout/ 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/toplevel-id-list "['top-panel']" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/object-id-list "['menu-bar', 'clock', 'systray']" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/applet-id "'menu-bar'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/module-id "'org.gnome.gnome-panel.menu'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/pack-type "'start'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/toplevel-id "'top-panel'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/applet-id "'clock'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/module-id "'org.gnome.gnome-panel.clock'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/pack-type "'center'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/toplevel-id "'top-panel'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/applet-id "'notification-area'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/module-id "'org.gnome.gnome-panel.notification-area'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/pack-type "'end'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/toplevel-id "'top-panel'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/type "'color'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/color "'#000000'" 2>>"$R/apply10.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/opacity "1.0" 2>>"$R/apply10.log"
+echo LAYOUT_NEGRO_OK >> "$S"
+gsettings set org.gnome.desktop.interface gtk-theme "Yaru-dark" 2>>"$R/apply10.log"
+gsettings set org.gnome.desktop.interface icon-theme "Yaru" 2>>"$R/apply10.log"
+gsettings set org.gnome.desktop.wm.preferences theme "Yaru-dark" 2>>"$R/apply10.log"
+NW=/usr/share/backgrounds/cnusr25-Simple_Raccoon_Dark.png
+[ -f "$NW" ] || NW=$(ls /usr/share/backgrounds/*.png 2>/dev/null | grep -iv warty | head -1)
+gsettings set org.gnome.desktop.background picture-uri "file://$NW" 2>>"$R/apply10.log"
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$NW" 2>>"$R/apply10.log" || true
+metacity --replace >>"$R/fb10.log" 2>&1 &
+sleep 2
+gnome-flashback >>"$R/fb10.log" 2>&1 &
+gnome-panel >>"$R/fb10.log" 2>&1 &
+echo "== dock SIN terminal muerto, CON console:" >> "$S"
+LDIR="$HOME/.config/plank/dock1/launchers"
+rm -f "$LDIR"/*.dockitem 2>/dev/null
+mkdir -p "$LDIR"
+for D in org.gnome.Nautilus org.gnome.Settings org.gnome.Console org.gnome.TextEditor org.gnome.Calculator org.gnome.eog org.gnome.Evince xfce4-taskmanager synaptic; do
+  F="/usr/share/applications/$D.desktop"
+  if [ -f "$F" ]; then
+    printf '[PlankDockItemPreferences]\nType=1\nURI=file://%s\n' "$F" > "$LDIR/$D.dockitem"
+    echo "DOCKITEM_OK: $D" >> "$S"
+  else
+    echo "DOCKITEM_FALTA: $D" >> "$S"
+  fi
+done
+dconf write /net/launchpad/plank/docks/dock1/position "'left'" 2>>"$R/apply10.log"
+plank >>"$R/plank10.log" 2>&1 &
+sleep 5
+pgrep -x plank >/dev/null && echo PLANK_VIVO >> "$S" || echo PLANK_MUERTO >> "$S"
+dbus-daemon --config-file="$R/system-dbus.conf" --fork 2>>"$R/apply10.log" && echo SYSTEM_BUS_OK >> "$S"
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=$R/system-bus
+UPD=$(find /usr/lib /usr/libexec -name upowerd 2>/dev/null | head -1)
+[ -n "$UPD" ] && { "$UPD" >>"$R/upowerd.log" 2>&1 & sleep 3; pgrep -f upowerd >/dev/null && echo UPOWERD_VIVO >> "$S"; }
+echo "== weston por NOMBRE + sockets purgados:" >> "$S"
+### CONTENIDO /usr/local/bin/session11.sh ###
+#!/bin/bash
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex LANG=es_ES.UTF-8 TERM=xterm-256color
+R=/tmp/rt-dex
+S="$R/s11status.log"; T="$R/menu11.log"
+: > "$S"; : > "$T"
+export DISPLAY=:0
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1 GTK_USE_PORTAL=0
+dconf reset -f /org/gnome/gnome-panel/layout/ 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/toplevel-id-list "['top-panel']" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/object-id-list "['menu-bar', 'clock', 'systray']" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/applet-id "'menu-bar'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/module-id "'org.gnome.gnome-panel.menu'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/pack-type "'start'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/toplevel-id "'top-panel'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/applet-id "'clock'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/module-id "'org.gnome.gnome-panel.clock'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/pack-type "'center'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/toplevel-id "'top-panel'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/applet-id "'notification-area'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/module-id "'org.gnome.gnome-panel.notification-area'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/pack-type "'end'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/toplevel-id "'top-panel'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/type "'color'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/color "'#000000'" 2>>"$R/apply11.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/opacity "1.0" 2>>"$R/apply11.log"
+echo LAYOUT_NEGRO_OK >> "$S"
+gsettings set org.gnome.desktop.interface gtk-theme "Yaru-dark" 2>>"$R/apply11.log"
+gsettings set org.gnome.desktop.interface icon-theme "Yaru" 2>>"$R/apply11.log"
+gsettings set org.gnome.desktop.wm.preferences theme "Yaru-dark" 2>>"$R/apply11.log"
+NW=/usr/share/backgrounds/cnusr25-Simple_Raccoon_Dark.png
+[ -f "$NW" ] && gsettings set org.gnome.desktop.background picture-uri "file://$NW" 2>>"$R/apply11.log"
+[ -f "$NW" ] && gsettings set org.gnome.desktop.background picture-uri-dark "file://$NW" 2>>"$R/apply11.log" || true
+metacity --replace >>"$R/fb11.log" 2>&1 &
+sleep 2
+gnome-flashback >>"$R/fb11.log" 2>&1 &
+gnome-panel >>"$R/fb11.log" 2>&1 &
+LDIR="$HOME/.config/plank/dock1/launchers"
+mkdir -p "$LDIR"
+for D in org.gnome.Nautilus org.gnome.Settings org.gnome.Console org.gnome.TextEditor org.gnome.Calculator org.gnome.eog org.gnome.Evince xfce4-taskmanager synaptic; do
+  F="/usr/share/applications/$D.desktop"
+  [ -f "$F" ] && printf '[PlankDockItemPreferences]\nType=1\nURI=file://%s\n' "$F" > "$LDIR/$D.dockitem"
+done
+dconf write /net/launchpad/plank/docks/dock1/position "'left'" 2>>"$R/apply11.log"
+plank >>"$R/plank11.log" 2>&1 &
+sleep 5
+echo "== bus sistema + upowerd:" >> "$S"
+dbus-daemon --config-file="$R/system-dbus.conf" --fork 2>>"$R/apply11.log" && echo SYSTEM_BUS_OK >> "$S"
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=$R/system-bus
+UPD=$(find /usr/lib /usr/libexec -name upowerd 2>/dev/null | head -1)
+[ -n "$UPD" ] && "$UPD" >>"$R/upowerd.log" 2>&1 &
+sleep 2
+echo "== SONDA X11: shell completa sobre el X actual?" >> "$S"
+if gnome-shell --help 2>&1 | grep -qi "x11"; then
+  : > "$R/shellx11.log"
+  gnome-shell --x11 >>"$R/shellx11.log" 2>&1 &
+  sleep 45
+  if pgrep -f "gnome-shell --x11" >/dev/null 2>&1; then
+    echo SHELL_X11_VIVO >> "$S"
+    pkill -x gnome-panel 2>/dev/null; pkill -f "gnome-flashback" 2>/dev/null
+### CONTENIDO /usr/local/bin/session12.sh ###
+#!/bin/bash
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex LANG=es_ES.UTF-8 TERM=xterm-256color
+R=/tmp/rt-dex
+S="$R/s12status.log"; T="$R/menu12.log"
+: > "$S"; : > "$T"
+D=""
+for D0 in :0 :1 :2; do xdpyinfo -display "$D0" >/dev/null 2>&1 && D="$D0" && break; done
+[ -n "$D" ] || { echo X_MUERTO >> "$S"; exit 1; }
+export DISPLAY="$D"
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1 GTK_USE_PORTAL=0
+echo "== CURA PRINCIPAL: UpdateActivationEnvironment (el bus nacio sin DISPLAY):" >> "$S"
+gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus --method org.freedesktop.DBus.UpdateActivationEnvironment "{'DISPLAY':<'$D'>,'XDG_RUNTIME_DIR':'/tmp/rt-dex','HOME':'/home/dexuser','USER':'dexuser','LOGNAME':'dexuser','LANG':'es_ES.UTF-8','XDG_CURRENT_DESKTOP':'GNOME-Flashback','XDG_SESSION_TYPE':'x11','TERM':'xterm-256color','PATH':<'$PATH'>}" >> "$S" 2>&1
+echo ACTIVATION_ENV_ACTUALIZADO >> "$S"
+echo "== layout + negro ANTES del panel:" >> "$S"
+dconf reset -f /org/gnome/gnome-panel/layout/ 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/toplevel-id-list "['top-panel']" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/object-id-list "['menu-bar', 'clock', 'systray']" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/applet-id "'menu-bar'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/module-id "'org.gnome.gnome-panel.menu'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/pack-type "'start'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/toplevel-id "'top-panel'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/applet-id "'clock'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/module-id "'org.gnome.gnome-panel.clock'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/pack-type "'center'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/toplevel-id "'top-panel'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/applet-id "'notification-area'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/module-id "'org.gnome.gnome-panel.notification-area'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/pack-type "'end'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/toplevel-id "'top-panel'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/type "'color'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/color "'#000000'" 2>>"$R/apply12.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/opacity "1.0" 2>>"$R/apply12.log"
+echo LAYOUT_NEGRO_OK >> "$S"
+gsettings set org.gnome.desktop.interface gtk-theme "Yaru-dark" 2>>"$R/apply12.log"
+gsettings set org.gnome.desktop.interface icon-theme "Yaru" 2>>"$R/apply12.log"
+gsettings set org.gnome.desktop.wm.preferences theme "Yaru-dark" 2>>"$R/apply12.log"
+NW=/usr/share/backgrounds/cnusr25-Simple_Raccoon_Dark.png
+[ -f "$NW" ] || NW=$(ls /usr/share/backgrounds/*.png 2>/dev/null | grep -iv warty | head -1)
+gsettings set org.gnome.desktop.background picture-uri "file://$NW" 2>>"$R/apply12.log"
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$NW" 2>>"$R/apply12.log" || true
+metacity --replace >>"$R/fb12.log" 2>&1 &
+sleep 2
+gnome-flashback >>"$R/fb12.log" 2>&1 &
+gnome-panel >>"$R/fb12.log" 2>&1 &
+echo "== DOCK FORENSE + Icon= ABSOLUTO (fin de carpetas grises):" >> "$S"
+LDIR="$HOME/.config/plank/dock1/launchers"
+LAPPS="$HOME/.local/share/applications"
+mkdir -p "$LDIR" "$LAPPS"
+rm -f "$LDIR"/*.dockitem 2>/dev/null
+for DSK in org.gnome.Nautilus org.gnome.Settings org.gnome.Console org.gnome.TextEditor org.gnome.Calculator org.gnome.eog org.gnome.Evince xfce4-taskmanager synaptic; do
+  F="/usr/share/applications/$DSK.desktop"
+  [ -f "$F" ] || { echo "DOCK_FALTA_DESKTOP: $DSK" >> "$S"; continue; }
+  ICONN=$(grep -m1 "^Icon=" "$F" | cut -d= -f2)
+  ABSPNG=$(python3 - "$ICONN" <<'PYX'
+import sys
+try:
+    import gi
+    gi.require_version("Gtk", "3.0")
+    from gi.repository import Gtk
+### CONTENIDO /usr/local/bin/session13.sh ###
+#!/bin/bash
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex LANG=es_ES.UTF-8 TERM=xterm-256color
+R=/tmp/rt-dex
+S="$R/s13status.log"; T="$R/menu13.log"
+: > "$S"; : > "$T"
+D="$DISPLAY"
+[ -n "$D" ] || { for D0 in :0 :1 :2; do xdpyinfo -display "$D0" >/dev/null 2>&1 && D="$D0" && break; done; }
+[ -n "$D" ] || { echo X_MUERTO >> "$S"; exit 1; }
+export DISPLAY="$D"
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1 GTK_USE_PORTAL=0
+echo "== CURA PRINCIPAL: el bus NACIO con DISPLAY (dbus-run-session hereda env) y ademas:" >> "$S"
+echo "BUS_DISPLAY=$DISPLAY" >> "$S"
+OUTA=$(gdbus call --session --dest org.freedesktop.DBus --object-path /org/freedesktop/DBus --method org.freedesktop.DBus.UpdateActivationEnvironment "{'DISPLAY':'$D','XDG_RUNTIME_DIR':'$R','HOME':'/home/dexuser','USER':'dexuser','LOGNAME':'dexuser','LANG':'es_ES.UTF-8','XDG_CURRENT_DESKTOP':'GNOME-Flashback','XDG_SESSION_TYPE':'x11','TERM':'xterm-256color','PATH':'$PATH'}" 2>&1)
+echo "UPDACT_OUT: $OUTA" >> "$S"
+case "$OUTA" in *"()"*) echo ACTIVATION_ENV_VERIFICADO >> "$S";; *) echo ACTIVATION_ENV_FALLO >> "$S";; esac
+echo "== layout + negro ANTES del panel:" >> "$S"
+dconf reset -f /org/gnome/gnome-panel/layout/ 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/toplevel-id-list "['top-panel']" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/object-id-list "['menu-bar', 'clock', 'systray']" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/applet-id "'menu-bar'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/module-id "'org.gnome.gnome-panel.menu'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/pack-type "'start'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/toplevel-id "'top-panel'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/applet-id "'clock'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/module-id "'org.gnome.gnome-panel.clock'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/pack-type "'center'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/toplevel-id "'top-panel'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/applet-id "'notification-area'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/module-id "'org.gnome.gnome-panel.notification-area'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/pack-type "'end'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/toplevel-id "'top-panel'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/type "'color'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/color "'#000000'" 2>>"$R/apply13.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/opacity "1.0" 2>>"$R/apply13.log"
+echo LAYOUT_NEGRO_OK >> "$S"
+gsettings set org.gnome.desktop.interface gtk-theme "Yaru-dark" 2>>"$R/apply13.log"
+gsettings set org.gnome.desktop.interface icon-theme "Yaru" 2>>"$R/apply13.log"
+gsettings set org.gnome.desktop.wm.preferences theme "Yaru-dark" 2>>"$R/apply13.log"
+NW=/usr/share/backgrounds/cnusr25-Simple_Raccoon_Dark.png
+[ -f "$NW" ] || NW=$(ls /usr/share/backgrounds/*.png 2>/dev/null | grep -iv warty | head -1)
+gsettings set org.gnome.desktop.background picture-uri "file://$NW" 2>>"$R/apply13.log"
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$NW" 2>>"$R/apply13.log" || true
+metacity --replace >>"$R/fb13.log" 2>&1 &
+sleep 2
+gnome-flashback >>"$R/fb13.log" 2>&1 &
+gnome-panel >>"$R/fb13.log" 2>&1 &
+echo "== DOCK con Icon= ABSOLUTO (Settings ya hereda el override del Exec):" >> "$S"
+LDIR="$HOME/.config/plank/dock1/launchers"
+LAPPS="$HOME/.local/share/applications"
+mkdir -p "$LDIR" "$LAPPS"
+rm -f "$LDIR"/*.dockitem 2>/dev/null
+for DSK in org.gnome.Nautilus org.gnome.Settings org.gnome.Console org.gnome.TextEditor org.gnome.Calculator org.gnome.eog org.gnome.Evince xfce4-taskmanager synaptic; do
+  F="/usr/share/applications/$DSK.desktop"
+  [ -f "$F" ] || { echo "DOCK_FALTA_DESKTOP: $DSK" >> "$S"; continue; }
+  ICONN=$(grep -m1 "^Icon=" "$F" | cut -d= -f2)
+  ABSPNG=$(python3 - "$ICONN" <<'PYX'
+import sys
+try:
+    import gi
+### CONTENIDO /usr/local/bin/session8.sh ###
+#!/bin/bash
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex LANG=es_ES.UTF-8
+R=/tmp/rt-dex
+S="$R/s8status.log"; T="$R/menu8.log"
+: > "$S"; : > "$T"
+export DISPLAY=:0
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1 GTK_USE_PORTAL=0
+echo "== layout + negro ANTES del panel (receta G2x verificada):" >> "$S"
+dconf reset -f /org/gnome/gnome-panel/layout/ 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/toplevel-id-list "['top-panel']" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/object-id-list "['menu-bar', 'clock', 'systray']" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/applet-id "'menu-bar'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/module-id "'org.gnome.gnome-panel.menu'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/pack-type "'start'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/toplevel-id "'top-panel'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/applet-id "'clock'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/module-id "'org.gnome.gnome-panel.clock'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/pack-type "'center'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/toplevel-id "'top-panel'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/applet-id "'notification-area'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/module-id "'org.gnome.gnome-panel.notification-area'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/pack-type "'end'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/toplevel-id "'top-panel'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/type "'color'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/color "'#000000'" 2>>"$R/apply8.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/opacity "1.0" 2>>"$R/apply8.log"
+echo LAYOUT_NEGRO_OK >> "$S"
+gsettings set org.gnome.desktop.interface gtk-theme "Yaru-dark" 2>>"$R/apply8.log"
+gsettings set org.gnome.desktop.interface icon-theme "Yaru" 2>>"$R/apply8.log"
+gsettings set org.gnome.desktop.wm.preferences theme "Yaru-dark" 2>>"$R/apply8.log"
+WALL=/usr/share/backgrounds/warty-final-ubuntu.png
+[ -f "$WALL" ] || WALL=$(ls /usr/share/backgrounds/*.png 2>/dev/null | head -1)
+gsettings set org.gnome.desktop.background picture-uri "file://$WALL" 2>>"$R/apply8.log"
+gsettings set org.gnome.desktop.background picture-uri-dark "file://$WALL" 2>>"$R/apply8.log" || true
+metacity --replace >>"$R/fb8.log" 2>&1 &
+sleep 2
+gnome-flashback >>"$R/fb8.log" 2>&1 &
+gnome-panel >>"$R/fb8.log" 2>&1 &
+echo "== dock con .desktop EXPLICITOS verificados (fin de carpetas grises):" >> "$S"
+LDIR="$HOME/.config/plank/dock1/launchers"
+rm -f "$LDIR"/*.dockitem 2>/dev/null
+mkdir -p "$LDIR"
+for D in org.gnome.Nautilus org.gnome.TextEditor org.gnome.Calculator org.gnome.eog evince xfce4-taskmanager synaptic org.gnome.Terminal; do
+  F="/usr/share/applications/$D.desktop"
+  if [ -f "$F" ]; then
+    printf '[PlankDockItemPreferences]\nType=1\nURI=file://%s\n' "$F" > "$LDIR/$D.dockitem"
+    echo "DOCKITEM_OK: $D" >> "$S"
+  else
+    echo "DOCKITEM_FALTA: $D" >> "$S"
+  fi
+done
+dconf write /net/launchpad/plank/docks/dock1/position "'left'" 2>>"$R/apply8.log"
+dconf write /net/launchpad/plank/docks/dock1/theme "'Docky'" 2>>"$R/apply8.log" || true
+plank >>"$R/plank8.log" 2>&1 &
+sleep 5
+pgrep -x plank >/dev/null && echo PLANK_VIVO >> "$S" || echo PLANK_MUERTO >> "$S"
+echo "== bus de sistema D-Bus + upowerd con RUTA REAL:" >> "$S"
+dbus-daemon --config-file="$R/system-dbus.conf" --fork 2>>"$R/apply8.log" && echo SYSTEM_BUS_OK >> "$S" || echo SYSTEM_BUS_FAIL >> "$S"
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=$R/system-bus
+### CONTENIDO /usr/local/bin/session9.sh ###
+#!/bin/bash
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex LANG=es_ES.UTF-8 TERM=xterm-256color
+R=/tmp/rt-dex
+S="$R/s9status.log"; T="$R/menu9.log"
+: > "$S"; : > "$T"
+export DISPLAY=:0
+export XDG_CURRENT_DESKTOP=GNOME-Flashback XDG_SESSION_TYPE=x11 LIBGL_ALWAYS_SOFTWARE=1 NO_AT_BRIDGE=1 GTK_USE_PORTAL=0
+echo "== dconf: layout + negro ANTES del panel (receta verificada):" >> "$S"
+dconf reset -f /org/gnome/gnome-panel/layout/ 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/toplevel-id-list "['top-panel']" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/object-id-list "['menu-bar', 'clock', 'systray']" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/applet-id "'menu-bar'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/module-id "'org.gnome.gnome-panel.menu'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/pack-type "'start'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/menu-bar/toplevel-id "'top-panel'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/applet-id "'clock'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/module-id "'org.gnome.gnome-panel.clock'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/pack-type "'center'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/clock/toplevel-id "'top-panel'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/applet-id "'notification-area'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/module-id "'org.gnome.gnome-panel.notification-area'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/pack-type "'end'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/layout/objects/systray/toplevel-id "'top-panel'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/type "'color'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/color "'#000000'" 2>>"$R/apply9.log"
+dconf write /org/gnome/gnome-panel/toplevels/top-panel/background/opacity "1.0" 2>>"$R/apply9.log"
+echo LAYOUT_NEGRO_OK >> "$S"
+gsettings set org.gnome.desktop.interface gtk-theme "Yaru-dark" 2>>"$R/apply9.log"
+gsettings set org.gnome.desktop.interface icon-theme "Yaru" 2>>"$R/apply9.log"
+gsettings set org.gnome.desktop.wm.preferences theme "Yaru-dark" 2>>"$R/apply9.log"
+echo "== FONDO MODERNO (fin del marron 2004):" >> "$S"
+NW=$(ls /usr/share/backgrounds/*.png /usr/share/backgrounds/*/*.png 2>/dev/null | grep -iv warty | grep -iE "yaru|dark|ubuntu" | head -1)
+if [ -n "$NW" ]; then
+  gsettings set org.gnome.desktop.background picture-uri "file://$NW" 2>>"$R/apply9.log"
+  gsettings set org.gnome.desktop.background picture-uri-dark "file://$NW" 2>>"$R/apply9.log" || true
+  echo "FONDO: $NW" >> "$S"
+else
+  gsettings set org.gnome.desktop.background picture-uri "" 2>>"$R/apply9.log"
+  gsettings set org.gnome.desktop.background primary-color "'#1a1a2e'" 2>>"$R/apply9.log"
+  echo "FONDO: color solido #1a1a2e" >> "$S"
+fi
+metacity --replace >>"$R/fb9.log" 2>&1 &
+sleep 2
+gnome-flashback >>"$R/fb9.log" 2>&1 &
+gnome-panel >>"$R/fb9.log" 2>&1 &
+echo "== dock completo (ids reales, incluidos Settings/Consola/Evince):" >> "$S"
+LDIR="$HOME/.config/plank/dock1/launchers"
+rm -f "$LDIR"/*.dockitem 2>/dev/null
+mkdir -p "$LDIR"
+for D in org.gnome.Nautilus org.gnome.Settings org.gnome.Terminal org.gnome.Console org.gnome.TextEditor org.gnome.Calculator org.gnome.eog org.gnome.Evince xfce4-taskmanager synaptic; do
+  F="/usr/share/applications/$D.desktop"
+  if [ -f "$F" ]; then
+    printf '[PlankDockItemPreferences]\nType=1\nURI=file://%s\n' "$F" > "$LDIR/$D.dockitem"
+    echo "DOCKITEM_OK: $D" >> "$S"
+  else
+    echo "DOCKITEM_FALTA: $D" >> "$S"
+  fi
+done
+dconf write /net/launchpad/plank/docks/dock1/position "'left'" 2>>"$R/apply9.log"
+### CONTENIDO /usr/local/bin/settings-gnome.sh ###
+#!/bin/bash
+export XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_DESKTOP=GNOME
+exec /usr/bin/gnome-control-center "$@"
+### CONTENIDO /usr/local/bin/shell-diag.sh ###
+#!/bin/bash
+R=/tmp/rt-dex
+S="$R/s16status.log"
+: > "$S"
+echo "SHELLDIAG_START $(date -u +%T)Z" >> "$S"
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=$R LANG=es_ES.UTF-8 TERM=xterm-256color DISPLAY=:0
+SBA=""
+[ -S "$R/system-bus" ] && SBA="unix:path=$R/system-bus"
+rm -f "$R"/wayland-* "$R"/wayland-*.lock 2>/dev/null
+weston --backend=x11-backend.so --width=912 --height=1300 >>"$R/weston16.log" 2>&1 &
+sleep 12
+pgrep -x weston >/dev/null && echo WESTON3_VIVO >> "$S" || { echo WESTON3_MUERTO >> "$S"; tail -8 "$R/weston16.log" >> "$S"; }
+WD=$(ls "$R" 2>/dev/null | grep -o "wayland-[0-9]*" | head -1)
+echo "WAYLAND_DISPLAY=$WD" >> "$S"
+dbus-run-session -- sh -c "env WAYLAND_DISPLAY='$WD' DISPLAY= DBUS_SYSTEM_BUS_ADDRESS='$SBA' XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_TYPE=wayland XDG_SESSION_ID=c1 SHELL_NO_HARDWARE_CURSOR=1 LD_PRELOAD=/usr/local/lib/libfakesession.so gnome-shell --wayland >> '$R/shell16.log' 2>&1" &
+echo SHELL3_LANZADA >> "$S"
+wait
+### CONTENIDO /usr/local/bin/shell-full.sh ###
+#!/bin/bash
+R=/tmp/rt-dex
+S="$R/s14status.log"
+: > "$S"
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=$R LANG=es_ES.UTF-8 TERM=xterm-256color DISPLAY=:0
+rm -f "$R"/wayland-* "$R"/wayland-*.lock 2>/dev/null
+weston --backend=x11-backend.so --width=912 --height=1333 >>"$R/weston14.log" 2>&1 &
+sleep 12
+WID=$(wmctrl -l 2>/dev/null | awk 'tolower($0) ~ /weston/ {print $1; exit}')
+if [ -n "$WID" ]; then
+  wmctrl -ir "$WID" -b add,fullscreen 2>/dev/null && echo WESTON_FULLSCREEN >> "$S"
+  echo "WESTON_WID=$WID" >> "$S"
+else
+  echo WESTON_WINDOW_AUSENTE >> "$S"
+fi
+WD=$(ls "$R" 2>/dev/null | grep -o "wayland-[0-9]*" | head -1)
+echo "WAYLAND_DISPLAY=$WD" >> "$S"
+dbus-run-session -- sh -c "env WAYLAND_DISPLAY='$WD' DISPLAY= XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_TYPE=wayland XDG_SESSION_ID=c1 SHELL_NO_HARDWARE_CURSOR=1 LD_PRELOAD=/usr/local/lib/libfakesession.so gnome-shell --wayland >> '$R/shell14.log' 2>&1" &
+echo SHELL_LANZADA >> "$S"
+wait
+### CONTENIDO /usr/local/bin/shell-full2.sh ###
+#!/bin/bash
+R=/tmp/rt-dex
+S="$R/s15status.log"
+echo "SHELLFULL2_START $(date -u +%T)Z" >> "$S"
+export HOME=/home/dexuser USER=dexuser LOGNAME=dexuser
+export XDG_RUNTIME_DIR=$R LANG=es_ES.UTF-8 TERM=xterm-256color DISPLAY=:0
+SBA=""
+[ -S "$R/system-bus" ] && SBA="unix:path=$R/system-bus"
+rm -f "$R"/wayland-* "$R"/wayland-*.lock 2>/dev/null
+weston --backend=x11-backend.so --width=912 --height=1333 >>"$R/weston15.log" 2>&1 &
+sleep 12
+if pgrep -x weston >/dev/null; then echo WESTON2_VIVO >> "$S"; else echo WESTON2_MUERTO >> "$S"; tail -8 "$R/weston15.log" >> "$S"; fi
+WID=$(wmctrl -l 2>/dev/null | awk 'tolower($0) ~ /weston/ {print $1; exit}')
+if [ -n "$WID" ]; then
+  wmctrl -ir "$WID" -b add,fullscreen 2>/dev/null && echo "WESTON2_FULLSCREEN wid=$WID" >> "$S" || echo WESTON2_FS_FALLO >> "$S"
+else
+  echo WESTON2_WINDOW_AUSENTE >> "$S"
+fi
+WD=$(ls "$R" 2>/dev/null | grep -o "wayland-[0-9]*" | head -1)
+echo "WAYLAND_DISPLAY=$WD" >> "$S"
+echo "SYSTEM_BUS_PARA_SHELL=${SBA:-ninguno}" >> "$S"
+dbus-run-session -- sh -c "env WAYLAND_DISPLAY='$WD' DISPLAY= DBUS_SYSTEM_BUS_ADDRESS='$SBA' XDG_CURRENT_DESKTOP=GNOME XDG_SESSION_TYPE=wayland XDG_SESSION_ID=c1 SHELL_NO_HARDWARE_CURSOR=1 LD_PRELOAD=/usr/local/lib/libfakesession.so gnome-shell --wayland >> '$R/shell15.log' 2>&1" &
+echo SHELL2_LANZADA >> "$S"
+wait
+### CONTENIDO /usr/local/bin/start-escritorio.sh ###
+#!/bin/bash
+export DISPLAY=${DISPLAY:-:0} HOME=/home/dexuser XDG_RUNTIME_DIR=/tmp/rt-dex
+. /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null
+mkdir -p /tmp/rt-dex
+if [ ! -S "${XDG_RUNTIME_DIR}/bus-unix" ] && [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+  eval $(dbus-launch --sh-syntax)
+fi
+pgrep -x metacity >/dev/null || nohup metacity --replace >/tmp/rt-dex/metacity.log 2>&1 &
+sleep 2
+pgrep -x gnome-panel >/dev/null || nohup gnome-panel >/tmp/rt-dex/panel.log 2>&1 &
+pgrep -x plank >/dev/null || nohup plank >/tmp/rt-dex/plank.log 2>&1 &
+IMG=$(find /usr/share/backgrounds -type f \( -name '*.jpg' -o -name '*.png' \) 2>/dev/null | head -1)
+[ -n "$IMG" ] && command -v feh >/dev/null 2>&1 && feh --bg-scale "$IMG" >/dev/null 2>&1
+echo Escritorio iniciado.
+### CONTENIDO /usr/local/bin/substrate-flashback.sh ###
+#!/bin/bash
+# SubstrateOS — volver al escritorio clasico (flashback)
+export HOME=/home/dexuser
+export XDG_RUNTIME_DIR=/tmp/rt-dex
+[ -f /etc/profile.d/zz-adreno-gpu.sh ] && . /etc/profile.d/zz-adreno-gpu.sh
+pkill -x gnome-shell 2>/dev/null; pkill -x weston 2>/dev/null
+sleep 2
+su -s /bin/bash dexuser -c "DISPLAY= XDG_RUNTIME_DIR=/tmp/rt-dex metacity --replace >/dev/null 2>&1 &"
+sleep 2
+su -s /bin/bash dexuser -c "DISPLAY= XDG_RUNTIME_DIR=/tmp/rt-dex metacity >/dev/null 2>&1 & gnome-panel >/dev/null 2>&1 & plank >/dev/null 2>&1 &"
+exit 0
+### CONTENIDO /usr/local/bin/synaptic-root.sh ###
+#!/bin/bash
+export XDG_CURRENT_DESKTOP=GNOME
+if [ -S /tmp/rt-dex/system-bus ]; then export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/rt-dex/system-bus; fi
+exec sudo -n "/usr/sbin/synaptic" "$@"
+--- H. infraestructura de sesion (fakes) ---
+total 53
+drwxr-xr-x+ 3 root root  3452 Nov 15 08:19 .
+drwxr-xr-x+ 8 root root  3452 Nov 13 19:14 ..
+drwx------+ 2 root root  3452 Nov 15 08:46 __pycache__
+-rw-r--r--+ 1 root root   421 Nov 13 19:28 dbus-system.conf
+-rwxr-xr-x+ 1 root root 11731 Nov 14 11:13 fake-login1.py
+-rw-------+ 1 root root 18918 Nov 15 08:46 nm-stub.py
+-rw-------+ 1 root root  5951 Nov 14 19:21 nm-stub.py.bak-20261115-031741
+total 34
+drwxr-xr-x+ 10 root root 3452 Nov 12 10:09 .
+drwxr-xr-x+ 24 root root 3452 Nov 14 19:10 ..
+drwxr-xr-x+  2 root root 3452 Nov 12 10:08 ask-password
+-rw-r--r--+  1 root root    7 Sep 27 10:29 container
+drwxr-xr-x+  2 root root 3452 Nov 12 10:08 machines
+drwxr-xr-x+  4 root root 3452 Nov 12 10:08 netif
+drwxr-xr-x+  2 root root 3452 Nov 12 10:09 resolve
+drwxr-xr-x+  2 root root 3452 Nov 12 10:08 seats
+drwxr-xr-x+  2 root root 3452 Nov 14 10:55 sessions
+drwxr-xr-x+  2 root root 3452 Nov 12 10:08 shutdown
+drwxr-xr-x+  2 root root 3452 Nov 12 10:08 users
+FINAL-STATUS.txt
+adb-all-1901.txt
+adb-all-1907.txt
+adb-crash.txt
+app-cairo.log
+app-calc-cairo.log
+app-calc-nolrz.log
+app-calc-software.log
+app-cogl-broad.log
+app-dex-noshadow.log
+app-dex-noshadow2.log
+app-dex-session-final.log
+app-dri3off-shell.log
+app-editor-a11yoff-defaultgsk.log
+app-editor-both.log
+--- I. sesiones definidas ---
+/usr/share/wayland-sessions:
+gnome-wayland.desktop
+gnome.desktop
+weston.desktop
+
+/usr/share/xsessions:
+gnome-flashback-compiz.desktop
+gnome-flashback-metacity.desktop
+--- J. autostart del usuario ---
+total 10
+drwxr-xr-x+  2 root root 3452 Nov 13 03:56 .
+drwx------+ 16 root root 3452 Nov 13 06:59 ..
+-rw-r--r--+  1 root root  193 Nov 13 03:56 remmina-applet.desktop
+[Desktop Entry]
+Version=1.0
+Name=Remmina Applet
+Comment=Connect to remote desktops through the applet menu
+Icon=org.remmina.Remmina
+Exec=remmina -i
+Terminal=false
+Type=Application
+Hidden=false
+--- K. acceso remoto ---
+31246 sshd -D -e
+/data/data/com.termux/files/usr/bin/sshd
+--- L. top procesos dentro de la distro ---
+aid_u0_+ 19570  200  0.0   6632  3284 ?        R     2023   0:00 ps aux
+aid_u0_+ 19429 35.6  0.0 10809512 4204 ?       S     2023   0:00 /data/data/com.termux/files/usr/bin/proot --kill-on-exit --link2symlink --sysvipc --kernel-release=\Linux\localhost\6.17.0-PRoot-Distro\#1 SMP PREEMPT_DYNAMIC Fri, 10 Oct 2025 00:00:00 +0000\aarch64\localdomain\-1\ -L --change-id=0:0 --rootfs=. --cwd=/root --bind=/dev --bind=/proc --bind=/sys --bind=/dev/urandom:/dev/random --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sys_empty:/sys/fs/selinux --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/loadavg:/proc/loadavg --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/stat:/proc/stat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/uptime:/proc/uptime --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/version:/proc/version --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/vmstat:/proc/vmstat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_entry_cap_last_cap:/proc/sys/kernel/cap_last_cap --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_inotify_max_user_watches:/proc/sys/fs/inotify/max_user_watches --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowuid:/proc/sys/kernel/overflowuid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowgid:/proc/sys/kernel/overflowgid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/shm:/dev/shm --bind=/data/app --bind=/data/dalvik-cache --bind=/data/misc/apexdata/com.android.art/dalvik-cache --bind=/storage/self/primary:/mnt/sdcard --bind=/storage/self/primary:/sdcard --bind=/storage/self/primary:/storage/emulated/0 --bind=/storage/self/primary:/storage/self/primary --bind=/data/data/com.termux/cache --bind=/data/data/com.termux/files/home --bind=/apex --bind=/odm --bind=/product --bind=/system --bind=/system_ext --bind=/vendor --bind=/linkerconfig/ld.config.txt --bind=/linkerconfig/com.android.art/ld.config.txt --bind=/data/data/com.termux/files/usr --bind=/data/data/com.termux/files/usr/tmp:/tmp /bin/bash -c bash /tmp/recon-in.sh
+aid_u0_+ 30225 20.0  1.2 15554188 147436 ?     Sl    2023  54:27 com.termux
+aid_u0_+ 32256  3.3  0.3 14309116 40456 ?      Ssl   2023   6:48 termux-x11 com.termux.x11 :0
+aid_u0_+ 24357  3.2  2.5 26674944 286028 ?     Ssl   2023   7:23 /data/data/com.termux/files/usr/libexec/opencode/opencode.bin serve --service
+aid_u0_+ 18430  2.9  0.2 10953704 23228 ?      S<l   2023   6:49 python3 server.py
+aid_u0_+ 19433  2.7  0.0   4524  2548 ?        S     2023   0:00 bash /tmp/recon-in.sh
+aid_u0_+  3714  0.9  0.5 6281420 64160 ?       Sl    2023   0:27 gnome-shell
+--- FIN DE LA DISTRO ---
+=== M. lado Termux ===
+distros instaladas:
+procesos proot vivos:
+2903 /data/data/com.termux/files/usr/bin/proot --kill-on-exit --link2symlink --sysvipc --kernel-release=\Linux\localhost\6.17.0-PRoot-Distro\#1 SMP PREEMPT_DYNAMIC Fri, 10 Oct 2025 00:00:00 +0000\aarch64\localdomain\-1\ -L --change-id=0:0 --rootfs=. --cwd=/root --bind=/dev --bind=/proc --bind=/sys --bind=/dev/urandom:/dev/random --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sys_empty:/sys/fs/selinux --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/loadavg:/proc/loadavg --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/stat:/proc/stat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/uptime:/proc/uptime --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/version:/proc/version --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/vmstat:/proc/vmstat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_entry_cap_last_cap:/proc/sys/kernel/cap_last_cap --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_inotify_max_user_watches:/proc/sys/fs/inotify/max_user_watches --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowuid:/proc/sys/kernel/overflowuid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowgid:/proc/sys/kernel/overflowgid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/shm:/dev/shm --bind=/data/app --bind=/data/dalvik-cache --bind=/data/misc/apexdata/com.android.art/dalvik-cache --bind=/storage/self/primary:/mnt/sdcard --bind=/storage/self/primary:/sdcard --bind=/storage/self/primary:/storage/emulated/0 --bind=/storage/self/primary:/storage/self/primary --bind=/data/data/com.termux/cache --bind=/data/data/com.termux/files/home --bind=/apex --bind=/odm --bind=/product --bind=/system --bind=/system_ext --bind=/vendor --bind=/linkerconfig/ld.config.txt --bind=/linkerconfig/com.android.art/ld.config.txt --bind=/data/data/com.termux/files/usr --bind=/data/data/com.termux/files/usr/tmp:/tmp /bin/bash -c bash -c '   while [ ! -S /tmp/rt-dex/system-bus49 ]; do sleep 1; done   export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/tmp/rt-dex/system-bus49   while :; do     /usr/lib/polkit-1/polkitd --no-debug >>/tmp/rt-dex/polkitd.log 2>&1     echo "polkitd exit=$? $(date -u +%FT%TZ)" >>/tmp/rt-dex/polkitd.log     sleep 2   done '
+2904 /data/data/com.termux/files/usr/bin/proot --kill-on-exit --link2symlink --sysvipc --kernel-release=\Linux\localhost\6.17.0-PRoot-Distro\#1 SMP PREEMPT_DYNAMIC Fri, 10 Oct 2025 00:00:00 +0000\aarch64\localdomain\-1\ -L --change-id=0:0 --rootfs=. --cwd=/root --bind=/dev --bind=/proc --bind=/sys --bind=/dev/urandom:/dev/random --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sys_empty:/sys/fs/selinux --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/loadavg:/proc/loadavg --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/stat:/proc/stat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/uptime:/proc/uptime --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/version:/proc/version --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/vmstat:/proc/vmstat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_entry_cap_last_cap:/proc/sys/kernel/cap_last_cap --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_inotify_max_user_watches:/proc/sys/fs/inotify/max_user_watches --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowuid:/proc/sys/kernel/overflowuid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowgid:/proc/sys/kernel/overflowgid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/shm:/dev/shm --bind=/data/app --bind=/data/dalvik-cache --bind=/data/misc/apexdata/com.android.art/dalvik-cache --bind=/storage/self/primary:/mnt/sdcard --bind=/storage/self/primary:/sdcard --bind=/storage/self/primary:/storage/emulated/0 --bind=/storage/self/primary:/storage/self/primary --bind=/data/data/com.termux/cache --bind=/data/data/com.termux/files/home --bind=/apex --bind=/odm --bind=/product --bind=/system --bind=/system_ext --bind=/vendor --bind=/linkerconfig/ld.config.txt --bind=/linkerconfig/com.android.art/ld.config.txt --bind=/data/data/com.termux/files/usr --bind=/data/data/com.termux/files/usr/tmp:/tmp /bin/bash -c bash /tmp/rt-dex/session49.sh
+3911 proot --shm-helper
+boot scripts de Termux:
+total 15
+drwxr-xr-x. 2 u0_a345 u0_a345 3452 Nov 13 14:57 .
+drwx------. 3 u0_a345 u0_a345 3452 Nov 13 23:56 ..
+-rwx------. 1 u0_a345 u0_a345  544 Nov  5 02:55 01-dex.sh
+-rwx------. 1 u0_a345 u0_a345  252 Nov 13 15:10 revive.sh
+#!/data/data/com.termux/files/usr/bin/bash
+# Auto-arranque NATIVO del DeX (sin PRoot) al encender el S25.
+export PATH=/data/data/com.termux/files/usr/bin:/system/bin:/system/xbin
+export HOME=/data/data/com.termux/files/home
+
+# wake-lock: mantiene Termux vivo aunque se cierre la app (notificación persistente)
+termux-wake-lock 2>/dev/null || true
+
+# arrancar el supervisor nativo del DeX
+if ! pgrep -f 'dex/watchdog.sh' >/dev/null 2>&1; then
+  nohup bash /data/data/com.termux/files/home/dex/watchdog.sh >/tmp/rd-watchdog-stdout.log 2>&1 &
+fi
+#!/data/data/com.termux/files/usr/bin/sh
+export SVDIR="/data/data/com.termux/files/usr/var/service"
+pgrep -x runsvdir >/dev/null 2>&1 || nohup runsvdir "$SVDIR" >/dev/null 2>&1 &
+sleep 2
+sv up sshd 2>/dev/null
+tmux new-session -d -s agente 2>/dev/null
+hooks en .bashrc:
+scripts en ~/substrate:
+total 255
+drwx------. 59 u0_a345 u0_a345 3452 Nov 16 16:28 .
+drwx------. 36 u0_a345 u0_a345 8192 Nov 16 16:42 ..
+drwx------.  3 u0_a345 u0_a345 3452 Nov 10 13:50 .github
+drwx------.  2 u0_a345 u0_a345 3452 Nov 16 16:46 bridge
+-rw-------.  1 u0_a345 u0_a345 3191 Nov 10 22:52 c3.sh
+-rw-------.  1 u0_a345 u0_a345   84 Nov 16 16:28 commands.sh
+drwx------.  2 u0_a345 u0_a345 3452 Nov 12 01:29 d1
+-rw-------.  1 u0_a345 u0_a345    7 Nov 12 01:27 d1_raw.txt
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 18:20 m10
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 18:30 m11
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 18:35 m12
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 18:39 m13
+drwx------.  3 u0_a345 u0_a345 3452 Nov 10 19:09 m14
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 19:14 m15
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 19:31 m16
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 19:35 m17
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 19:42 m18
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 19:48 m19
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 17:03 m2
+drwx------.  3 u0_a345 u0_a345 3452 Nov 10 20:14 m20
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 20:20 m21
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 20:27 m22
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 20:36 m23
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 20:39 m24
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 20:40 m25
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 20:48 m26
+drwx------.  3 u0_a345 u0_a345 3452 Nov 10 21:30 m27
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 21:33 m28
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 21:38 m29
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 17:25 m3
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:01 m31
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:20 m33
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:24 m34
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:27 m35
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:32 m36
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:53 m37
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:58 m38
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 22:59 m39
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 23:27 m40
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 23:34 m41
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 23:45 m42
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 01:23 m43
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 01:43 m45
+drwx------.  5 u0_a345 u0_a345 3452 Nov 11 14:41 m46
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:13 m47
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:15 m48
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:16 m49
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 17:26 m5
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:17 m50
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:18 m51
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:26 m53
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:25 m54
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 17:53 m56
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 20:05 m57
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 20:05 m58
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 20:05 m59
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 17:34 m6
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 20:06 m60
+drwx------.  2 u0_a345 u0_a345 3452 Nov 11 20:08 m61
+drwx------.  3 u0_a345 u0_a345 3452 Nov 10 17:49 m7
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 18:00 m8
+drwx------.  2 u0_a345 u0_a345 3452 Nov 10 18:13 m9
+-rw-------.  1 u0_a345 u0_a345 1000 Nov 10 16:19 mission.log
+-rw-------.  1 u0_a345 u0_a345 9448 Nov 10 16:19 mission.sh
+-rw-------.  1 u0_a345 u0_a345 1082 Nov 10 13:56 phase0-fixed.yml
+-rw-------.  1 u0_a345 u0_a345 1436 Nov 10 14:21 phase0-workflow.yml
+-rw-------.  1 u0_a345 u0_a345 2803 Nov 10 14:54 phase1-workflow.yml
+-rw-------.  1 u0_a345 u0_a345    6 Nov 13 18:31 test_ok.pid
+uptime y carga:
+ 16:59:19 up  4:37,  0 users,  load average: 11.50, 11.38, 11.68
+VEREDICTO: RECON_COMPLETO — inventario de como se levanta, controla y ve tu Ubuntu recolectado arriba. Ningun archivo ni config fue modificado (solo lectura verificado).
+=== MISION-A28-RECON COMPLETE ===
 === EXIT=0 ===
