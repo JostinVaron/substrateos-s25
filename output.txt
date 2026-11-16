@@ -1,1 +1,3 @@
-canal del bridge migrado a substrateos-s25 — esperando el reporte de la mision A27 (auto-migracion)
+=== BRIDGE RUN 2026-11-16T21:46:19Z (v4) ===
+BRIDGE IDLE — loop migrado a substrateos-s25. Sin misiones pendientes 2026-11-16T21:46:20Z
+=== EXIT=0 ===
