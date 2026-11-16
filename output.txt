@@ -1,3 +1,8 @@
-=== BRIDGE RUN 2026-11-16T21:46:19Z (v4) ===
-BRIDGE IDLE — loop migrado a substrateos-s25. Sin misiones pendientes 2026-11-16T21:46:20Z
+=== BRIDGE RUN 2026-11-16T21:48:46Z (v4) ===
+=== MISION-PING — prueba de vida del canal 2026-11-16T21:48:46Z ===
+pid del loop (lockfile): 28572
+uptime del telefono:  16:48:46 up 4:26, 0 users, load average: 11.66, 11.81, 11.99
+archivos del canal local: agent.log arranque.log battery-feed.sh commands.sh daemon.log dump.xml escritorio-daemon.sh loop-console.log loop.sh out.b64 out.json output.txt run.sh start-escritorio.sh status.txt v3.lock v4.lock 
+VEREDICTO: PONG — el bridge lee y ejecuta misiones desde substrateos-s25 rama bridge.
+=== MISION-PING COMPLETE ===
 === EXIT=0 ===
