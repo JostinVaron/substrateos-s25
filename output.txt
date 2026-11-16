@@ -1,21 +1,20 @@
-=== BRIDGE RUN 2026-11-16T22:33:56Z (v4) ===
-=== MISION-A33-FIREFOX-INSTALL — Firefox por la ruta VIABLE 2026-11-16T22:33:56Z ===
---- 1. decision de ruta: origen y simulacion de firefox-esr ---
-origen_ubuntu=0  paquetes_a_instalar=3
+=== BRIDGE RUN 2026-11-16T22:34:42Z (v4) ===
+=== MISION-A34-FIREFOX-R2 — Firefox con rutas corregidas 2026-11-16T22:34:42Z ===
+--- 1. RUTA A: firefox-esr si la SIMULACION es limpia (chequeo real) ---
+paquetes_a_instalar=3  menciones_snapd_systemd=0
   +libevent-2.1-7t64
   +libvpx9
   +firefox-esr
---- esr no elegible (origen=0 inst=3); ire a RUTA B ---
---- 2b. RUTA B: binario oficial Mozilla linux-aarch64 ---
-tamano_descargado=19 bytes
-DESCARGA_FALLO
+SIMULACION_LIMPIA: instalando firefox-esr por apt...
+APT_OK version:
+Mozilla Firefox 153.7.0esr
 --- 3. lanzador .desktop (directiva del repo) ---
+LANZADOR_OK Exec=/usr/bin/firefox-esr
 --- 4. estado final ---
-ruta_usada=NINGUNA
-/dev/block/dm-97  219G  183G   36G  84% /
-               total        used        free      shared  buff/cache   available
-Mem:            10Gi       7.4Gi       2.3Gi        72Mi       1.5Gi       3.5Gi
+ruta_usada=esr
+audit_ok
+/dev/block/dm-97  219G  184G   36G  84% /
 FIN_INNER
-VEREDICTO: ver arriba — Firefox instalado via RUTA_A (apt esr) o RUTA_B (binario Mozilla) o fallo documentado. El paquete trampa 'firefox' (PreDepends snapd) NO se toco. Siguiente paso: test de lanzamiento en la sesion viva.
-=== MISION-A33-FIREFOX-INSTALL COMPLETE ===
+VEREDICTO: ruta_usada arriba. Si esr|mozilla -> Firefox instalado y con lanzador; proximo: abrirlo en la sesion viva con verificacion visual.
+=== MISION-A34-FIREFOX-R2 COMPLETE ===
 === EXIT=0 ===
