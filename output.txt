@@ -1,17 +1,34 @@
-=== BRIDGE RUN 2026-11-16T23:51:03Z (v4) ===
-=== MISION-A48-ARTCRAFT-LIMPIEZA — mesa limpia para prueba de una sola instancia 2026-11-16T23:51:03Z ===
---- 1. instancias launcher vivas ahora ---
-cero_instancias
-
---- 2. cerrar las que haya (pid exacto) ---
-MESA_LIMPIA_CERO_INSTANCIAS
---- 3. ventana launcher en pantalla? ---
-sin ventanas craft
---- 4. icono del dock apunta al oficial ---
-Exec=substrate-gpu-run artcraft-launcher
---- 5. salud del escritorio ---
+=== BRIDGE RUN 2026-11-16T23:56:41Z (v4) ===
+=== MISION-A49-ARTCRAFT-CRASH-INPUT — ¿crashea al interactuar? 2026-11-16T23:56:41Z ===
+--- 1. logs nuevos desde el crash del usuario (post-23:51) ---
+drwxr-xr-x+ 2 root root 3452 2026-11-16 23:55:37.973991020 +0000 .
+drwxr-xr-x+ 3 root root 3452 2026-11-16 23:39:35.101991387 +0000 ..
+-rw-------+ 1 root root 3228 2026-11-16 23:49:12.261991167 +0000 artcraft-launcher.1.log
+-rw-------+ 1 root root 3291 2026-11-16 23:47:41.829991202 +0000 artcraft-launcher.2.log
+-rw-------+ 1 root root 1362 2026-11-16 23:55:39.613991020 +0000 artcraft-launcher.log
+== contenido completo del log mas reciente (/home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log) ==
+[2026-11-16T23:55:37Z INFO  artcraft_launcher] ArtCraft Launcher 0.19.2, log file /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log
+--- 2. lanzar COMO EL DOCK (substrate-gpu-run) con stderr capturado ---
+pid=27173
+ventana id=0x00c00002 nombre='ArtCraft Launcher'
+geometria: X=0 Y=769 WIDTH=1080 HEIGHT=760 
+--- 3. INTERACCION programatica (lo que A47 nunca hizo) ---
+foco_dado
+unknown opt: 63
+clic_centro_dado
+vivo_tras_clic
+clic_derecha_abajo_dado
+--- 4. veredicto de la interaccion ---
+SOBREVIVIO_INTERACCION (sin crash)
+--- 5. stderr capturado (el panico, si hubo) ---
+[bytes err=3405]
+[2026-11-16T23:56:43Z INFO  artcraft_launcher] ArtCraft Launcher 0.19.2, log file /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log
+MESA-LOADER: failed to retrieve device information
+--- 6. stdout capturado (sin ureq) ---
+--- 7. dmesg por si fue segfault del kernel ---
+--- 8. salud del escritorio ---
 SHELL_VIVO
 FIN_INNER
-VEREDICTO: si MESA_LIMPIA_CERO_INSTANCIAS, el usuario puede abrir el icono del dock y probar UNA sola instancia del launcher sin colisiones.
-=== MISION-A48-ARTCRAFT-LIMPIEZA COMPLETE ===
+VEREDICTO: arriba esta el exit code y el stderr en el momento exacto del crash con interaccion. Si SOBREVIVIO_INTERACCION y el usuario igual crashea, la diferencia restante es el hardware de entrada real (SPen/touch de la tablet via WTM) — pedirle reproducir con mouse normal. NO especular mas alla del dato.
+=== MISION-A49-ARTCRAFT-CRASH-INPUT COMPLETE ===
 === EXIT=0 ===
