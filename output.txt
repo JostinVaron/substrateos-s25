@@ -1,25 +1,23 @@
-=== BRIDGE RUN 2026-11-16T23:12:55Z (v4) ===
-=== MISION-A42-ARTCRAFT-LAUNCHER — terreno + launcher para la suite ArtCraft 2026-11-16T23:12:55Z ===
---- 1. dependencias comunes de apps 3D (directiva 03-APPS-GPU.md) ---
-deps_exit=0
-Use 'apt autoremove' to remove them.
-0 upgraded, 0 newly installed, 0 to remove and 18 not upgraded.
---- 2. carpeta de apps del usuario (directiva repo) ---
---- 3. instalando artcraft-launcher (/usr/local/bin) ---
-launcher_instalado
---- 4. icono en el dock (sesion root: /usr/share/applications) ---
-desktop_ok
---- 5. verificacion (checklist del repo) ---
-GPU_WRAPPER_OK
-[GPU]
-Extended renderer info (GLX_MESA_query_renderer):
-OpenGL renderer string: Adreno (TM) 830v1
-[Apps en /home/dexuser/Apps]
-drwxr-xr-x+  2 root root 3452 Nov 16 22:34 .
-audit_exit=0
---- 6. ayuda del launcher ---
-uso: artcraft-launcher {status|install <ruta|URL>|run [args]}
-FIN_INNER
-VEREDICTO: launcher listo. La suite misma NO se descargo — el repo manda no inventar rutas de ArtCraft. Cuando exista URL o archivo oficial: artcraft-launcher install <URL|ruta> la instala con GPU Adreno en un paso.
-=== MISION-A42-ARTCRAFT-LAUNCHER COMPLETE ===
+=== BRIDGE RUN 2026-11-16T23:17:51Z (v4) ===
+=== MISION-A43-VSCODE-GUARDIAN-OFF — apagar el guardian que reabre VS Code 2026-11-16T23:17:51Z ===
+--- 1. localizar guardian (verificar identidad antes de matar) ---
+guardian_pids=26788 26797 
+  PID COMMAND
+26788 /data/data/com.termux/files/usr/bin/proot --kill-on-exit --link2symlink --sysvipc --
+26797 bash /tmp/vskeep.sh
+--- 2. matar guardian PRIMERO (para que no reanime) ---
+guardian_pid_26788 terminado
+guardian_pid_26797 terminado
+GUARDIAN_MUERTO_CONFIRMADO
+--- 3. cerrar ventana de VS Code de forma limpia (xdotool, nunca pkill -f) ---
+--- 4. procesos code restantes (pids exactos verificados) ---
+code_pids=
+CODE_LIMPIO
+--- 5. verificacion final (nada resucita) ---
+0x02000005  0 localhost Resources
+GUARDIO_SIGUE_MUERTO_TRAS_10s
+               total        used        free      shared  buff/cache   available
+Mem:            10Gi       7.3Gi       1.4Gi        96Mi       2.5Gi       3.6Gi
+VEREDICTO: guardian apagado para siempre. VS Code ya NO se reabre solo; se lanza unicamente cuando el usuario lo abra (icono del dock ya parchado con wrapper seguro).
+=== MISION-A43-VSCODE-GUARDIAN-OFF COMPLETE ===
 === EXIT=0 ===
