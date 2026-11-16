@@ -1,20 +1,33 @@
-=== BRIDGE RUN 2026-11-16T22:34:42Z (v4) ===
-=== MISION-A34-FIREFOX-R2 — Firefox con rutas corregidas 2026-11-16T22:34:42Z ===
---- 1. RUTA A: firefox-esr si la SIMULACION es limpia (chequeo real) ---
-paquetes_a_instalar=3  menciones_snapd_systemd=0
-  +libevent-2.1-7t64
-  +libvpx9
-  +firefox-esr
-SIMULACION_LIMPIA: instalando firefox-esr por apt...
-APT_OK version:
-Mozilla Firefox 153.7.0esr
---- 3. lanzador .desktop (directiva del repo) ---
-LANZADOR_OK Exec=/usr/bin/firefox-esr
---- 4. estado final ---
-ruta_usada=esr
+=== BRIDGE RUN 2026-11-16T22:42:22Z (v4) ===
+=== MISION-A36-VSCODE — limpiar trampa + instalar VS Code completo 2026-11-16T22:42:22Z ===
+--- 1. TRAMPA firefox: simulacion de borrado (nunca a ciegas) ---
+  -firefox
+paquetes_a_remover=1 criticos=0
+TRAMPA_ELIMINADA
+firefox_ii_restantes=0
+--- 2. repo oficial Microsoft (clave GPG + sources arm64) ---
+gpg_size=640
+update_exit=0
+code:
+  Installed: (none)
+  Candidate: 1.146.0-1794340783
+  Version table:
+--- 3. instalando code ---
+install_exit=0
+Processing triggers for desktop-file-utils (0.28-1build1) ...
+Processing triggers for gnome-menus (3.38.1-1ubuntu1) ...
+Processing triggers for man-db (2.13.1-1build1) ...
+Processing triggers for shared-mime-info (2.4-5build3) ...
+VERSION:
+You are trying to start Visual Studio Code as a super user which isn't recommended. If this was intended, please add the argument `--no-sandbox` and specify an alternate user data directory using the `--user-data-dir` argument.
+--- 4. lanzador proot-safe (directiva del repo) ---
+LANZADOR_OK (vscode-proot.desktop con flags proot)
+--- 5. salud final ---
 audit_ok
-/dev/block/dm-97  219G  184G   36G  84% /
+/dev/block/dm-97  219G  185G   35G  85% /
+               total        used        free      shared  buff/cache   available
+Mem:            10Gi       7.7Gi       787Mi       111Mi       2.8Gi       3.2Gi
 FIN_INNER
-VEREDICTO: ruta_usada arriba. Si esr|mozilla -> Firefox instalado y con lanzador; proximo: abrirlo en la sesion viva con verificacion visual.
-=== MISION-A34-FIREFOX-R2 COMPLETE ===
+VEREDICTO: ver arriba — trampa evaluada/eliminada sin colateral y VS Code arm64 oficial instalado con lanzador proot-safe. Proximo: abrirlo en la sesion viva y login GitHub para funciones agenticas (Copilot).
+=== MISION-A36-VSCODE COMPLETE ===
 === EXIT=0 ===
