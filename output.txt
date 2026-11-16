@@ -1,28 +1,6 @@
-=== BRIDGE RUN 2026-11-16T22:59:32Z (v4) ===
-=== MISION-A39-VSCODE-UNO — parche correcto + lanzamiento en sesion unica viva 2026-11-16T22:59:32Z ===
---- 0. entorno X alcanzable? ---
-name of display:    :0
---- 1. parche CORRECTO a los .desktop reales (prefijo exacto, respaldo previo) ---
-ahora /usr/share/applications/com.microsoft.VSCode.desktop:
-Exec=/usr/local/bin/vscode-proot %F
-Exec=/usr/local/bin/vscode-proot --new-window %F
-ahora /usr/share/applications/com.microsoft.VSCode.UrlHandler.desktop:
-Exec=/usr/local/bin/vscode-proot --open-url %U
---- 2. lanzar code DENTRO de esta misma sesion (nohup interno, nada externo) ---
-code_pid=23291
---- 3. monitoreo proceso+ventana hasta 150 s ---
-PROCESO_MURIO_EN_2s
---- 4. procesos code vivos ---
-23322 /usr/share/code/code --no-sandbox --user-data-dir=/root/.config/Code-proot --disable-gpu --disable-dev-shm-usage
-23379 /usr/share/code/code --type=zygote --no-zygote-sandbox --no-sandbox
-23380 /usr/share/code/code --type=zygote --no-sandbox
-23436 /usr/share/code/code --type=gpu-process --disable-gpu-sandbox --no-sandbox --disable-dev-shm-usage --ozone-platform=x11 --enable-crash-reporter=4afb89be-1286-4233-9c29-ec2533558c8a,no_channel --user-data-dir=/root/.config/Code-proot --gpu-preferences=WAAAAAAAAAAgAQAEAAAAAAAAAAAAAGAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAACAAAAAAAAAAIAAAAAAAAAABAAAAAAAAAAgAAAAAAAAACAAAAAAAAAAIAAAAAAAAAA== --use-gl=disabled --shared-files --field-trial-handle=3,i,11765245973562402335,4949877529591055462,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker,UpdateCompositorMemoryPolicyOnScreenChange --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,1433945694928582147,12779320963854206468,4 --trace-process-track-uuid=3190708988185955192
-23438 /usr/share/code/code --type=utility --utility-sub-type=network.mojom.NetworkService --lang=en-US --service-sandbox-type=none --no-sandbox --disable-dev-shm-usage --enable-crash-reporter=4afb89be-1286-4233-9c29-ec2533558c8a,no_channel --user-data-dir=/root/.config/Code-proot --standard-schemes=vscode-webview,vscode-file --secure-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --cors-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --fetch-schemes=vscode-webview,vscode-file,vscode-remote-resource,vscode-managed-remote-resource --service-worker-schemes=vscode-webview --code-cache-schemes=vscode-webview,vscode-file --shared-files=v8_context_snapshot_data:100 --field-trial-handle=3,i,11765245973562402335,4949877529591055462,262144 --enable-features=DocumentPolicyIncludeJSCallStacksInCrashReports,EarlyEstablishGpuChannel,EstablishGpuChannelAsync,GlobalShortcutsPortal,GlobalShortcutsPortalPreferredTrigger,PdfUseShowSaveFilePicker,UpdateCompositorMemoryPolicyOnScreenChange --disable-features=CalculateNativeWinOcclusion,DropInputEventsWhilePaintHolding,LocalNetworkAccessChecks,ScreenAIOCREnabled,SpareRendererForSitePerProcess,TraceSiteInstanceGetProcessCreation --variations-seed-version --pseudonymization-salt-handle=7,i,1433945694928582147,12779320963854206468,4 --trace-process-track-uuid=3190708989122997041
---- 5. ventanas X ---
-0x00c00004  0 localhost Visual Studio Code
---- 6. log de Electron (head 25) ---
---- 7. captura ---
-colores=37712
-VEREDICTO_A39: SIN_VENTANA — seccion 6 contiene el porque real, NO especular
-=== MISION-A39-VSCODE-UNO COMPLETE ===
+=== BRIDGE RUN 2026-11-16T23:00:00Z (v4) ===
+=== MISION-A40-VSCODE-FRENTE — traer la ventana existente al frente 2026-11-16T23:00:00Z ===
+ventana=
+VEREDICTO_A40: VENTANA_DESAPARECIDA — relevar de nuevo
+=== MISION-A40-VSCODE-FRENTE COMPLETE ===
 === EXIT=0 ===
