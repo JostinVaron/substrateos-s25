@@ -1,39 +1,61 @@
-echo "=== MISION-A45-ARTCRAFT-RECON — mapear la suite ArtCraft real, sin instalar nada $(date -u +%FT%TZ) ==="
+echo "=== MISION-A46-ARTCRAFT-INSTALL — launcher OFICIAL aarch64, el correcto $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
 T="$PREFIX/tmp"
-cat > "$T/recon.sh" <<'EOS'
+cat > "$T/aci.sh" <<'EOS'
 set -u
-echo "--- 1. ¿existe binario artcraft en PATH? ---"
-command -v artcraft 2>/dev/null || echo "no_en_path"
-echo "--- 2. paquetes con 'art' o 'craft' instalados ---"
-dpkg -l 2>/dev/null | grep -iE "artcraft|art-craft|artcraft" | head -10 || echo "sin_paquete"
-echo "--- 3. busqueda de archivos en el sistema (60 s max) ---"
-timeout 60 find / -iname "*artcraft*" -not -path "*/proc/*" -not -path "*/sys/*" 2>/dev/null | head -30
-echo "--- 4. .desktop relacionados ---"
-grep -il "artcraft" /usr/share/applications/*.desktop /home/dexuser/.local/share/applications/*.desktop /root/.local/share/applications/*.desktop 2>/dev/null
-for D in $(grep -il "artcraft" /usr/share/applications/*.desktop 2>/dev/null | head -5); do
-  echo "== $D =="; grep -E "^(Exec|Name|Icon)=" "$D"
+export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
+export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
+echo "--- 1. descubrir assets reales del release v0.19.2 via API (sin inventar) ---"
+curl -s --max-time 60 https://api.github.com/repos/storytold/craft-launcher/releases/tags/v0.19.2 > /tmp/cl-rel.json
+echo "assets_encontrados:"
+grep -o '"name": *"[^"]*\(deb\|AppImage\|rpm\|flatpak\)[^"]*"' /tmp/cl-rel.json | sed 's/"name": *//' | sort -u | head -20
+DEB_URL=$(grep -o '"browser_download_url": *"[^"]*aarch64[^"]*\.deb"' /tmp/cl-rel.json | head -1 | grep -o 'https[^"]*')
+AI_URL=$(grep -o '"browser_download_url": *"[^"]*aarch64[^"]*\.AppImage"' /tmp/cl-rel.json | head -1 | grep -o 'https[^"]*')
+echo "deb_aarch64=${DEB_URL:-NINGUNO}"
+echo "appimage_aarch64=${AI_URL:-NINGUNO}"
+if [ -n "$DEB_URL" ]; then
+  echo "--- 2. descargar .deb aarch64 oficial ---"
+  curl -L --max-time 600 -o /tmp/craft-launcher-aarch64.deb "$DEB_URL" && echo "descarga_ok bytes=$(stat -c%s /tmp/craft-launcher-aarch64.deb)"
+  echo "--- 3. instalar (apt resuelve dependencias) ---"
+  apt-get install -y /tmp/craft-launcher-aarch64.deb >/tmp/cl-inst.log 2>&1
+  echo "install_exit=$?"; tail -3 /tmp/cl-inst.log
+elif [ -n "$AI_URL" ]; then
+  echo "--- 2b. no hay .deb aarch64 — usando AppImage aarch64 (directiva repo: extract-and-run) ---"
+  curl -L --max-time 600 -o /home/dexuser/Apps/artcraft-launcher-aarch64.AppImage "$AI_URL"
+  chmod +x /home/dexuser/Apps/artcraft-launcher-aarch64.AppImage
+  echo "appimage_ok bytes=$(stat -c%s /home/dexuser/Apps/artcraft-launcher-aarch64.AppImage)"
+else
+  echo "VEREDICTO: SIN_ASSET_AARCH64_COMPATIBLE — NO invento; reportar al dueno"
+  exit 0
+fi
+echo "--- 4. binario oficial presente? ---"
+command -v artcraft-launcher && /usr/bin/artcraft-launcher --version 2>/dev/null | head -1 || ls /home/dexuser/Apps/*.AppImage 2>/dev/null
+echo "--- 5. colision: renombrar MI script, no tapar al oficial ---"
+[ -f /usr/local/bin/artcraft-launcher ] && mv /usr/local/bin/artcraft-launcher /usr/local/bin/artcraft-helper && echo "mi_script_renombrado_a_artcraft-helper"
+echo "--- 6. repuntar icono del dock al launcher OFICIAL con GPU wrapper ---"
+printf '[Desktop Entry]\nType=Application\nName=ArtCraft Launcher\nExec=substrate-gpu-run artcraft-launcher\nIcon=applications-graphics\nTerminal=false\nCategories=Graphics;\n' > /usr/share/applications/artcraft-gpu.desktop
+update-desktop-database /usr/share/applications 2>/dev/null || true
+grep "^Exec=" /usr/share/applications/artcraft-gpu.desktop
+echo "--- 7. prueba GUI: lanzar, esperar ventana, capturar, CERRAR LIMPIO (sin residuos) ---"
+nohup substrate-gpu-run artcraft-launcher > /tmp/cl-gui.log 2>&1 &
+GP=$!
+VW=""
+for i in $(seq 1 30); do
+  sleep 2
+  VW=$(wmctrl -l 2>/dev/null | grep -iE "artcraft|craft" | awk '{print $1}' | head -1)
+  [ -n "$VW" ] && { echo "ventana_a_los_$((i*2))s id=$VW nombre='$(xdotool getwindowname $VW 2>/dev/null)'"; break; }
 done
-echo "--- 5. directorios de datos del usuario ---"
-ls -la /home/dexuser 2>/dev/null | head -20
-ls -la /root 2>/dev/null | grep -iE "art|craft|config" | head -10
-ls /opt 2>/dev/null
-echo "--- 6. ayuda/version de binarios hallados (solo lectura, no GUI) ---"
-B=$(timeout 60 find / -iname "*artcraft*" -type f -perm -u+x -not -path "*/proc/*" -not -path "*/sys/*" 2>/dev/null | head -5)
-for X in $B; do
-  echo "== $X =="
-  timeout 15 "$X" --help 2>&1 | head -12
-  timeout 10 "$X" --version 2>&1 | head -3
-done
-echo "--- 7. logs recientes del updater (busca 'updates are complete') ---"
-timeout 30 grep -ril "updates are complete" /tmp /root/.local /home/dexuser/.local /var/log 2>/dev/null | head -5
-echo "--- 8. parchar leak de zenity en artcraft-launcher (timeout 60) ---"
-sed -i 's|zenity --info --title="ArtCraft Launcher"|timeout 60 zenity --info --title="ArtCraft Launcher"|' /usr/local/bin/artcraft-launcher 2>/dev/null
-grep -n "zenity" /usr/local/bin/artcraft-launcher | head -2
-echo "FIN_RECON"
+scrot -o /tmp/rt-dex/artcraft-launcher.png 2>/dev/null
+identify -format 'colores=%k\n' /tmp/rt-dex/artcraft-launcher.png 2>/dev/null
+pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO
+[ -n "$VW" ] && xdotool windowclose "$VW" 2>/dev/null && echo "ventana_cerrada_limpia"
+sleep 3
+head -8 /tmp/cl-gui.log
+pgrep -x artcraft-laun >/dev/null && echo "LAUNCHER_PROCESO_RESTANTE (matar por pid)" && for P in $(pgrep -x artcraft-laun); do kill "$P"; done || echo "SIN_RESIDUOS"
+echo "FIN_INNER"
 EOS
-proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/recon.sh 2>&1
-rm -f "$T/recon.sh"
-echo "VEREDICTO: mapa de la suite arriba. NO se instalo nada ni se lanzo GUI. Con estos datos se decide: binario correcto del launcher clasico y como abrirlo con substrate-gpu-run."
-echo "=== MISION-A45-ARTCRAFT-RECON COMPLETE ==="
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/aci.sh 2>&1
+rm -f "$T/aci.sh"
+echo "VEREDICTO: ver arriba. Si install_ok y ventana detectada: launcher oficial instalado; el usuario lo abre desde el dock cuando quiera (vive dentro de su sesion GNOME). Si SIN_ASSET: no se invento nada, reportar."
+echo "=== MISION-A46-ARTCRAFT-INSTALL COMPLETE ==="
 echo "### BRIDGE MARKER ###"
