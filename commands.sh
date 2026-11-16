@@ -1,49 +1,39 @@
-echo "=== MISION-A44-RAM-PURGE — purgar solo residuos mios, escritorio intacto $(date -u +%FT%TZ) ==="
+echo "=== MISION-A45-ARTCRAFT-RECON — mapear la suite ArtCraft real, sin instalar nada $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
 T="$PREFIX/tmp"
-cat > "$T/purge.sh" <<'EOS'
+cat > "$T/recon.sh" <<'EOS'
 set -u
-export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
-export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
-echo "--- 1. RAM antes ---"
-free -h | head -2
-echo "--- 2. top 8 consumidores dentro del proot (RSS) ---"
-ps aux --sort=-rss 2>/dev/null | head -9 | awk '{printf "%s %sMB ", $1, int($6/1024); for(i=11;i<=NF;i++) printf "%s ", $i; print ""}' | cut -c1-110
-echo "--- 3. residuo: firefox de los tests (cierre gracil via xdotool) ---"
-W=$(wmctrl -l 2>/dev/null | grep -i "mozilla firefox" | awk '{print $1}' | head -1)
-if [ -n "$W" ]; then
-  xdotool windowclose "$W" 2>/dev/null && echo "firefox_test_cerrado_gracilmente"
-  sleep 4
-else
-  echo "firefox_ya_no_esta_abierto"
-fi
-echo "--- 4. residuos: glxgears/calc/weston (pids exactos); code solo si es huerfano sin ventana ---"
-for PAT in glxgears gnome-calculato weston; do
-  for P in $(pgrep -x "$PAT" 2>/dev/null); do kill "$P" 2>/dev/null && echo "matado $PAT pid=$P"; done
+echo "--- 1. ¿existe binario artcraft en PATH? ---"
+command -v artcraft 2>/dev/null || echo "no_en_path"
+echo "--- 2. paquetes con 'art' o 'craft' instalados ---"
+dpkg -l 2>/dev/null | grep -iE "artcraft|art-craft|artcraft" | head -10 || echo "sin_paquete"
+echo "--- 3. busqueda de archivos en el sistema (60 s max) ---"
+timeout 60 find / -iname "*artcraft*" -not -path "*/proc/*" -not -path "*/sys/*" 2>/dev/null | head -30
+echo "--- 4. .desktop relacionados ---"
+grep -il "artcraft" /usr/share/applications/*.desktop /home/dexuser/.local/share/applications/*.desktop /root/.local/share/applications/*.desktop 2>/dev/null
+for D in $(grep -il "artcraft" /usr/share/applications/*.desktop 2>/dev/null | head -5); do
+  echo "== $D =="; grep -E "^(Exec|Name|Icon)=" "$D"
 done
-if ! wmctrl -l 2>/dev/null | grep -qi "visual studio code"; then
-  for P in $(pgrep -x code 2>/dev/null); do kill "$P" 2>/dev/null && echo "matado code huerfano pid=$P"; done
-else
-  echo "code_omitido: hay ventana viva (no interferir)"
-fi
-pgrep -f vskeep >/dev/null 2>&1 && echo "GUARDIAN_REVIVIO_ALERTA" || echo "guardian_sigue_muerto_ok"
-echo "--- 5. caches de apt ---"
-du -sh /var/cache/apt/archives 2>/dev/null
-apt-get clean 2>/dev/null && echo "apt_cache_limpiado"
-apt-get autoremove -y >/tmp/purge-ar.log 2>&1; echo "autoremove_exit=$?"
-tail -2 /tmp/purge-ar.log
-echo "--- 6. drop_caches (puede no aplicar en proot) ---"
-sync 2>/dev/null
-echo 3 > /proc/sys/vm/drop_caches 2>/dev/null && echo "drop_ok" || echo "drop_no_permitido_en_proot"
-sleep 3
-echo "--- 7. RAM despues ---"
-free -h | head -2
-echo "--- 8. consumidor mas pesado restante (tu escritorio, se espera) ---"
-ps aux --sort=-rss 2>/dev/null | sed -n '2p' | cut -c1-100
-echo "FIN_INNER"
+echo "--- 5. directorios de datos del usuario ---"
+ls -la /home/dexuser 2>/dev/null | head -20
+ls -la /root 2>/dev/null | grep -iE "art|craft|config" | head -10
+ls /opt 2>/dev/null
+echo "--- 6. ayuda/version de binarios hallados (solo lectura, no GUI) ---"
+B=$(timeout 60 find / -iname "*artcraft*" -type f -perm -u+x -not -path "*/proc/*" -not -path "*/sys/*" 2>/dev/null | head -5)
+for X in $B; do
+  echo "== $X =="
+  timeout 15 "$X" --help 2>&1 | head -12
+  timeout 10 "$X" --version 2>&1 | head -3
+done
+echo "--- 7. logs recientes del updater (busca 'updates are complete') ---"
+timeout 30 grep -ril "updates are complete" /tmp /root/.local /home/dexuser/.local /var/log 2>/dev/null | head -5
+echo "--- 8. parchar leak de zenity en artcraft-launcher (timeout 60) ---"
+sed -i 's|zenity --info --title="ArtCraft Launcher"|timeout 60 zenity --info --title="ArtCraft Launcher"|' /usr/local/bin/artcraft-launcher 2>/dev/null
+grep -n "zenity" /usr/local/bin/artcraft-launcher | head -2
+echo "FIN_RECON"
 EOS
-proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/purge.sh 2>&1
-rm -f "$T/purge.sh"
-echo "VEREDICTO: purga de residuos de misiones aplicada. Escritorio y sesion NO tocados. Ver RAM antes/despues arriba. Si el telefono sigue apretado, la presion principal esta en el lado Android (multitarea WTM + tablet), fuera del alcance del proot."
-echo "=== MISION-A44-RAM-PURGE COMPLETE ==="
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/recon.sh 2>&1
+rm -f "$T/recon.sh"
+echo "VEREDICTO: mapa de la suite arriba. NO se instalo nada ni se lanzo GUI. Con estos datos se decide: binario correcto del launcher clasico y como abrirlo con substrate-gpu-run."
+echo "=== MISION-A45-ARTCRAFT-RECON COMPLETE ==="
 echo "### BRIDGE MARKER ###"
