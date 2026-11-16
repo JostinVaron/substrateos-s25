@@ -1,51 +1,21 @@
-=== BRIDGE RUN 2026-11-16T22:30:03Z (v4) ===
-=== MISION-A32-FIREFOX-EVAL — ¿Firefox servira en este entorno? 2026-11-16T22:30:03Z ===
---- 1. LA TRAMPA: ¿el paquete firefox de apt es real o pasarela a snap? ---
-firefox:
-  Installed: 1:1snap1-0ubuntu9.1
-  Candidate: 1:1snap1-0ubuntu9.1
-  Version table:
- *** 1:1snap1-0ubuntu9.1 500
-        500 http://ports.ubuntu.com/ubuntu-ports resolute-updates/main arm64 Packages
-        100 /var/lib/dpkg/status
-     1:1snap1-0ubuntu8 500
-Package: firefox
-Installed-Size: 113
-Version: 1:1snap1-0ubuntu9.1
-Size: 68286
-Package: firefox
-Installed-Size: 121
-dependencias que delatan la pasarela snap:
-  PreDepends: snapd
----
---- 2. ¿snapd es usable aqui? (esperado: NO en proot) ---
-snap    2.78+ubuntu26.04
-snapd   unavailable
-series  -
-error: cannot list snaps: cannot communicate with server: Get "http://localhost/v2/snaps": dial unix /run/snapd.socket: connect: no such file or directory
---- 3. alternativas en los repos oficiales ---
-firefox-esr:
-  Installed: (none)
-  Candidate: 153.7.0esr-1~deb13u1
-  Version table:
-     153.7.0esr-1~deb13u1 1
-firefox - Installs Firefox snap and provides some system integration
-activity-aware-firefox - wrapper to make Firefox aware of Plasma Desktop activities
-librust-fxprof-processed-profile-dev - Create profiles in the Firefox Profiler's processed profile JSON format - Rust source code
-node-playwright - JavaScript framework for Web Testing and Automation
-webext-vimium-firefox - keyboard-based navigation and control (Firefox)
-xul-ext-ubufox - Ubuntu modifications for Firefox
-webext-debianbuttons - Buttons for querying Debian-related pages with Firefox
-xul-ext-debianbuttons - Buttons for Firefox - Transitional package
---- 4. ruta oficial Mozilla (binario arm64 directo, sin snap ni ppa) ---
-HTTP/2 302 
-server: nginx
-date: Mon, 16 Nov 2026 22:32:46 GMT
---- 5. recursos: RAM y disco disponible ahora ---
-               total        used        free      shared  buff/cache   available
-Mem:            10Gi       7.3Gi       2.7Gi        77Mi       1.2Gi       3.6Gi
-Swap:          4.0Gi       4.0Gi        13Mi
+=== BRIDGE RUN 2026-11-16T22:33:56Z (v4) ===
+=== MISION-A33-FIREFOX-INSTALL — Firefox por la ruta VIABLE 2026-11-16T22:33:56Z ===
+--- 1. decision de ruta: origen y simulacion de firefox-esr ---
+origen_ubuntu=0  paquetes_a_instalar=3
+  +libevent-2.1-7t64
+  +libvpx9
+  +firefox-esr
+--- esr no elegible (origen=0 inst=3); ire a RUTA B ---
+--- 2b. RUTA B: binario oficial Mozilla linux-aarch64 ---
+tamano_descargado=19 bytes
+DESCARGA_FALLO
+--- 3. lanzador .desktop (directiva del repo) ---
+--- 4. estado final ---
+ruta_usada=NINGUNA
 /dev/block/dm-97  219G  183G   36G  84% /
---- 6. entorno grafico que heredaria: GTK y render ---
-/data/data/com.termux/files/home/substrate/bridge/run.sh: line 25: unexpected EOF while looking for matching `''
-=== EXIT=2 ===
+               total        used        free      shared  buff/cache   available
+Mem:            10Gi       7.4Gi       2.3Gi        72Mi       1.5Gi       3.5Gi
+FIN_INNER
+VEREDICTO: ver arriba — Firefox instalado via RUTA_A (apt esr) o RUTA_B (binario Mozilla) o fallo documentado. El paquete trampa 'firefox' (PreDepends snapd) NO se toco. Siguiente paso: test de lanzamiento en la sesion viva.
+=== MISION-A33-FIREFOX-INSTALL COMPLETE ===
+=== EXIT=0 ===
