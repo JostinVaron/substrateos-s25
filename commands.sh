@@ -1,32 +1,75 @@
-echo "=== MISION-A32-FIREFOX-EVAL — ¿Firefox servira en este entorno? $(date -u +%FT%TZ) ==="
+echo "=== MISION-A33-FIREFOX-INSTALL — Firefox por la ruta VIABLE $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
-G() { proot-distro login ubuntu-gnome --shared-tmp -- bash -c "$1" 2>&1; }
-
-echo "--- 1. LA TRAMPA: ¿el paquete firefox de apt es real o pasarela a snap? ---"
-G 'apt-cache policy firefox 2>/dev/null | head -8'
-G 'apt-cache show firefox 2>/dev/null | grep -E "^(Package|Version|Installed-Size|Size):" | head -6'
-echo "dependencias que delatan la pasarela snap:"
-G 'apt-cache depends firefox 2>/dev/null | grep -iE "snap| transitional" ; echo "---"; apt-cache show firefox 2>/dev/null | grep -iE "Description-en" | head -2'
-
-echo "--- 2. ¿snapd es usable aqui? (esperado: NO en proot) ---"
-G 'snap version 2>&1 | head -3; snap list 2>&1 | head -3'
-
-echo "--- 3. alternativas en los repos oficiales ---"
-G 'apt-cache policy firefox-esr 2>/dev/null | head -5; apt-cache search firefox 2>/dev/null | grep -vE "language|locale|theme|extension" | head -8'
-
-echo "--- 4. ruta oficial Mozilla (binario arm64 directo, sin snap ni ppa) ---"
-G 'timeout 12 curl -sI https://download.mozilla.org/ 2>&1 | head -3 || echo "SIN_RED_A_MOZILLA"'
-
-echo "--- 5. recursos: RAM y disco disponible ahora ---"
-G 'free -h | head -3; df -h / | tail -1'
-
-echo "--- 6. entorno grafico que heredaria: GTK y render ---"
-G 'dpkg -l 2>/dev/null | grep -cE "ii  libgtk-4|ii  libgtk-3"; echo "librerias gtk arriba"
-G 'export DISPLAY=:0; timeout 6 xdpyinfo >/dev/null 2>&1 && echo X_OK'
-
-echo "--- 7. sintesis para decidir ruta ---"
-echo "LECTURA: si seccion 1 muestra Depends: snapd o paquete transitorio, la ruta apt firefox NO SIRVE."
-echo "Si firefox-esr no aparece en seccion 3, las rutas viables son: binario oficial Mozilla arm64 (seccion 4) o PPA mozillateam."
-echo "Firefox es GTK3 (no GTK4): riesgo LRZ/SIGKILL bajo, pero render sera software por diseno — aceptable para navegador."
-echo "=== MISION-A32-FIREFOX-EVAL COMPLETE ==="
+T="$PREFIX/tmp"
+cat > "$T/ff-in.sh" <<'EOS'
+set -u
+FF_DONE=""
+echo "--- 1. decision de ruta: origen y simulacion de firefox-esr ---"
+SRCUBU=$(apt-cache policy firefox-esr 2>/dev/null | grep -c "ports.ubuntu.com")
+apt-get -s install firefox-esr >/tmp/ff-sim.txt 2>&1
+NINST=$(grep -c "^Inst " /tmp/ff-sim.txt)
+echo "origen_ubuntu=$SRCUBU  paquetes_a_instalar=$NINST"
+grep -E "^Inst " /tmp/ff-sim.txt | awk '{print "  +"$2}' | head -12
+if [ "$SRCUBU" -ge 1 ] && [ "$NINST" -gt 0 ] && [ "$NINST" -lt 30 ]; then
+  echo "--- 2. RUTA A: apt install firefox-esr ---"
+  apt-get install -y firefox-esr >/tmp/ff-install.log 2>&1
+  if [ $? -eq 0 ] && command -v firefox-esr >/dev/null; then
+    echo "APT_OK"
+    timeout 40 firefox-esr --version 2>&1 | head -1
+    FF_DONE=esr
+  else
+    echo "APT_FALLO:"; tail -8 /tmp/ff-install.log
+  fi
+else
+  echo "--- esr no elegible (origen=$SRCUBU inst=$NINST); ire a RUTA B ---"
+fi
+if [ -z "$FF_DONE" ]; then
+  echo "--- 2b. RUTA B: binario oficial Mozilla linux-aarch64 ---"
+  mkdir -p /home/dexuser/Apps
+  curl -sL --max-time 480 -o /tmp/ff.tar.xz "https://download.mozilla.org/?product=firefox-latest&os=linux-aarch64&lang=es-ES" || curl -sL --max-time 480 -o /tmp/ff.tar.xz "https://download.mozilla.org/?product=firefox-latest&os=linux-aarch64&lang=en-US"
+  SZ=$(stat -c%s /tmp/ff.tar.xz 2>/dev/null || echo 0)
+  echo "tamano_descargado=$SZ bytes"
+  if [ "$SZ" -gt 50000000 ]; then
+    tar -xJf /tmp/ff.tar.xz -C /home/dexuser/Apps/ && echo "EXTRACT_OK"
+    if [ -x /home/dexuser/Apps/firefox/firefox ]; then
+      echo "MOZILLA_OK"
+      timeout 40 /home/dexuser/Apps/firefox/firefox --version 2>&1 | head -1
+      FF_DONE=mozilla
+    fi
+  else
+    echo "DESCARGA_FALLO"
+  fi
+fi
+echo "--- 3. lanzador .desktop (directiva del repo) ---"
+if [ "$FF_DONE" = "esr" ]; then
+  EXECBIN=/usr/bin/firefox-esr
+elif [ "$FF_DONE" = "mozilla" ]; then
+  EXECBIN=/home/dexuser/Apps/firefox/firefox
+fi
+if [ -n "$FF_DONE" ]; then
+  mkdir -p /home/dexuser/.local/share/applications
+  cat > /home/dexuser/.local/share/applications/firefox.desktop <<EOD
+[Desktop Entry]
+Type=Application
+Name=Firefox
+Exec=$EXECBIN
+Icon=firefox
+Terminal=false
+Categories=Network;WebBrowser;
+EOD
+  chmod 644 /home/dexuser/.local/share/applications/firefox.desktop
+  chown dexuser:dexuser /home/dexuser/.local/share/applications/firefox.desktop 2>/dev/null || true
+  update-desktop-database /home/dexuser/.local/share/applications 2>/dev/null || true
+  echo "LANZADOR_OK Exec=$EXECBIN"
+fi
+echo "--- 4. estado final ---"
+echo "ruta_usada=${FF_DONE:-NINGUNA}"
+df -h / | tail -1
+free -h | head -2
+echo "FIN_INNER"
+EOS
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/ff-in.sh 2>&1
+rm -f "$T/ff-in.sh"
+echo "VEREDICTO: ver arriba — Firefox instalado via RUTA_A (apt esr) o RUTA_B (binario Mozilla) o fallo documentado. El paquete trampa 'firefox' (PreDepends snapd) NO se toco. Siguiente paso: test de lanzamiento en la sesion viva."
+echo "=== MISION-A33-FIREFOX-INSTALL COMPLETE ==="
 echo "### BRIDGE MARKER ###"
