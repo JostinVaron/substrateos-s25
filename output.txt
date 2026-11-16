@@ -1,40 +1,51 @@
-=== BRIDGE RUN 2026-11-16T22:18:40Z (v4) ===
-=== MISION-A31 — integridad post-tests + preparacion para instalar apps 2026-11-16T22:18:40Z ===
---- 1. INTEGRIDAD: session GNOME ---
-SHELL_VIVO
-ventanas_abiertas=0
-  dimensions:    2000x1200 pixels (529x317 millimeters)
---- 2. INTEGRIDAD: procesos huerfanos de los tests ---
-GLXGEARS_AUN_VIVE (mal)
-CALC_AUN_VIVA
-logins proot activos: 3
---- 3. INTEGRIDAD: salud del shell (sin crash en el log) ---
-21:13:22.4791              Adwaita[ 7533]: WARNING: The resource style-dark.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
-21:13:22.4797              Adwaita[ 7533]: WARNING: The resource style-hc.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
-21:13:29.5858          cc-hostname[ 7533]: WARNING: Failed to get property 'Chassis': GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.freedesktop.hostname1 was not provided by any .service files
-21:13:29.6010                 GLib[ 7533]:CRITICAL: g_strv_contains: assertion 'str != NULL' failed
-21:13:35.0857 cc-multitasking-panel[ 7533]: WARNING: Failed to determine if save/restore is supported: GDBus.Error:org.freedesktop.DBus.Error.ServiceUnknown: The name org.gnome.SessionManager was not provided by any .service files
-0
---- 4. INTEGRIDAD: carga y memoria ahora ---
- 22:18:42 up 2 min,  0 users,  load average: 0.12, 0.07, 0.02
+=== BRIDGE RUN 2026-11-16T22:30:03Z (v4) ===
+=== MISION-A32-FIREFOX-EVAL — ¿Firefox servira en este entorno? 2026-11-16T22:30:03Z ===
+--- 1. LA TRAMPA: ¿el paquete firefox de apt es real o pasarela a snap? ---
+firefox:
+  Installed: 1:1snap1-0ubuntu9.1
+  Candidate: 1:1snap1-0ubuntu9.1
+  Version table:
+ *** 1:1snap1-0ubuntu9.1 500
+        500 http://ports.ubuntu.com/ubuntu-ports resolute-updates/main arm64 Packages
+        100 /var/lib/dpkg/status
+     1:1snap1-0ubuntu8 500
+Package: firefox
+Installed-Size: 113
+Version: 1:1snap1-0ubuntu9.1
+Size: 68286
+Package: firefox
+Installed-Size: 121
+dependencias que delatan la pasarela snap:
+  PreDepends: snapd
+---
+--- 2. ¿snapd es usable aqui? (esperado: NO en proot) ---
+snap    2.78+ubuntu26.04
+snapd   unavailable
+series  -
+error: cannot list snaps: cannot communicate with server: Get "http://localhost/v2/snaps": dial unix /run/snapd.socket: connect: no such file or directory
+--- 3. alternativas en los repos oficiales ---
+firefox-esr:
+  Installed: (none)
+  Candidate: 153.7.0esr-1~deb13u1
+  Version table:
+     153.7.0esr-1~deb13u1 1
+firefox - Installs Firefox snap and provides some system integration
+activity-aware-firefox - wrapper to make Firefox aware of Plasma Desktop activities
+librust-fxprof-processed-profile-dev - Create profiles in the Firefox Profiler's processed profile JSON format - Rust source code
+node-playwright - JavaScript framework for Web Testing and Automation
+webext-vimium-firefox - keyboard-based navigation and control (Firefox)
+xul-ext-ubufox - Ubuntu modifications for Firefox
+webext-debianbuttons - Buttons for querying Debian-related pages with Firefox
+xul-ext-debianbuttons - Buttons for Firefox - Transitional package
+--- 4. ruta oficial Mozilla (binario arm64 directo, sin snap ni ppa) ---
+HTTP/2 302 
+server: nginx
+date: Mon, 16 Nov 2026 22:32:46 GMT
+--- 5. recursos: RAM y disco disponible ahora ---
                total        used        free      shared  buff/cache   available
-Mem:            10Gi       8.0Gi       1.7Gi        93Mi       1.5Gi       2.9Gi
-Swap:          4.0Gi       4.0Gi        60Ki
---- 5. TERRENO: espacio en disco del contenedor ---
-/dev/block/dm-97  219G  184G   36G  84% /
-/data/data/com.termux/files/usr/tmp  219G  184G   36G  84% /tmp
---- 6. TERRENO: salud de dpkg/apt (auditoria, sin cambios) ---
-audit_ok
-128
---- 7. TERRENO: actualizando listas de paquetes (apt update, seguro) ---
-Get:13 http://ports.ubuntu.com/ubuntu-ports resolute-updates/universe arm64 Packages [473 kB]
-Fetched 2127 kB in 9s (245 kB/s)
-Reading package lists...
---- 8. TERRENO: que hay ya instalado (resumen) ---
-1890
-/usr/sbin/synaptic
-/usr/bin/apt
-/usr/bin/snap
-VEREDICTO: INTEGRIDAD_Y_TERRENO_MEDIDOS — datos arriba; nada destructivo ejecutado (solo apt update de listas). Listos para instalar apps.
-=== MISION-A31 COMPLETE ===
-=== EXIT=0 ===
+Mem:            10Gi       7.3Gi       2.7Gi        77Mi       1.2Gi       3.6Gi
+Swap:          4.0Gi       4.0Gi        13Mi
+/dev/block/dm-97  219G  183G   36G  84% /
+--- 6. entorno grafico que heredaria: GTK y render ---
+/data/data/com.termux/files/home/substrate/bridge/run.sh: line 25: unexpected EOF while looking for matching `''
+=== EXIT=2 ===
