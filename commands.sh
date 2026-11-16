@@ -1,7 +1,9 @@
-echo "=== MISION-PING — prueba de vida del canal $(date -u +%FT%TZ) ==="
-echo "pid del loop (lockfile): $(cat $HOME/substrate/bridge/v4.lock 2>/dev/null)"
-echo "uptime del telefono: $(uptime 2>/dev/null | tr -s ' ')"
-echo "archivos del canal local: $(ls $HOME/substrate/bridge/ 2>/dev/null | tr '\n' ' ')"
-echo "VEREDICTO: PONG — el bridge lee y ejecuta misiones desde substrateos-s25 rama bridge."
-echo "=== MISION-PING COMPLETE ==="
+echo "=== MISION-DEMO-STREAM — demostracion en tiempo real $(date -u +%FT%TZ) ==="
+echo "observa: una linea nueva cada 2 segundos"
+for i in 1 2 3 4 5 6 7 8 9 10; do
+  echo "linea $i/10 — $(date +%H:%M:%S)"
+  sleep 2
+done
+echo "VEREDICTO: STREAM_OK — acabas de ver al bridge trabajando en vivo"
+echo "=== MISION-DEMO-STREAM COMPLETE ==="
 echo "### BRIDGE MARKER ###"
