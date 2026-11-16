@@ -1,35 +1,35 @@
-=== BRIDGE RUN 2026-11-16T22:06:47Z (v4) ===
-=== MISION-A29-R2 — Calculadora con login proot persistente 2026-11-16T22:06:47Z ===
---- 0. causa raiz de R1 ---
-proot usa --kill-on-exit: la calc lanzada como hija de un login efimero murio al salir el bash -c. R2 usa login persistente (setsid) con la calc en exec.
---- 1. ventanas antes ---
---- 2. lanzando login PERSISTENTE con la calc en foreground ---
-login_persistente_pid=29807
---- 3. esperando ventana (max 30 s, xdotool/wmctrl) ---
-ventana detectada a los ~2 s
---- 4. verificacion con instrumentos corregidos ---
-todas las ventanas (wmctrl -l):
-0x00c00004  0 localhost Calculator
-VENTANA_CALC_ID=12582914
-titulo: gnome-calculator
-Window 12582914
-  Position: 0,0 (screen: 0)
-  Geometry: 1x1
-VENTANA_ACTIVADA_TRAER_AL_FRENTE
---- 5. log de la calc (si fallo, el por que esta aqui) ---
-MESA-EGL: warning: DRI3 error: Could not get DRI3 device
-MESA-EGL: warning: Ensure your X server supports DRI3 to get accelerated rendering
-
-(gnome-calculator:29813): Adwaita-WARNING **: 22:06:50.580: The resource style-dark.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
-
-(gnome-calculator:29813): Adwaita-WARNING **: 22:06:50.581: The resource style-hc.css is deprecated and shouldn't be used anymore. Use style.css with media queries instead.
-
-(gnome-calculator:29813): IBUS-WARNING **: 22:06:51.033: Unable to connect to ibus: Could not connect: No such file or directory
---- 6. captura de evidencia ---
-colores=139181
---- 7. el shell sobrevivio? ---
+=== BRIDGE RUN 2026-11-16T22:08:35Z (v4) ===
+=== MISION-A30-GPU — ¿los programas usan la Adreno 830 o caen a software? 2026-11-16T22:08:35Z ===
+--- 1. BASELINE SIN WRAPPER (como lanzaria una app ingenua) ---
+Extended renderer info (GLX_MESA_query_renderer):
+    Accelerated: yes
+OpenGL renderer string: zink Vulkan 1.4(Adreno (TM) 830v1 (MESA_TURNIP))
+OpenGL version string: 4.6 (Compatibility Profile) Mesa 26.3.0-devel (git-98f3d6229d)
+--- 2. CON SUBSTRATE-GPU-RUN (receta del repo para apps GPU) ---
+Extended renderer info (GLX_MESA_query_renderer):
+    Accelerated: yes
+OpenGL renderer string: Adreno (TM) 830v1
+OpenGL version string: 4.6 (Compatibility Profile) Mesa 26.3.0-devel (git-98f3d6229d)
+--- 3. VULKAN VIA WRAPPER (turnip directo) ---
+	apiVersion         = 1.4.354
+	deviceName         = Adreno (TM) 830
+	driverName         = turnip Mesa driver
+	apiVersion         = 1.4.354
+	deviceName         = llvmpipe (LLVM 21.1.8, 128 bits)
+	driverName         = llvmpipe
+--- 4. PRUEBA DURISIMA: fds kgsl abiertos por el proceso GL ---
+kgsl_fds_del_proceso_GL=4
+renderer_del_proceso: 
+--- 5. FPS comparado (12 s cada uno) ---
+FPS software (llvmpipe):
+120.019 FPS
+FPS hardware (Adreno via wrapper):
+120.045 FPS
+--- 6. el shell sobrevivio (regla de oro) ---
 SHELL_VIVO
-VEREDICTO: CALC_ABIERTA_EN_PANTALLA — la Calculadora queda ABIERTA para verificacion visual humana. NO se declara exito total hasta que el dueno confirme verla.
-para cerrarla despues: proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'DISPLAY=:0 xdotool search --class calc windowclose'
-=== MISION-A29-R2 COMPLETE ===
+--- 7. sintesis automatica ---
+LECTURA: seccion 1 debe decir llvmpipe/swrast (compositor software, por diseno).
+Secciones 2-4 deben decir Adreno 830 con kgsl_fds>=1: esa es la prueba de GPU REAL.
+Si seccion 4 reporta kgsl_fds=0 y renderer zink/llvmpipe, la GPU NO esta en uso y hay que arreglar.
+=== MISION-A30-GPU COMPLETE ===
 === EXIT=0 ===
