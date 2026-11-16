@@ -1,2 +1,7 @@
-echo "BRIDGE IDLE — loop migrado a substrateos-s25. Sin misiones pendientes $(date -u +%FT%TZ)"
+echo "=== MISION-PING — prueba de vida del canal $(date -u +%FT%TZ) ==="
+echo "pid del loop (lockfile): $(cat $HOME/substrate/bridge/v4.lock 2>/dev/null)"
+echo "uptime del telefono: $(uptime 2>/dev/null | tr -s ' ')"
+echo "archivos del canal local: $(ls $HOME/substrate/bridge/ 2>/dev/null | tr '\n' ' ')"
+echo "VEREDICTO: PONG — el bridge lee y ejecuta misiones desde substrateos-s25 rama bridge."
+echo "=== MISION-PING COMPLETE ==="
 echo "### BRIDGE MARKER ###"
