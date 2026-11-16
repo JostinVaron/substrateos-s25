@@ -1,6 +1,16 @@
-=== BRIDGE RUN 2026-11-16T23:00:00Z (v4) ===
-=== MISION-A40-VSCODE-FRENTE — traer la ventana existente al frente 2026-11-16T23:00:00Z ===
-ventana=
-VEREDICTO_A40: VENTANA_DESAPARECIDA — relevar de nuevo
-=== MISION-A40-VSCODE-FRENTE COMPLETE ===
+=== BRIDGE RUN 2026-11-16T23:00:40Z (v4) ===
+=== MISION-A41-VSCODE-KEEP — guardian persistente para VS Code 2026-11-16T23:00:40Z ===
+guardian_pid=26788 (sesion proot PERSISTENTE — nunca se cierra)
+--- esperando 110 s a que el guardian haga su trabajo ---
+--- resultado del guardian ---
+[23:00:41] guardian iniciado dbus=unix:path=/tmp/dbus-5OM6CBNLuL,guid=53b9528a700ec2e23f8a7ab96afb71b5
+[23:00:41] code_pid=26803
+[23:00:43] VENTANA_EN_2s id=0x00c00004
+titulo='Visual Studio Code'
+colores=32947
+VEREDICTO: VSCODE_VIVO_Y_VISIBLE
+--- guardian vivo en Termux? ---
+26788 /data/data/com.termux/files/usr/bin/proot --kill-on-exit --link2symlink --sysvipc --kernel-release=\Linux\localhost\6.17.0-PRoot-Distro\#1 SMP PREEMPT_DYNAMIC Fri, 10 Oct 2025 00:00:00 +0000\aarch64\localdomain\-1\ -L --change-id=0:0 --rootfs=. --cwd=/root --bind=/dev --bind=/proc --bind=/sys --bind=/dev/urandom:/dev/random --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sys_empty:/sys/fs/selinux --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/loadavg:/proc/loadavg --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/stat:/proc/stat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/uptime:/proc/uptime --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/version:/proc/version --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/vmstat:/proc/vmstat --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_entry_cap_last_cap:/proc/sys/kernel/cap_last_cap --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_inotify_max_user_watches:/proc/sys/fs/inotify/max_user_watches --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowuid:/proc/sys/kernel/overflowuid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/sysdata/sysctl_kernel_overflowgid:/proc/sys/kernel/overflowgid --bind=/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/shm:/dev/shm --bind=/data/app --bind=/data/dalvik-cache --bind=/data/misc/apexdata/com.android.art/dalvik-cache --bind=/storage/self/primary:/mnt/sdcard --bind=/storage/self/primary:/sdcard --bind=/storage/self/primary:/storage/emulated/0 --bind=/storage/self/primary:/storage/self/primary --bind=/data/data/com.termux/cache --bind=/data/data/com.termux/files/home --bind=/apex --bind=/odm --bind=/product --bind=/system --bind=/system_ext --bind=/vendor --bind=/linkerconfig/ld.config.txt --bind=/linkerconfig/com.android.art/ld.config.txt --bind=/data/data/com.termux/files/usr --bind=/data/data/com.termux/files/usr/tmp:/tmp /bin/bash -c bash /tmp/vskeep.sh
+26797 bash /tmp/vskeep.sh
+=== MISION-A41-VSCODE-KEEP COMPLETE ===
 === EXIT=0 ===
