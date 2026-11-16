@@ -1,79 +1,17 @@
-=== BRIDGE RUN 2026-11-16T23:47:37Z (v4) ===
-=== MISION-A47-ARTCRAFT-CRASH-DIAG — por que crashea el catalogo 2026-11-16T23:47:37Z ===
---- 1. log oficial del launcher (crash previo del usuario) ---
--rw-------+ 1 root root  216 Nov 16 23:46 artcraft-launcher.1.log
--rw-------+ 1 root root 3423 Nov 16 23:46 artcraft-launcher.2.log
--rw-------+ 1 root root 1894 Nov 16 23:46 artcraft-launcher.log
-== ultimas 25 lineas de /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log ==
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:46:34Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:46:35Z DEBUG ureq_proto::client] Call<RecvResponse>
-== lineas con panic/error/fatal/warn en todo el log ==
---- 2. reproducir: lanzar con GPU (como el dock) y vigilar 90 s ---
-pid=16307
-...vivo a los 20s, ventanas: 1
-...vivo a los 40s, ventanas: 1
-...vivo a los 60s, ventanas: 1
-...vivo a los 80s, ventanas: 1
-SOBREVIVIO_90s (sin crash en esta pasada)
---- 3. log de la GUI de esta pasada ---
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Prepare>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:47:41Z DEBUG ureq_proto::client] Call<Cleanup>
---- 4. diagnostico A/B: mismo launcher con render SOFTWARE (si el GL es el asesino, este sobrevive) ---
-...software vivo a los 20s
-...software vivo a los 40s
-...software vivo a los 60s
-...software vivo a los 80s
-SOBREVIVIO_SOFTWARE_90s
-senal: el problema es el GL/GPU path
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<SendRequest>
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvResponse>
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<Cleanup>
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<RecvBody>
-[2026-11-16T23:49:12Z DEBUG ureq_proto::client] Call<Cleanup>
---- 5. salud final ---
+=== BRIDGE RUN 2026-11-16T23:51:03Z (v4) ===
+=== MISION-A48-ARTCRAFT-LIMPIEZA — mesa limpia para prueba de una sola instancia 2026-11-16T23:51:03Z ===
+--- 1. instancias launcher vivas ahora ---
+cero_instancias
+
+--- 2. cerrar las que haya (pid exacto) ---
+MESA_LIMPIA_CERO_INSTANCIAS
+--- 3. ventana launcher en pantalla? ---
+sin ventanas craft
+--- 4. icono del dock apunta al oficial ---
+Exec=substrate-gpu-run artcraft-launcher
+--- 5. salud del escritorio ---
 SHELL_VIVO
-               total        used        free      shared  buff/cache   available
-Mem:            10Gi       7.5Gi       2.2Gi        92Mi       1.5Gi       3.4Gi
 FIN_INNER
-VEREDICTO: el porque real del crash esta arriba (exit code + log + resultado A/B GPU-vs-software). Con eso se elige la cura: flags al wrapper o icono de dock, NO a ciegas.
-=== MISION-A47-ARTCRAFT-CRASH-DIAG COMPLETE ===
+VEREDICTO: si MESA_LIMPIA_CERO_INSTANCIAS, el usuario puede abrir el icono del dock y probar UNA sola instancia del launcher sin colisiones.
+=== MISION-A48-ARTCRAFT-LIMPIEZA COMPLETE ===
 === EXIT=0 ===
