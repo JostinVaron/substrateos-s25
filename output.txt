@@ -1,8 +1,16 @@
-=== BRIDGE RUN 2026-11-16T21:48:46Z (v4) ===
-=== MISION-PING — prueba de vida del canal 2026-11-16T21:48:46Z ===
-pid del loop (lockfile): 28572
-uptime del telefono:  16:48:46 up 4:26, 0 users, load average: 11.66, 11.81, 11.99
-archivos del canal local: agent.log arranque.log battery-feed.sh commands.sh daemon.log dump.xml escritorio-daemon.sh loop-console.log loop.sh out.b64 out.json output.txt run.sh start-escritorio.sh status.txt v3.lock v4.lock 
-VEREDICTO: PONG — el bridge lee y ejecuta misiones desde substrateos-s25 rama bridge.
-=== MISION-PING COMPLETE ===
+=== BRIDGE RUN 2026-11-16T21:55:39Z (v4) ===
+=== MISION-DEMO-STREAM — demostracion en tiempo real 2026-11-16T21:55:39Z ===
+observa: una linea nueva cada 2 segundos
+linea 1/10 — 16:55:39
+linea 2/10 — 16:55:41
+linea 3/10 — 16:55:43
+linea 4/10 — 16:55:45
+linea 5/10 — 16:55:47
+linea 6/10 — 16:55:49
+linea 7/10 — 16:55:51
+linea 8/10 — 16:55:53
+linea 9/10 — 16:55:55
+linea 10/10 — 16:55:57
+VEREDICTO: STREAM_OK — acabas de ver al bridge trabajando en vivo
+=== MISION-DEMO-STREAM COMPLETE ===
 === EXIT=0 ===
