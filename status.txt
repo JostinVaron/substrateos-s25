@@ -1,4 +1,4 @@
 loop: v4 (pid 28572)
-ts: 2026-11-16T22:08:33Z
-estado: corriendo
+ts: 2026-11-16T22:09:09Z
+estado: subiendo output
 mision: MISION-A30
