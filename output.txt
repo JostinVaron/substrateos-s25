@@ -1,23 +1,36 @@
-=== BRIDGE RUN 2026-11-17T01:23:29Z (v5) ===
-=== MISION-A63-VERIFICACION-BROKER — verificacion completa del arbol nativo 2026-11-17T01:23:29Z ===
---- 1. broker nativo: vivo y con adj=0? ---
-broker_pid=26039 adj=0
---- 2. fifo compartido ---
-fifo_OK en /data/data/com.termux/files/usr/tmp/launch.fifo
---- 3. historial del broker ---
-[20:22:26] lanzando vectorcraft
---- 4. dentro del proot: cliente e iconos ---
-cliente_OK
-iconos_apuntando_al_broker=4/4
---- 5. prueba en vivo propia: vectorcraft via fifo, 15 s ---
-vectorcraft_pid=NO
-APP_NO_NACIO — revisar ~/tmp/app-live-vectorcraft.log
-2026-11-17T01:23:30.556Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
-MESA-LOADER: failed to retrieve device information
-2026-11-17T01:23:30.711Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:23:30.711Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:23:30.761Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
---- 6. broker sigue vivo ---
-BROKER_PERSISTE
-=== MISION-A63-VERIFICACION-BROKER COMPLETE ===
+=== BRIDGE RUN 2026-11-17T01:30:27Z (v5) ===
+=== MISION-A64-VENTANA-FANTASMA — revivir escritorio y traer ventanas al frente 2026-11-17T01:30:27Z ===
+--- 0. X server vivo? ---
+X0
+--- 1. relanzar el escritorio (idempotente) ---
+arranque_pid=31228
+--- 2. esperar asentamiento de la sesion (50 s) ---
+  X OK en :0
+[2/4] sesion persistente del escritorio
+  lanzando sesion completa en proot persistente...
+  esperando que levante (50s)...
+== escritorios (el * es el actual) ==
+0  * DG: 1600x900  VP: 0,0  WA: 0,24 1600x876  Workspace 1
+1  - DG: 1600x900  VP: N/A  WA: 0,24 1600x876  Workspace 2
+== ventanas con geometria: id escritorio x y ancho alto host titulo ==
+0x00c00002  0 0    98   1600 839  localhost VectorCraft
+0x00a00007 -1 0    0    1600 24   localhost Top Expanded Edge Panel
+0x00e00003 -1 0    0    1600 924  localhost Desktop
+0x02000003 -1 0    0    133  900  localhost plank
+== apps vivas dentro del proot (prueba de vida real) ==
+vectorcraft VIVO pid=28057
+== trayendo cada ventana craft al escritorio 0 y activandola ==
+ventana 0x00c00002 movida a escritorio 0
+ventana 0x00c00002 activada
+== ventanas despues del movimiento ==
+0x00c00002  0 0    98   1600 839  localhost VectorCraft
+0x00a00007 -1 0    0    1600 24   localhost Top Expanded Edge Panel
+0x00e00003 -1 0    0    1600 924  localhost Desktop
+0x02000003 -1 0    0    133  900  localhost plank
+== salud ==
+SHELL_MUERTO
+--- 3. broker nativo sigue vivo? ---
+BROKER_VIVO
+VEREDICTO: con wmctrl -lG veremos en que escritorio y con que geometria abrio la ventana fantasma. Si estaba en escritorio !=0 o con x/y fuera de pantalla, ya quedo movida y activada — el usuario deberia VER la ventana ahora. Si alguna app no aparece en 'vivas', la lista acorta el siguiente paso.
+=== MISION-A64-VENTANA-FANTASMA COMPLETE ===
 === EXIT=0 ===
