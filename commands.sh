@@ -1,92 +1,51 @@
-echo "=== MISION-A51-ARTCRAFT-FORENSE — toolkit, OOM, sw+interaccion $(date -u +%FT%TZ) ==="
+echo "=== MISION-A52-INSTALLER-127 — forense y cura del error 127 $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
 T="$PREFIX/tmp"
-cat > "$T/fore.sh" <<'EOS'
+cat > "$T/a52.sh" <<'EOS'
 set -u
 export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
 export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
-echo "--- 1. cerrar instancias ---"
-for P in $(pgrep -x artcraft-laun 2>/dev/null); do kill "$P" 2>/dev/null; done
-sleep 1
-pgrep -x artcraft-laun >/dev/null && echo AUN_HAY || echo CERO_INSTANCIAS
-echo "--- 2. logs del wrapper (sesiones del usuario) ---"
-ls -la /tmp/artcraft-session-*.log 2>/dev/null | tail -4
-for L in $(ls -t /tmp/artcraft-session-*.log 2>/dev/null | head -2); do
-  echo "== $L =="; grep -vE "ureq_proto" "$L" | tail -8
-done
-echo "--- 3. toolkit del binario (define la cura) ---"
-ldd /usr/local/bin/artcraft-launcher 2>&1 | head -12
-echo "hints:"
-strings /usr/local/bin/artcraft-launcher 2>/dev/null | grep -im1 -E "winit|iced-|egui|slint|libgtk|gtk-3|gtk4|relm4"
-echo "--- 4. flags soportados ---"
-timeout 20 artcraft-launcher --help 2>&1 | head -12
-echo "--- 5. dispositivos de entrada reales ---"
-apt-get install -y xinput >/tmp/xi.log 2>&1
-xinput list 2>&1 | head -14
-echo "--- 6. lanzamiento MONITORIZADO (ruta exacta del dock) 150 s ---"
-/usr/local/bin/artcraft-dock-launch &
-WP=$!
-for i in $(seq 1 30); do
-  sleep 5
-  RSS=$(ps -o rss= -p "$(pgrep -x artcraft-laun | head -1)" 2>/dev/null)
-  FM=$(free -m | awk '/^Mem/{print $7}')
-  echo "t=$((i*5))s rss_kb=${RSS:-MUERTO} memlibre_mb=$FM"
-  pgrep -x artcraft-laun >/dev/null || { wait $WP; echo "MURIO_EXIT=$? t=$((i*5))s"; break; }
-done
-pgrep -x artcraft-laun >/dev/null && { echo "SOBREVIVIO_150s"; for P in $(pgrep -x artcraft-laun); do kill "$P"; done; }
-echo "--- 7. test OOM: presion 3 GiB + relanzar 90 s ---"
-nohup python3 -c "
-import time
-b=[]
-try:
-    while True:
-        b.append(bytearray(50*1024*1024)); time.sleep(0.4)
-        if sum(len(x) for x in b) >= 3*1024**3: break
-except MemoryError:
-    pass
-time.sleep(150)
-" > /tmp/alloc.log 2>&1 &
-ALLOC=$!
-sleep 10
+echo "--- 0. A51: vivo, muerto o colgado + limpieza de restos ---"
+pgrep -f "fore.sh" >/dev/null && echo A51_VIVO || echo A51_NO_CORRE
+for P in $(pgrep -f "python3 -c" 2>/dev/null); do kill -9 "$P" 2>/dev/null; echo "alloc_limpiado_pid=$P"; done
 free -m | head -2
-/usr/local/bin/artcraft-dock-launch &
-WP2=$!
-for i in $(seq 1 18); do
-  sleep 5
-  pgrep -x artcraft-laun >/dev/null || { wait $WP2; echo "MURIO_BAJO_PRESION_EXIT=$? t=$((i*5))s"; break; }
+echo "--- 1. que comando de instalador busca el launcher (127 = command not found) ---"
+for CMD in pkexec pkcon apt-get dpkg flatpak gdebi; do
+  W=$(command -v $CMD 2>/dev/null); echo "$CMD => ${W:-FALTA}"
 done
-pgrep -x artcraft-laun >/dev/null && echo "SOBREVIVIO_PRESION" || true
-kill "$ALLOC" 2>/dev/null
-for P in $(pgrep -f "python3 -c"); do kill "$P" 2>/dev/null; done
-for P in $(pgrep -x artcraft-laun); do kill "$P" 2>/dev/null; done
-sleep 2
-free -m | head -2
-echo "--- 8. software render + interaccion (hueco de matriz) ---"
-HOME=/home/dexuser LIBGL_ALWAYS_SOFTWARE=1 GSK_RENDERER=cairo artcraft-launcher > /tmp/a51-sw.log 2>&1 &
-SP=$!
-sleep 8
-VW=$(wmctrl -l 2>/dev/null | grep -i craft | awk '{print $1}' | head -1)
-if [ -n "$VW" ]; then
-  xdotool windowactivate "$VW" 2>/dev/null; sleep 1
-  read X Y W H <<< "$(xdotool getwindowgeometry --shell $VW | awk '/^X/{x=$2}/^Y/{y=$2}/^WIDTH/{w=$2}/^HEIGHT/{h=$2} END{print x,y,w,h}')"
-  CX=$((X+W/2)); CY=$((Y+H/2))
-  for i in 1 2 3; do xdotool mousemove $((CX-80+i*40)) $((CY-60+i*20)); sleep 1; done
-  xdotool click 1; sleep 2
-  xdotool key Down; sleep 2
-  xdotool click 1; sleep 3
-  if kill -0 $SP 2>/dev/null; then echo "SOBREVIVIO_SW_INTERACCION"; else wait $SP; echo "CRASH_SW_INTERACCION_EXIT=$?"; fi
-  grep -vE "ureq_proto" /tmp/a51-sw.log | grep -iE "panic|error|fatal" | tail -8
-  for P in $(pgrep -x artcraft-laun); do kill "$P" 2>/dev/null; done
+echo "strings_installer_hints:"
+strings /usr/local/bin/artcraft-launcher 2>/dev/null | grep -oE "pkexec|pkcon|packagekit|apt-get|dpkg -i|flatpak install|gdebi|polkit" | sort | uniq -c | sort -rn | head -6
+echo "--- 2. toolkit (paso que A51 no llego a reportar) ---"
+strings /usr/local/bin/artcraft-launcher 2>/dev/null | grep -im1 -E "winit|iced-|egui|slint|libgtk|gtk-3|gtk4"
+ldd /usr/local/bin/artcraft-launcher 2>&1 | grep -iE "gtk|adw" | head -4
+echo "--- 3. logs del usuario (incluye tu error 127 capturado) ---"
+for L in $(ls -t /tmp/artcraft-session-*.log 2>/dev/null | head -3); do
+  echo "== $L =="; grep -vE "ureq_proto" "$L" | tail -6
+done
+echo "--- 4. LA CURA: instalar policykit + packagekit ---"
+apt-get install -y policykit-1 packagekit >/tmp/apt52.log 2>&1; echo "apt_exit=$?"
+grep -iE "^E:|unable|not found" /tmp/apt52.log | head -3
+W=$(command -v pkcon); echo "pkcon_ahora=${W:-SIGUE_FALTA}"
+echo "--- 5. agente polkit vivo en el bus de sesion ---"
+if [ -x /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 ]; then
+  /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 >/dev/null 2>&1 &
+  sleep 1; echo agente_gnome_ok
+elif command -v lxpolkit >/dev/null 2>&1; then
+  lxpolkit >/dev/null 2>&1 & sleep 1; echo lxpolkit_ok
 else
-  echo "SIN_VENTANA_SW (posible crash de arranque sw)"; wait $SP; echo "EXIT_SW=$?"
-  tail -8 /tmp/a51-sw.log | grep -vE "ureq_proto"
+  echo SIN_AGENTE_POLKIT
 fi
-echo "--- 9. salud ---"
+echo "--- 6. prueba REAL del mecanismo (paquete inofensivo 'sl') ---"
+timeout 150 pkcon -p --noninteractive install sl >/tmp/pkcon-test.log 2>&1; EC=$?
+echo "pkcon_exit=$EC"
+tail -3 /tmp/pkcon-test.log
+dpkg -l sl >/dev/null 2>&1 && echo MECANISMO_INSTALACION_OK || echo MECANISMO_FALLA
+echo "--- 7. salud ---"
 pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO
 echo "FIN_INNER"
 EOS
-proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/fore.sh 2>&1
-rm -f "$T/fore.sh"
-echo "VEREDICTO: con toolkit + exit codes + matriz completa arriba se decide la cura en A52. NO especular."
-echo "=== MISION-A51-ARTCRAFT-FORENSE COMPLETE ==="
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a52.sh 2>&1
+rm -f "$T/a52.sh"
+echo "VEREDICTO: si strings muestra pkcon/pkexec y ahora existen + prueba sl OK, el 127 esta curado. PROXIMO PASO HUMANO: reintentar instalar la app desde el launcher (cerrarlo y reabrirlo primero) y avisar."
+echo "=== MISION-A52-INSTALLER-127 COMPLETE ==="
 echo "### BRIDGE MARKER ###"
