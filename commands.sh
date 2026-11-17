@@ -1,63 +1,49 @@
-echo "=== MISION-A55-OOM-VS-WINIT — firma del crash de las apps $(date -u +%FT%TZ) ==="
+echo "=== MISION-A56-TRAMPA-APPS — trampa de captura para las 4 apps $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
 T="$PREFIX/tmp"
-echo "--- 1. LADO ANDROID (Termux, fuera del proot): la evidencia del sospechoso OOM ---"
-echo "== RAM del telefono (la que Android ve) =="
-free -h | head -2
-grep -E "^(MemTotal|MemAvailable|SwapTotal|SwapFree|Committed_AS)" /proc/meminfo
-echo "== PSI: presion de memoria del kernel (some = cuello, full = matando) =="
-cat /proc/pressure/memory 2>/dev/null || echo "sin PSI"
-echo "== contador de kills OOM del kernel (desde el arranque) =="
-grep -E "^(oom_kill|pgmajfault)" /proc/vmstat 2>/dev/null || echo "sin vmstat"
-echo "== logcat: muertes por LMKD (lo que mato a Firefox) =="
-logcat -d 2>/dev/null | grep -iE "lowmemorykiller|lmkd|kill.*process|out of memory" | tail -12 || echo "logcat_no_accesible"
-echo "== Top consumidores de RAM vistos por Android (top 8) =="
-ps -eo rss,comm --sort=-rss 2>/dev/null | head -9
-echo "--- 2. LADO PROOT: firma del crash de las apps ArtCraft ---"
-cat > "$T/a55.sh" <<'EOS'
+cat > "$T/a56.sh" <<'EOS'
 set -u
 export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
 export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
-echo "== binarios instalados por las 4 apps =="
-dpkg -L vectorcraft 2>/dev/null | grep -E "bin/" | head -3
-APPBIN=$(dpkg -L vectorcraft 2>/dev/null | grep -E "/(bin|opt)/" | grep -vE "\.(desktop|png|xml|md)$" | head -1)
-echo "app_bin=${APPBIN:-NO_ENCONTRADO}"
-[ -z "$APPBIN" ] && { echo "buscando binario alternativo..."; ls /usr/local/bin/ 2>/dev/null | grep -iE "vector|craft" | head -4; }
-echo "== hay logs propios de las apps? =="
-ls /home/dexuser/.local/share/ 2>/dev/null | grep -iE "craft" 
-find /home/dexuser/.local/share -name "*.log" -mmin -60 2>/dev/null | head -4
-echo "== lanzar VectorCraft MONITORIZADO con captura (trampa del wrapper otra vez) =="
-export HOME=/home/dexuser
+echo "--- 1. wrapper de captura para apps ---"
+cat > /usr/local/bin/artcraft-app-launch <<'EOF'
+#!/bin/bash
+# Trampa de captura para apps ArtCraft: stderr + exit code + RAM en vivo.
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 LOG=/tmp/app-session-$TS.log
-substrate-gpu-run "$APPBIN" > "$LOG" 2>&1 &
-AP=$!
-echo "pid=$AP log=$LOG"
-DEAD=""
-for i in $(seq 1 30); do
-  sleep 2
-  if ! kill -0 $AP 2>/dev/null; then
-    wait $AP; RC=$?
-    echo "MURIO_EN_$((i*2))s EXIT=$RC"
-    DEAD="si"; break
+echo "[$(date -u +%FT%TZ)] app=$1 pid_inicio" > "$LOG"
+# muestreador de memoria: si la app muere con RAM desplomada = OOM; si muere con panic = winit
+( while true; do sleep 3; echo "[$(date -u +%FT%TZ)] rss_kb=$(ps -o rss= -p $PPID 2>/dev/null | tr -d ' ') memavail_kb=$(grep MemAvailable /proc/meminfo | awk '{print $2}')" >> "$LOG"; done ) &
+SAMP=$!
+substrate-gpu-run "$@" >> "$LOG" 2>&1
+RC=$?
+kill $SAMP 2>/dev/null
+echo "[$(date -u +%FT%TZ)] EXIT_CODE=$RC" >> "$LOG"
+exit $RC
+EOF
+chmod 755 /usr/local/bin/artcraft-app-launch
+echo wrapper_ok
+echo "--- 2. repuntar los .desktop de las 4 apps al wrapper ---"
+for PKG in vectorcraft photocraft filmcraft lightcraft; do
+  D=$(dpkg -L $PKG 2>/dev/null | grep -E "\.desktop$" | head -1)
+  if [ -n "$D" ]; then
+    BIN=$(grep "^Exec=" "$D" | head -1 | sed 's/^Exec=//' | awk '{print $1}')
+    [ -n "$BIN" ] && sed -i "s|^Exec=.*|Exec=/usr/local/bin/artcraft-app-launch $BIN|" "$D" && echo "$PKG: $D -> trampa ($BIN)"
+  else
+    echo "$PKG: sin .desktop"
   fi
-  RSS=$(ps -o rss= -p $AP 2>/dev/null | tr -d ' ')
-  AV=$(grep MemAvailable /proc/meminfo | awk '{print $2}')
-  [ $((i % 3)) -eq 0 ] && echo "t=$((i*2))s rss_kb=${RSS} memavail_kb=$AV"
 done
-[ -z "$DEAD" ] && { echo "SOBREVIVIO_60s"; kill $AP 2>/dev/null; }
-echo "== FIRMA: stderr de la app (panic winit = exit 101 con texto; SIGKILL OOM = 137 en silencio) =="
-echo "[bytes log=$(stat -c%s "$LOG" 2>/dev/null || echo 0)]"
-grep -vE "ureq_proto|MESA" "$LOG" | tail -12
-echo "== PSI y oom_kill DESPUES de la prueba (comparar con antes) =="
-cat /proc/pressure/memory 2>/dev/null
-grep -E "^oom_kill" /proc/vmstat 2>/dev/null
-echo "== salud =="
+update-desktop-database /usr/share/applications 2>/dev/null || true
+echo "--- 3. verificar trampas activas ---"
+grep -l "artcraft-app-launch" /usr/share/applications/*.desktop 2>/dev/null | head -5
+echo "--- 4. borrar logs viejos de app (mantener los nuevos limpios) ---"
+find /tmp -name "app-session-*.log" -mmin +60 -delete 2>/dev/null; echo limpieza_ok
+echo "--- 5. salud ---"
 pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO
 echo "FIN_INNER"
 EOS
-proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a55.sh 2>&1
-rm -f "$T/a55.sh"
-echo "VEREDICTO: la firma decide. EXIT=137/9 sin stderr + MemAvailable bajo + oom_kill subiendo = RAM AGOTADA (cura: disciplina de memoria, no parches). EXIT=101 con panic winit = mismo bug del launcher (cura distinta). Leer ambos lados antes de concluir."
-echo "=== MISION-A55-OOM-VS-WINIT COMPLETE ==="
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a56.sh 2>&1
+rm -f "$T/a56.sh"
+echo "VEREDICTO: trampas puestas. PROXIMO PASO HUMANO: abrir cada app desde el dock, usarla hasta que crashee (si crashea), y avisar — cada crash quedara grabado en /tmp/app-session-*.log con exit code y RAM en vivo: panic winit = exit 101 con texto; RAM agotada = exit 137 con memavail desplomado. Con la firma de UN crash se decide la cura."
+echo "=== MISION-A56-TRAMPA-APPS COMPLETE ==="
 echo "### BRIDGE MARKER ###"
