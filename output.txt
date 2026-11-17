@@ -1,31 +1,44 @@
-=== BRIDGE RUN 2026-11-17T02:07:50Z (v5) ===
-=== MISION-A71-UN-LOOP-PRUEBA-BIEN — un solo loop + prueba de FilmCraft medida bien 2026-11-17T02:07:50Z ===
---- 1. matar al v5 huérfano (doble loop detectado en A70) ---
-V5_MATADO (pid 24468)
-v5: ausente
-v6: VIVO pid=4226
---- 2. escritorio: verificar desde dentro del proot ---
-filmcraft_pid=14702
-== WM ==
-WM_REAL: sin WM
-colores=36435
-SHELL_VIVO pid=12029
-== FilmCraft desde dentro ==
-filmcraft_VIVA pid=14702 adj=0 rss=174792kB
-FIN_PARTE1
---- 3. MONITOREO 4 MIN (mediciones desde dentro del proot) ---
-t+30s MURIO — firma:
-proot info: vpid 1: terminated with signal 9
-proot info: vpid 1: terminated with signal 9
-proot info: vpid 1: terminated with signal 9
---- 4. logcat FRESCO de la ventana ---
-11-16 21:08:23.472  3325  3636 I ActivityManager: Process PhantomProcessRecord {2b8a9b1 16361:16971:sleep/u0a345} died
-11-16 21:08:23.472  3325  3636 I ActivityManager: Process PhantomProcessRecord {c3a5e96 16360:16971:sleep/u0a345} died
---- 5. estado final ---
-LOOP_V6_VIVO pid=4226 (unico)
+=== BRIDGE RUN 2026-11-17T02:09:17Z (v6) ===
+=== MISION-A72-CAZADOR-EN-VIVO — capturar al asesino con escena limpia 2026-11-17T02:09:17Z ===
+--- 0. estado de flags phantom (re-verificar que sigan) ---
+monitor_phantom_procs=false
+max_phantom_processes=2147483647
+--- 1. logcat en streaming desde AHORA (captura al asesino en el acto) ---
+captura_iniciada pid=18052 -> /data/data/com.termux/files/usr/tmp/a72-logcat.cap
+--- 2. procstate de termux antes de la prueba ---
+--- 3. UNA SOLA sesion proot: lanzar FilmCraft y monitorear en su loop interno ---
+filmcraft_pid=18132
+MURIO_EN_t+10s pid_era=18132
+RESULTADO: MURIO_EN_MONITOREO
+--- 4. procstate de termux despues de la prueba ---
+  *APP* UID 10354 ProcessRecord{b1b18b9 15911:com.termux.x11/u0a354}
+    class=com.termux.x11.LorieApp
+    dir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk publicDir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk data=/data/user/0/com.termux.x11
+    packageList={com.termux.x11}
+        -> ContentProviderRecord{fcb21c7 u0 com.termux.x11/androidx.startup.InitializationProvider}
+      - 412fe2c/com.android.providers.settings/.SettingsProvider->15911:com.termux.x11/u0a354 s1/1 u0/0 +1h45m17s533ms
+--- 5. LA EVIDENCIA: logcat capturado en la ventana (decisiones de kill) ---
+11-16 21:08:05.494 I/ActivityManager( 3325): Process PhantomProcessRecord {63b49f6 14697:16971:proot/u0a345} died
+11-16 21:08:05.495 I/ActivityManager( 3325): Process PhantomProcessRecord {20ba1f7 14717:16971:proot/u0a345} died
+11-16 21:08:07.195 D/FreecessHandler( 3325): skipping freeze com.termux.api(10345) result : 41
+11-16 21:08:07.195 D/FreecessHandler( 3325): stop trying to freeze com.termux.api
+11-16 21:08:07.230 D/FreecessHandler( 3325): skipping freeze org.mozilla.firefox(10381) result : 41
+11-16 21:08:07.230 D/FreecessHandler( 3325): stop trying to freeze org.mozilla.firefox
+11-16 21:08:23.472 I/ActivityManager( 3325): Process PhantomProcessRecord {2b8a9b1 16361:16971:sleep/u0a345} died
+11-16 21:08:23.472 I/ActivityManager( 3325): Process PhantomProcessRecord {c3a5e96 16360:16971:sleep/u0a345} died
+11-16 21:08:24.347 I/ActivityManager( 3325): Process PhantomProcessRecord {9e59946 16198:16971:bash/u0a345} died
+11-16 21:08:24.347 I/ActivityManager( 3325): Process PhantomProcessRecord {d99c707 16192:16971:bash/u0a345} died
+11-16 21:09:18.171 I/adbd    (16714): adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings get global settings_enable_monitor_phantom_procs'
+11-16 21:09:18.204 I/adbd    (16714): adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config get activity_manager max_phantom_processes'
+11-16 21:09:37.693 D/FreecessHandler( 3325): skipping freeze org.mozilla.firefox(10381) result : 41
+11-16 21:09:37.693 D/FreecessHandler( 3325): stop trying to freeze org.mozilla.firefox
+11-16 21:09:42.297 I/lmkd    ( 1145): check proc pid launching app : 19505
+== kills de lmkd (aunque digan 'no processes') ==
+intentos_barrido_lmkd=219
+--- 6. estado final ---
+FILMCRAFT_MUERTA
 SHELL_VIVO
-FILMCRAFT_NO
 BROKER_VIVO
-VEREDICTO: un solo loop + FilmCraft VIVA con adj estable tras 4 min + sin kills frescos = sistema verificado en su configuracion final y caso cerrado. Si murio, esta ventana es limpia: un solo loop y medicion interna.
-=== MISION-A71-UN-LOOP-PRUEBA-BIEN COMPLETE ===
+VEREDICTO: si SOBREVIVIO con sesion unica — el monitoreo intensivo era parte del problema y el usuario prueba en uso normal. Si MURIO — la ventana capturada en $CAP nombra al asesino exacto (lmkd con adj, phantom killer, o freezer) y eso define la cura definitiva.
+=== MISION-A72-CAZADOR-EN-VIVO COMPLETE ===
 === EXIT=0 ===
