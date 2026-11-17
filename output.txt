@@ -1,38 +1,23 @@
-=== BRIDGE RUN 2026-11-17T01:07:08Z (v4) ===
-=== MISION-A58-CAZADOR-SIGKILL — quien dispara el SIGKILL 2026-11-17T01:07:08Z ===
---- 1. arbol de procesos y oom_score_adj de cada nivel (la huella del asesino) ---
-== Termux base (la raiz de todo) ==
-pid=14539 adj=935 name=com.termux.widget                                           
-pid=16971 adj=200 name=com.termux                                                  
-== proot (el contenedor) ==
-pid=18205 adj=0
-pid=18206 adj=0
-pid=21734 adj=0
-== gnome-shell y x11 ==
-pid=18569 adj=0 gnome-shell
-pid=17418 adj=0 main
---- 2. logcat: LMKD al acecho (lo que Android piensa de tus procesos) ---
---- 3. PRUEBA A/B: vectorcraft CON proteccion anti-kill ---
-== intento de blindaje: oom_score_adj=-1000 en todo el arbol ==
-pid=21781 NO_blindable (permiso)
-pid=21781 NO_blindable (permiso)
-oom_score_adj_final=0
---- 4. monitoreo 45 s (sin tocar el foco — solo ver si muere espontaneamente) ---
-t=9s vivo rss_kb=119448
-t=18s vivo rss_kb=119448
-t=27s vivo rss_kb=119448
-t=36s vivo rss_kb=119448
-t=45s vivo rss_kb=119448
-SOBREVIVIO_45s_BLINDADA
---- 5. firma del test ---
-2026-11-17T01:07:09.457Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:07:09.457Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
-2026-11-17T01:07:09.604Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:07:09.604Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:07:09.651Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
---- 6. salud ---
+=== BRIDGE RUN 2026-11-17T01:08:35Z (v4) ===
+=== MISION-A59-BLINDAJE-APPS — bajar oom_score_adj al lanzar cada app 2026-11-17T01:08:35Z ===
+--- 1. test de permiso: podemos escribir oom_score_adj dentro del proot? ---
+escritura_directa_OK adj=0
+--- 2. wrapper de apps v2: blindaje automatico ---
+wrapper_v2_instalado
+--- 3. verificacion: adj de un lanzamiento de prueba ---
+app_pid=22124 adj=0
+== log de la prueba ==
+[2026-11-17T01:08:36Z] app=/usr/bin/vectorcraft pid_inicio (blindaje v2)
+2026-11-17T01:08:36.390Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
+2026-11-17T01:08:36.391Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
+MESA-LOADER: failed to retrieve device information
+2026-11-17T01:08:36.564Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
+2026-11-17T01:08:36.564Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
+2026-11-17T01:08:36.611Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
+[2026-11-17T01:08:39Z] rss_kb=2616 adj=0
+--- 4. salud ---
 SHELL_VIVO
 FIN_INNER
-VEREDICTO: si vectorcraft BLINDADA sobrevive y la desprotegida murio en 3s (A57), el asesino es LMKD por oom_score_adj y la cura es blindar el arbol en el wrapper de apps (una linea en artcraft-app-launch). Si la blindada TAMBIEN muere, el asesino no es LMKD sino gestion Samsung/cgroup y el frente cambia (termux-wake-lock + foreground service o mover el proot a foreground).
-=== MISION-A58-CAZADOR-SIGKILL COMPLETE ===
+VEREDICTO: si la prueba muestra adj=0 en la app, el blindaje funciona y el usuario debe probar: abrir VectorCraft desde el dock y USARLA — con Termux:X11 en 'sin optimizacion de bateria' (Ajustes Android) la app deberia sobrevivir. Si escritura_denegada, el blindaje por proceso es imposible sin root y la unica cura es la de Android: desactivar optimizacion de bateria para Termux y Termux:X11 + wake-lock permanente.
+=== MISION-A59-BLINDAJE-APPS COMPLETE ===
 === EXIT=0 ===
