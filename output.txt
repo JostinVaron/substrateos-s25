@@ -1,57 +1,58 @@
-=== BRIDGE RUN 2026-11-17T01:33:19Z (v5) ===
-=== MISION-A66-SESSION-BUS-HUNT — encontrar el bus de la sesion nueva y levantar el Shell 2026-11-17T01:33:19Z ===
---- 1. log completo del arranque (que paso en la sesion relanzada) ---
-[1/4] X server
-  X OK en :0
-[2/4] sesion persistente del escritorio
-  lanzando sesion completa en proot persistente...
-  esperando que levante (50s)...
-[3/4] verificacion
-  METACITY=1 FLASHBACK=1 PANEL=1 PLANK=1 NM=1 XPM=5
-  GPU:     GLX_MESA_copy_sub_buffer, GLX_MESA_gl_interop, GLX_MESA_query_renderer, 
-  ventanas:
-    0x00c00002  0 localhost VectorCraft
-    0x00a00007 -1 localhost Top Expanded Edge Panel
-    0x00e00003 -1 localhost Desktop
-    0x02000003 -1 localhost plank
-[4/4] captura
-  COLORES=5098
-  copia: ~/BOOT-escritorio.png
-=== ARRANQUE TERMINADO ===
---- 2. donde quedo el bus de sesion? ---
-== lado Termux (tmp compartido) ==
-total 144546
-drwx------. 22 u0_a345 u0_a345    20480 Nov 16 20:31 .
-drwxrwxrwt. 92 u0_a345 u0_a345    57344 Nov 16 20:33 ..
--rw-rw-rw-.  1 u0_a345 u0_a345     2907 Nov 15 03:57 FINAL-STATUS.txt
--rw-rw-rw-.  1 u0_a345 u0_a345 44675763 Nov 16 14:02 adb-all-1901.txt
-== lado proot (tmp privado del contenedor) ==
---- 3. procesos gnome/dbus vivos ---
-31257 dbus-daemon --config-file=/tmp/rt-dex/system-dbus.conf --fork
-31276 /usr/bin/dbus-daemon --syslog-only --fork --print-pid 5 --print-address 7 --session
-31326 /usr/bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 11 --address=unix:path=/tmp/rt-dex/at-spi/bus_0
---- 4. relanzamiento del Shell con el bus correcto (buscando la dir en ambos lados) ---
-BUS_NO_ENCONTRADO — enumerando candidatos
-OSL_PIPE_0_SingleOfficeIPC_4fa7c4171fbc114e957e8fa6905dc2
-a47-gui.log
-a47-sw.log
-a49-err.log
-a49-out.log
-a64-arranque.log
-a66.sh
-ab-test-20261117T010709Z.log
-ac-deps.log
-adb.10345.log
---- 5. verificacion final ---
-SHELL_MUERTO
-APP_VIVA
-0x00a00007 -1 localhost Top Expanded Edge Panel
-0x00e00003 -1 localhost Desktop
-0x02000003 -1 localhost plank
-0x00c00002  0 localhost Untitled-1 — VectorCraft
-FIN_INNER
---- 6. broker ---
+=== BRIDGE RUN 2026-11-17T01:48:19Z (v5) ===
+=== MISION-A67-TAHOE-RESTORE — forense + cura del escritorio Tahoe 2026-11-17T01:48:19Z ===
+--- 1. FORENSE: que paso cuando ejecutaste gnome49 ---
+== last-gnome49.log ==
+[S] Deteniendo sesion anterior...
+[S] Arrancando GNOME Shell 49 X11 (~35 s)...
+[S] afinidad prime cores 6-7 aplicada
+[S] OK: shell pid=9363 kgsl_fds=0 swrast=0 dbus=2
+== session49-launch.log ==
+error: fuse init failed: Can't mount path /tmp/rt-dex/doc
+dbus-daemon[9017]: [session uid=0 pid=9017 pidfd=4] Activating service name='org.freedesktop.impl.portal.desktop.gnome' requested by ':1.17' (uid=0 pid=9116 comm="/usr/libexec/xdg-desktop-portal" label="u:r:untrusted_app_27:s0:c89,c257,c512,c768")
+dbus-daemon[9017]: [session uid=0 pid=9017 pidfd=4] Successfully activated service 'org.gnome.ScreenSaver'
+ATTENTION: default value of option vblank_mode overridden by environment.
+MESA-LOADER: failed to retrieve device information
+dbus-daemon[9017]: [session uid=0 pid=9017 pidfd=4] Activating service name='org.gnome.Settings.GlobalShortcutsProvider' requested by ':1.26' (uid=0 pid=9291 comm="/usr/libexec/xdg-desktop-portal-gnome" label="u:r:untrusted_app_27:s0:c89,c257,c512,c768")
+/tmp/rt-dex/session-inner.sh: line 68:  9114 Aborted                    setsid nohup "/usr/libexec/gsd-$s" >> "$RT/gsd-$s.log" 2>&1 < /dev/null
+ATTENTION: default value of option vblank_mode overridden by environment.
+MESA-LOADER: failed to retrieve device information
+dbus-daemon[9017]: [session uid=0 pid=9017 pidfd=4] Successfully activated service 'org.gnome.Settings.GlobalShortcutsProvider'
+dbus-daemon[9017]: [session uid=0 pid=9017 pidfd=4] Successfully activated service 'org.freedesktop.impl.portal.desktop.gnome'
+dbus-run-session: ignoring unknown child process 8982
+== shell49.log ==
+libmutter-Message: 01:43:51.879: Running GNOME Shell (using mutter 49.0) as a X11 window and compositing manager
+libmutter-Message: 01:43:51.899: Enabling experimental feature 'scale-monitor-framebuffer'
+libmutter-Message: 01:43:51.900: Enabling experimental feature 'xwayland-native-scaling'
+ATTENTION: default value of option vblank_mode overridden by environment.
+Xlib:  extension "DPMS" missing on display ":0".
+Xlib:  extension "DPMS" missing on display ":0".
+
+(gnome-shell:9363): libmutter-WARNING **: 01:43:52.338: Display “:0” already has a window manager; try using the --replace option to replace the current window manager.
+GNOME Shell failed to start: Failed to acquire window manager ownership
+
+SHELL_EXIT=1 at 2026-11-17T01:43:52Z
+--- 2. INVENTARIO de restos flashback que restart49 NO mata ---
+RESTO_VIVO: 31314 -> metacity --replace 
+RESTO_VIVO: 31447 -> gnome-panel 
+RESTO_VIVO: 31780 -> plank 
+--- 3. DESPLEGAR restart49.sh PARCHEADO (mata tambien flashback) ---
+parche_desplegado_en_RT_y_BK_persistente
+--- 4. REINICIO CANONICO: gnome49 --restart (usa el restart49 parcheado) ---
+gnome49_exit=0
+== salida completa del reinicio ==
+[S] Deteniendo sesion anterior...
+[S] resto detenido (31314)
+[S] resto detenido (31447)
+[S] resto detenido (31780)
+[S] Arrancando GNOME Shell 49 X11 (~35 s)...
+[S] afinidad prime cores 6-7 aplicada
+[S] OK: shell pid=24149 kgsl_fds=0 swrast=0 dbus=2
+--- 5. VERIFICACION INDEPENDIENTE CON EVIDENCIA ---
+WM_REAL: _NET_WM_NAME = "GNOME Shell"
+colores_captura=138510
+== ventanas ==
+--- 6. broker y salud ---
 BROKER_VIVO
-VEREDICTO: con el bus correcto el Shell deberia nacer. Si BUS_NO_ENCONTRADO en ambos lados, la sesion de arranque nunca completo su dbus — el siguiente paso sera relanzar todo con el script canonico del usuario en Termux (bash ~/arranque-escritorio.sh) y capturar su salida completa.
-=== MISION-A66-SESSION-BUS-HUNT COMPLETE ===
+VEREDICTO: WM_REAL debe decir GNOME Shell (no metacity). Si dice GNOME + colores>=10 y ventanas de shell, Tahoe volvio y esta vez con prueba. Si gnome49_exit!=0, los logs del paso 1 dicen por que.
+=== MISION-A67-TAHOE-RESTORE COMPLETE ===
 === EXIT=0 ===
