@@ -1,9 +1,11 @@
 # FINAL STATUS — SubstrateOS S25
 
 **Fecha:** 2026-11-17  
-**Estado:** GNOME Shell 49 X11 con **compositor GPU Zink/Turnip**, apps GTK4
-estables (`GSK_RENDERER=gl`), audio por PulseAudio+TCP, batería real y brillo
-por ADB. I-01 cerrado.
+**Estado:** GNOME Shell 49 X11 con **compositor GPU Zink/Turnip**, **ventanas de
+apps visibles y pixel-exactas** (`COGL_DISABLE_TFP=1`, I-11), apps GTK4 con
+`GSK_RENDERER=gl`, audio por PulseAudio+TCP, batería real y brillo por ADB.
+I-01 cerrado; I-11 cerrado; **I-12 abierto** (SIGKILL silencioso ~13% en arranque
+en frío, mitigación = supervisor pendiente).
 
 > Los PID son volátiles. Comprobar siempre con `gnome49 status`.
 
@@ -58,6 +60,49 @@ GNOME49_SW=1 gnome49 --restart   # escape hatch llvmpipe/swrast + Cairo
 3. Fase 5 (`dexuser`): no ejecutada; opcional/no bloqueante, requiere sesión
    parada, `chown` y rollback. I-02 sigue abierto.
 4. I-06: chevron Wi‑Fi en MacTahoe (CSS del tema), documentado como limitación.
+
+## Parche definitivo V3 (2026-11-17, tarde) — apps visibles
+
+**Problema:** las apps abrían pero no se veían ("plano invisible"); el escritorio
+sí. Las instantáneas anteriores lo daban por bueno porque medían **colores de la
+región** de la ventana — falso positivo: el wallpaper detrás también tiene 40k+
+colores.
+
+**Causa raíz (medida):** Termux:X11 anuncia DRI3 pero el open del dispositivo
+falla (`MESA-EGL: DRI3 error: Could not get DRI3 device`). Mutter X11 compone
+ventanas con GLX texture-from-pixmap; sin DRI3 no puede importar los pixmaps del
+servidor → actores sin contenido → invisibles. El shell UI se dibuja
+client-side (por eso se veía).
+
+**Fix en producción:** `export COGL_DISABLE_TFP=1` en
+`/etc/profile.d/zz-adreno-gpu.sh` (mutter lee cada ventana por CPU en cada damage
+y la compone igual; stage/efectos siguen en GPU). Se eliminó el
+`unset COGL_DISABLE_TFP` de `session49.sh` (quedaba de experimentos previos).
+
+**Evidencia:**
+- Gate RMSE (`scripts/distro/test-visibilidad.sh`) sobre `xlogo`: **RMSE=0,
+  AE=0 de 62 500 píxeles**; tras mover la ventana RMSE=0 en la nueva posición y
+  la vieja queda limpia (damage vivo).
+- Antes/después: `evidence/17-app-invisible-antes.png` /
+  `evidence/18-app-visible-despues.png`; transcripción en
+  `evidence/16-visibilidad-rmse.txt`.
+- Coste: shell **0.0% CPU en idle**; con animación pesada ~600% CPU agregado
+  (readback por damage).
+- Backups: `/etc/profile.d/zz-adreno-gpu.sh.pre-tfp-*`; copias en
+  `/tmp/rt-dex/` y `~/.local/share/substrate/rt-dex/`.
+
+**Pendientes que abre (I-12 y opcionales):**
+1. Supervisor auto-curativo (issue #2, fase A): detectar shell muerto → forense →
+   reintento con backoff → 3 fallos = modo software + notificación; re-aplicar
+   phantom-kill settings cada 10 min.
+2. Serie de 15 arranques por variante (`TU_DEBUG=noubwc`, `noltoc`,
+   `WSI=fifo`) para atacar el SIGKILL silencioso del cold boot (2/15 medido).
+   Datos crudos: `evidence/14-boot-series.csv`, `evidence/15-watcher-muerte-boot8.txt`.
+3. Ruta zero-copy opcional: TFP nativo con Mesa de Termux 26.2.7 para quitar el
+   readback CPU en animaciones.
+4. Regla permanente: toda verificación de visibilidad usa RMSE, nunca conteo de
+   colores. `gnome-control-center` requiere `XDG_CURRENT_DESKTOP=ubuntu:GNOME` y
+   aún aborta en `cc_object_storage` (usar paneles individuales).
 
 ## Rollback
 

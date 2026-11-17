@@ -14,6 +14,11 @@ Capturas reales de la máquina. No son renders ni maquetas.
 | `11-logcat-phantom-kill.txt` | Extracto de logcat: Android matando el árbol de la sesión durante el stress inicial (pico de procesos at-spi/ibus). |
 | `12-idle-gtk4-10min.png` | Text Editor GTK4 abierto durante 10 min sin morir (87 145 colores). |
 | `13-arranque-frio-zink.png` | Arranque en frío `gnome49-stop` + `gnome49` con los scripts finales (92 762 colores). |
+| `14-boot-series.csv` | Serie cruda de **15 arranques en frío** instrumentados (2 SIGKILL = 13.3%, al pintar la UI inicial). |
+| `15-watcher-muerte-boot8.txt` | Forense cruda de una muerte: watcher kgsl 1 Hz, estados, memoria, GPU busy, y eliminación de sospechosos. |
+| `16-visibilidad-rmse.txt` | Gate RMSE ventana-vs-pantalla: invisible antes del fix, **RMSE=0/AE=0** después. Demuestra el falso positivo del conteo de colores. |
+| `17-app-invisible-antes.png` | Calculadora "abierta" e invisible (Zink sin `COGL_DISABLE_TFP`): la región muestra el wallpaper. |
+| `18-app-visible-despues.png` | `xlogo` compuesto pixel-exacto tras el fix (`COGL_DISABLE_TFP=1`). |
 
 ## Instantánea 2026-11-16 (compositor software)
 

@@ -167,6 +167,72 @@ proot no ofrece el entorno de namespaces/systemd que esperan. Preferir `.deb`/Ap
 **Estado:** limitado.  
 Solo se simula lo mínimo. Apps que llamen a `systemctl` o logind avanzado pueden fallar.
 
+### I-11 — Las apps abren pero no se ven ("plano invisible") — **CERRADO 2026-11-17**
+
+**Estado:** resuelto (parche definitivo V3).  
+**Severidad:** era total (ninguna ventana visible); ahora 0.
+
+Síntoma (testimonio humano + medido): cualquier app abre (proceso vivo, ventana
+mapeada, `wmctrl` la lista) pero no aparece en pantalla; el escritorio (panel,
+dock, wallpaper) sí se ve.
+
+**Error de medición que lo ocultó:** contar colores de la región de una ventana es
+un **falso positivo** — el wallpaper tiene 40k+ colores. Los tests de la
+instantánea anterior (incluidos `12-idle-gtk4-10min.png` y los del issue #1) usaban
+ese método y reportaron éxito falso.
+
+**Cadena causal (medida):**
+1. Termux:X11 anuncia DRI3/Present, pero el open del dispositivo falla en cada
+   cliente: `MESA-EGL: DRI3 error: Could not get DRI3 device` (en `shell49.log`).
+2. Mutter X11 compone ventanas con **GLX texture-from-pixmap (TFP)**; sin DRI3 la
+   textura del pixmap del servidor no se puede importar → actor sin contenido.
+3. El shell UI sí se dibuja client-side (por eso el escritorio se veía).
+
+**Fix (validado, en producción):**
+`export COGL_DISABLE_TFP=1` en `/etc/profile.d/zz-adreno-gpu.sh`. Mutter lee las
+ventanas por CPU (XGetImage) por damage y las compone igual; el stage/efectos
+siguen en GPU (Zink/Turnip).
+- Evidencia RMSE: **0 (0)** y AE **0 de 62 500 píxeles** (xlogo, sesión reiniciada
+  limpia); tras mover la ventana RMSE=0 en la nueva posición y la vieja limpia.
+- Coste: shell **0.0% CPU en idle**; con animación pesada (glxgears de fondo)
+  ~600% CPU agregado (readback por damage).
+- `proot-distro login` NO hereda env del host → el knob debe vivir en
+  `zz-adreno-gpu.sh`/`session-inner.sh`. El `unset COGL_DISABLE_TFP` que había en
+  `session49.sh` se eliminó (era de los experimentos previos).
+
+**Protocolo nuevo (obligatorio):** `scripts/distro/test-visibilidad.sh` (RMSE
+ventana-vs-pantalla). Ver `evidence/16-visibilidad-rmse.txt`.
+Capturas: `evidence/17-app-invisible-antes.png` / `18-app-visible-despues.png`.
+
+**Mejora opcional:** ruta zero-copy (TFP nativo) con la Mesa de Termux 26.2.7
+(parches kgsl + soporte DRI3 de Termux:X11) para eliminar el readback CPU.
+
+### I-12 — SIGKILL silencioso en arranque en frío (~13%) — **ABIERTO**
+
+**Estado:** abierto; causa invisible sin root. **Mitigación pendiente: supervisor
+auto-curativo (issue #2, fase A).**  
+**Severidad:** alta (el arranque puede morir), mitigable con reintento automático.
+
+Medido en 15 arranques en frío instrumentados (2026-11-17): **2 muertes
+(13.3%)**, siempre al pintar la UI inicial (~t+20–28 s), con `SHELL_EXIT=137`.
+
+Eliminados por evidencia: phantom killer (monitor OFF y sin registros), lmkd,
+ActivityManager (`am_kill`/`am_proc_died` ausentes), OOM (4.4 GB libres), cgroup-OOM
+(el cgroup de la app no tiene controlador de memoria), faults de GPU
+(`gpufaults=0 0 0 0 0 0 0 0`), scripts de arranque (solo hacen `wait`), X server
+(vivo tras la muerte). El shell muere en estado `R`, GPU busy 8-10%, memoria plana.
+
+Hipótesis abiertas (sin visibilidad de dmesg/`/proc/vmstat` sin root):
+1. terminación por **HANG del driver kgsl** (`ft_policy=0xC2`, `ft_long_ib_detect=1`;
+   sólo loguea a dmesg);
+2. reaper silencioso de **Samsung Freecess** (Termux:X11 corre como
+   PhantomProcessRecord hijo de com.termux).
+
+Plan de mitigación: serie de 15 arranques por variante (`TU_DEBUG=noubwc`,
+`noltoc`, `MESA_VK_WSI_PRESENT_MODE=fifo`) + supervisor que detecte la muerte,
+guarde forense y relance con backoff (3 intentos → modo software + notificación).
+Datos crudos: `evidence/14-boot-series.csv`, `evidence/15-watcher-muerte-boot8.txt`.
+
 ---
 
 ## 2. Cosas que ya se descartaron

@@ -331,3 +331,24 @@ Una sesión se considera buena solo si:
 | LibreOffice | abre; renderizado estable |
 | `substrate-gpu-run glxinfo` | Adreno 830v1, OpenGL 4.6 |
 | GPU shell con GTK4 | **fallo intermitente; no por defecto** |
+
+---
+
+## 13. GATE DE VISIBILIDAD (obligatorio desde I-11)
+
+**Regla:** una ventana solo cuenta como "se ve" si `RMSE=0` entre su contenido
+(`import -window`) y su región en pantalla (`scrot` + crop). **El conteo de
+colores NO es válido** (el wallpaper da 40k+ y produce falsos positivos).
+
+```bash
+proot-distro login ubuntu-gnome --shared-tmp -- bash -c \
+  'DISPLAY=:0 /usr/local/bin/test-visibilidad.sh xlogo -geometry 250x250+120+120'
+# Esperado: RMSE=0 (0) / AE=0 de N px / VEREDICTO: VISIBLE
+```
+
+Script: `scripts/distro/test-visibilidad.sh` (copiar a `/usr/local/bin` en el
+distro). Datos de referencia: `evidence/16-visibilidad-rmse.txt`.
+
+**Nota:** las ventanas se cierran solas si hay interacción humana o restarts;
+los tests de visibilidad deben ser **atómicos** (lanzar app + medir en el mismo
+bloque de shell) para no dar falsos negativos por ventana ausente.

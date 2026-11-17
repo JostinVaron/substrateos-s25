@@ -97,7 +97,22 @@ GALLIUM_DRIVER=zink
 MESA_LOADER_DRIVER_OVERRIDE=zink
 LIBGL_ALWAYS_SOFTWARE=0
 MESA_VK_WSI_PRESENT_MODE=immediate
+COGL_DISABLE_TFP=1   # I-11: sin DRI3, zink no puede importar pixmaps (TFP); CPU readback
 ```
+
+**Por qué `COGL_DISABLE_TFP=1` (crítico, I-11):** Termux:X11 anuncia DRI3 pero
+el open del dispositivo falla (`MESA-EGL: DRI3 error: Could not get DRI3 device`).
+Mutter X11 compone las ventanas con GLX texture-from-pixmap; sin DRI3 la textura
+queda vacía y **las apps se abren pero no se ven** (el escritorio sí). Con
+`COGL_DISABLE_TFP=1` mutter lee cada ventana por CPU (XGetImage) en cada damage
+y la compone igual: visibilidad pixel-exacta, idle 0% CPU, coste solo con
+animación activa. **`proot-distro login` NO hereda env del host**: el knob debe ir
+en `zz-adreno-gpu.sh` o `session-inner.sh`, nunca por entorno externo.
+
+**Verificación de visibilidad OBLIGATORIA (`scripts/distro/test-visibilidad.sh`):**
+nunca contar colores de la región (el wallpaper da 40k+ y produce falsos positivos).
+El gate correcto compara pixel a pixel: `import -window $WID` vs `scrot` recortado
+→ `compare -metric RMSE` = **0** y `AE` = **0**.
 
 **Por qué Zink/Turnip:** el bug I-01 vivía en la ruta freedreno-gallium al
 componer superficies ARGB de GTK4. Zink emite otro stream de comandos (Vulkan

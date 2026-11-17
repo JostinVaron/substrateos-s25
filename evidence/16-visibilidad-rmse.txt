@@ -1,0 +1,38 @@
+# Gate de visibilidad — test RMSE ventana vs pantalla (2026-11-17)
+#
+# MOTIVO: el conteo de colores de la region de una ventana es un FALSO POSITIVO.
+# El wallpaper (MacTahoe) tiene 40k+ colores; una ventana NO compuesta muestra el
+# wallpaper en esa region y "parece pintada". Los tests previos (issue #1 y
+# evidence/12) usaron ese metodo y reportaron falsos exitos.
+#
+# METODO CORRECTO:
+#   import -window $WID win.png        # contenido real de la ventana (XGetImage al window)
+#   scrot screen.png
+#   convert screen.png -crop WxH+X+Y +repage region.png
+#   compare -metric RMSE win.png region.png null:
+#   RMSE 0 y AE 0 => la ventana esta compuesta pixel-exacta en pantalla.
+
+## ANTES DEL FIX (Zink/Turnip, sin COGL_DISABLE_TFP)
+# Calculadora abierta (ventana 410x666+315+15):
+ventana directa:    mean=0.195012 std=0.129766 colores=513
+region pantalla:    mean=0.541245 std=0.235977 colores=41368
+region antes de abrir: mean=0.530586 std=0.229284 colores=42068
+# => la region de pantalla NO cambio al abrir la app (sigue el wallpaper)
+# => ventana NO compuesta: invisible (testimonio humano: "abren en un plano invisible")
+# => los 41k colores eran el wallpaper: falso positivo de metodos anteriores
+
+## DESPUES DEL FIX (zz-adreno-gpu.sh: export COGL_DISABLE_TFP=1)
+# Sesion reiniciada y verificada (env en /proc/<shell>/environ: COGL_DISABLE_TFP=1)
+# Test atomico con xlogo (ventana 250x250+120+152):
+WID=0x1400001 geo=250x250+120+152
+RMSE DEFINITIVO: 0 (0)
+pixeles distintos (AE): 0 (0) de 62500
+# Tras mover la ventana (wmctrl -e 0,400,300) y re-medir:
+RMSE en posicion nueva: 0 (0)
+RMSE en posicion vieja: 0.51 (region limpia, sin residuo)
+# => composicion pixel-exacta y damage vivo (movimiento actualiza la pantalla)
+
+## COSTE MEDIDO
+# shell en idle (sin damage):        0.0% CPU
+# glxgears como ventana (560-574 FPS), animacion pesada: gnome-shell ~600% CPU (reporte de top)
+# => trade-off: readback CPU solo cuando hay damage; desktop en reposo gratis.

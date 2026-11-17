@@ -4,7 +4,7 @@
 
 Este repositorio es la **identidad operativa** de la máquina: qué hay, cómo arranca, qué se modificó, qué está verificado, qué falla y cómo reconstruirla desde cero. Está pensado para que otra IA o una persona pueda entender el sistema sin haber estado en esta conversación.
 
-> **Estado actual: compositor GPU Zink/Turnip estable.** GNOME Shell 49 compone en la Adreno 830 vía Zink sobre Turnip (`/dev/kgsl-3d0`), con 120 FPS vblank-locked, apps GTK4 en `GSK_RENDERER=gl` y **0 SIGKILL** en stress + soak + 10 min con ventana GTK4 abierta. El bug I-01 de freedreno-gallium con ARGB/GTK4 se rodea por diseño. Escape hatch software: `GNOME49_SW=1 gnome49 --restart`. Detalle en [`docs/05-ISSUES-ROADMAP.md`](docs/05-ISSUES-ROADMAP.md).
+> **Estado actual: compositor GPU Zink/Turnip con ventanas visibles (parche definitivo V3).** GNOME Shell 49 compone en la Adreno 830 vía Zink sobre Turnip (`/dev/kgsl-3d0`) y las ventanas de apps se componen **pixel-exactas** (`COGL_DISABLE_TFP=1`: sin DRI3 el TFP de zink no puede importar los pixmaps; mutter los lee por CPU). Verificado con el gate RMSE (`scripts/distro/test-visibilidad.sh`): **RMSE=0 / AE=0** y damage vivo al mover ventanas. Apps GTK4 en `GSK_RENDERER=gl`. Escape hatch software: `GNOME49_SW=1 gnome49 --restart`. Bug abierto: SIGKILL silencioso en ~13% de arranques en frío (I-12; mitigación pendiente = supervisor). Detalle en [`docs/05-ISSUES-ROADMAP.md`](docs/05-ISSUES-ROADMAP.md).
 
 - Fecha de esta instantánea: **2026-11-17**
 - Equipo: **Samsung Galaxy S25**, SoC Snapdragon 8 Elite, GPU **Adreno 830v1**

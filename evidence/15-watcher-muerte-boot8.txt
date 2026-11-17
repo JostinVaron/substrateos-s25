@@ -1,0 +1,44 @@
+# Forense cruda de la muerte del BOOT8 (2026-11-17 13:58:34-13:59:00)
+# Shell PID 24983 (gnome-shell, compositor Zink/Turnip)
+# Watcher kgsl 1 Hz — muestras reales de /tmp/rt-dex/watcher.log:
+# formato: hora pid=shell st=estado-proc hang=ft_hang_intr_status gf=gpufaults busy=gpu_busy% mem=MemAvailable(kB)
+
+13:58:34 pid=19602 st=X hang=1 gf=0 0 0 0 0 0 0 0  busy=9  mem=4180996   # pidfile aun apuntaba al shell anterior (muerto por gnome49-stop)
+13:58:54 pid=24983 st=t hang=1 gf=0 0 0 0 0 0 0 0  busy=9  mem=4759524   # nuevo shell arrancando (estado t = trazado por proot)
+13:58:55 pid=24983 st=t hang=1 gf=0 0 0 0 0 0 0 0  busy=8  mem=4662148
+13:58:56 pid=24983 st=S hang=1 gf=0 0 0 0 0 0 0 0  busy=8  mem=4535252
+13:58:57 pid=24983 st=t hang=1 gf=0 0 0 0 0 0 0 0  busy=8  mem=4498748
+13:58:58 pid=24983 st=R hang=1 gf=0 0 0 0 0 0 0 0  busy=8  mem=4473692   # R = corriendo normal
+13:58:59 pid=24983 st=S hang=1 gf=0 0 0 0 0 0 0 0  busy=8  mem=4424272
+13:59:00 pid=24983 st=X hang=1 gf=0 0 0 0 0 0 0 0  busy=10 mem=4709848   # MUERTO (X = /proc inexistente)
+
+# Identificacion del proceso:
+#   shell49.log: SHELL_EXIT=137 (128+9 = SIGKILL)
+#   gnome49: "[S] ERROR: gnome-shell murio mientras pintaba la UI."
+
+# Eliminacion de sospechosos (todo verificado en vivo):
+#   - phantom process killer: settings_enable_monitor_phantom_procs=false, max_phantom_processes=2147483647
+#     y NO hay lineas "PhantomProcessRecord ... died" para 24983 en main/events.
+#   - ActivityManager: sin am_kill/am_proc_died para el PID en el buffer events.
+#   - lmkd: sin lm_kill; MemAvailable 4.4 GB al morir.
+#   - OOM de kernel/cgroup: MemAvailable alto; el cgroup /apps/uid_10345/pid_* NO tiene controlador de memoria.
+#   - kgsl pagefaults: /sys/class/kgsl/kgsl-3d0/gpufaults = "0 0 0 0 0 0 0 0" (contador intacto).
+#   - scripts de arranque: restart49.sh/session-inner.sh solo hacen wait, no kill del shell.
+#   - X server / Termux:X11: vivo y respondiendo despues de la muerte (xdpyinfo OK).
+#
+# Estado kgsl relevante (lectura directa, sin root):
+#   /sys/class/kgsl/kgsl-3d0/ft_policy            = 0xC2
+#   /sys/class/kgsl/kgsl-3d0/ft_long_ib_detect    = 1
+#   /sys/class/kgsl/kgsl-3d0/ft_hang_intr_status  = 1
+#   /sys/class/kgsl/kgsl-3d0/gpu_model            = Adreno830v21200000000
+#
+# Hipotesis ABIERTAS (no se puede leer dmesg ni /proc/vmstat sin root):
+#   H1) termino por HANG del driver kgsl (ft_policy 0xC2 + long IB detect; solo loguea a dmesg).
+#   H2) reaper silencioso de Samsung (Freecess activo; com.termux y Termux:X11 en whitelist,
+#       Termux:X11 corre como PhantomProcessRecord hijo de com.termux).
+# Mitigacion comprometida: supervisor auto-curativo (issue #2, fase A) + serie de variantes
+# TU_DEBUG (fase B) con medicion de tasa por 15 arranques.
+#
+# Datos adicionales (ApplicationExitInfo de com.termux, historico):
+#   reason=3 LOW_MEMORY (varias), reason=13 OTHER KILLS BY SYSTEM "too many empty",
+#   reason=10 USER REQUESTED / FORCE STOP — corresponden al proceso principal de Termux, no al shell.

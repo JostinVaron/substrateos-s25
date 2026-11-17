@@ -38,7 +38,7 @@ if [ "${GNOME49_SW:-0}" = "1" ] && [ -f "$RT/zz-adreno-gpu.software.sh" ]; then
 else
   . /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null || true
 fi
-unset FD_MESA_DEBUG FD_FORCE_KGSL COGL_DISABLE_TFP
+unset FD_MESA_DEBUG FD_FORCE_KGSL
 [ "${GNOME49_SW:-0}" = "1" ] || unset LIBGL_DRI3_DISABLE
 export MESA_VK_WSI_PRESENT_MODE=immediate
 export vblank_mode=0

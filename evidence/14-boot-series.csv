@@ -1,0 +1,21 @@
+# Serie de arranques en frío 2026-11-17 — gnome49-stop + gnome49 (cada boot ~20-24 s)
+# Instrumentación: watcher kgsl 1 Hz (watcher.log) + adb logcat -b all + shell49.log
+# Base: compositor Zink/Turnip (antes del fix COGL_DISABLE_TFP de I-11)
+boot,fecha_local,duracion_s,resultado,detalle
+1,13:35,~40,OK,arranque documentado en FINAL-STATUS previo (sin ventanas de prueba)
+2,13:52:43,28,SIGKILL,SHELL_EXIT=137 "murio mientras pintaba la UI"; invisible en logcat main+events+system; sin am_kill/lmkd/PhantomProcessRecord; gpufaults=0; MemAvailable 4.4 GB; GPU busy 8-10%
+3,13:55,~35,OK,primer arranque instrumentado con watcher
+4,13:56,20,OK,
+5,13:56,23,OK,
+6,13:57,23,OK,
+7,13:57,23,OK,
+8,13:58:34,24,SIGKILL,PID 24983; ultimo sample 1 s antes: estado R, GPU busy 8-10%, memoria plana; sin registro en NINGUN buffer logcat
+9,13:59,21,OK,
+10,13:59,24,OK,
+11,14:00,22,OK,
+12,14:00,23,OK,
+13,14:00,23,OK,
+14,14:01,24,OK,
+15,14:01,23,OK,
+# TASA MEDIDA: 2 muertes / 15 arranques = 13.3%
+# Nota: las muertes ocurren al pintar la UI inicial (~t+20-28 s), no al abrir apps.
