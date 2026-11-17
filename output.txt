@@ -1,33 +1,23 @@
-=== BRIDGE RUN 2026-11-17T01:14:03Z (v4) ===
-=== MISION-A60-BROKER-BLINDADO — lanzar apps desde un padre con adj=0 2026-11-17T01:14:03Z ===
---- 1. firma de la muerte instantanea: el log mas reciente ---
-== /tmp/app-session-20261117T011249Z.log ==
-[2026-11-17T01:12:49Z] app=vectorcraft pid_inicio (blindaje v2)
-2026-11-17T01:12:49.270Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:12:49.270Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
-ATTENTION: default value of option vblank_mode overridden by environment.
+=== BRIDGE RUN 2026-11-17T01:23:29Z (v5) ===
+=== MISION-A63-VERIFICACION-BROKER — verificacion completa del arbol nativo 2026-11-17T01:23:29Z ===
+--- 1. broker nativo: vivo y con adj=0? ---
+broker_pid=26039 adj=0
+--- 2. fifo compartido ---
+fifo_OK en /data/data/com.termux/files/usr/tmp/launch.fifo
+--- 3. historial del broker ---
+[20:22:26] lanzando vectorcraft
+--- 4. dentro del proot: cliente e iconos ---
+cliente_OK
+iconos_apuntando_al_broker=4/4
+--- 5. prueba en vivo propia: vectorcraft via fifo, 15 s ---
+vectorcraft_pid=NO
+APP_NO_NACIO — revisar ~/tmp/app-live-vectorcraft.log
+2026-11-17T01:23:30.556Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
 MESA-LOADER: failed to retrieve device information
-2026-11-17T01:12:49.418Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:12:49.418Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:12:49.460Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-[2026-11-17T01:12:51Z] EXIT_CODE=137 adj_final=
-adj_al_morir=no_sample
---- 2. demostracion de la regla del kernel: no se puede bajar el adj heredado ---
-BAJO_a_0 (kernel permisivo)
---- 3. broker blindado: demonio hijo del bridge (adj=0) que lanza apps ---
-broker_pid=23737 adj=0
---- 4. repuntar los 4 iconos al cliente del broker ---
-vectorcraft -> broker-client (vectorcraft)
-photocraft -> broker-client (photocraft)
-filmcraft -> broker-client (filmcraft)
-lightcraft -> broker-client (lightcraft)
---- 5. PRUEBA EN VIVO: lanzar vectorcraft via broker y monitorear 20 s ---
-app_pid= adj= (esperado 0)
-MURIO_EN_2s
---- 6. salud ---
-SHELL_VIVO
+2026-11-17T01:23:30.711Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
+2026-11-17T01:23:30.711Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
+2026-11-17T01:23:30.761Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
+--- 6. broker sigue vivo ---
 BROKER_PERSISTE
-FIN_INNER
-VEREDICTO: si la prueba 5 muestra adj=0 y SOBREVIVIO, el usuario reintenta desde el dock — la app nace del broker, hereda adj=0 y LMKD no la mata. La mitad de Android sigue siendo recomendable: Termux y Termux:X11 en 'Sin restricciones' de bateria para blindar tambien al propio sistema, no solo a las apps.
-=== MISION-A60-BROKER-BLINDADO COMPLETE ===
+=== MISION-A63-VERIFICACION-BROKER COMPLETE ===
 === EXIT=0 ===
