@@ -177,6 +177,7 @@ docs/
   04-OPERACION-TESTS.md
   05-ISSUES-ROADMAP.md
   06-REFERENCIA-RAPIDA.md
+  07-ARTCRAFT-INFORME.md
 scripts/
   termux/       gnome49, gnome49-stop, restart49.sh, substrate-audio-up,
                 mactahoe-on/off
