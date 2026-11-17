@@ -1,30 +1,68 @@
-=== BRIDGE RUN 2026-11-17T00:49:51Z (v4) ===
-=== MISION-A54-POLKIT-FALLBACK — forense fino + instalador de respaldo 2026-11-17T00:49:51Z ===
---- 0. servicios de A53 siguen vivos? ---
-POLKITD_VIVO
-BUS_RELanzADO
---- 1. forense fino: stderr COMPLETO de pkexec como dexuser ---
-exit=127
-Error creating textual authentication agent: Error opening current controlling terminal for the process (`/dev/tty'): No such device or address
---- 2. la clave de proot: pkexec requiere setuid ---
--rwsr-xr-x+ /usr/bin/pkexec
-SETUID_FALTA_127_EXPLICADO
---- 3. FALLBACK PRACTICO: probar la ruta que SI funciona (apt como root) ---
--rw-r--r--+ 1 root root 110959010 Nov 17 00:38 filmcraft-0.20.1-linux-aarch64.deb
--rw-r--r--+ 1 root root 119870256 Nov 17 00:38 lightcraft-0.21.1-linux-aarch64.deb
--rw-r--r--+ 1 root root 137080668 Nov 17 00:35 photocraft-0.23.1-linux-aarch64.deb
--rw-r--r--+ 1 root root 154970264 Nov 17 00:47 vectorcraft-0.24.1-linux-aarch64.deb
-deb_descargado=/home/dexuser/.cache/artcraft-launcher/downloads/vectorcraft-0.24.1-linux-aarch64.deb
---- 4. parche del wrapper: fallback automatico post-instalador-fallido ---
-fallback_instalado
---- 5. prueba real del fallback (con lo que haya descargado) ---
-FALLBACK_FUNCIONA (vectorcraft instalado)
-Processing triggers for shared-mime-info (2.4-5build3) ...
-  -> OK
-[2026-11-17T00:51:59Z] fallback terminado
---- 6. salud ---
+=== BRIDGE RUN 2026-11-17T00:58:09Z (v4) ===
+=== MISION-A55-OOM-VS-WINIT — firma del crash de las apps 2026-11-17T00:58:09Z ===
+--- 1. LADO ANDROID (Termux, fuera del proot): la evidencia del sospechoso OOM ---
+== RAM del telefono (la que Android ve) ==
+               total        used        free      shared  buff/cache   available
+Mem:            10Gi       5.8Gi       1.4Gi        53Mi       3.9Gi       5.0Gi
+MemTotal:       11379960 kB
+MemAvailable:    5269476 kB
+SwapTotal:       4194300 kB
+SwapFree:        1827508 kB
+Committed_AS:   140431488 kB
+== PSI: presion de memoria del kernel (some = cuello, full = matando) ==
+sin PSI
+== contador de kills OOM del kernel (desde el arranque) ==
+sin vmstat
+== logcat: muertes por LMKD (lo que mato a Firefox) ==
+== Top consumidores de RAM vistos por Android (top 8) ==
+  RSS COMMAND
+240924 gnome-shell
+105216 com.termux.widget
+100456 com.termux
+94720 termux-x11 com.termux.x11 :0
+33624 /usr/libexec/mutter-x11-frames
+17044 ollama
+ 7396 /data/data/com.termux/files/usr/bin/proot
+ 7172 /usr/libexec/xdg-desktop-portal-gnome
+--- 2. LADO PROOT: firma del crash de las apps ArtCraft ---
+== binarios instalados por las 4 apps ==
+/usr/bin/vectorcraft
+/usr/bin/vectorcraft-cli
+app_bin=/usr/bin/vectorcraft
+== hay logs propios de las apps? ==
+ArtCraft
+ai.storyteller.artcraft-launcher
+ai.storyteller.craft-anything
+artcraft-launcher
+/home/dexuser/.local/share/gvfs-metadata/root-97f14fa8.log
+/home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log
+/home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.1.log
+/home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.2.log
+== lanzar VectorCraft MONITORIZADO con captura (trampa del wrapper otra vez) ==
+pid=16307 log=/tmp/app-session-20261117T005810Z.log
+t=6s rss_kb=121096 memavail_kb=5137948
+t=12s rss_kb=121096 memavail_kb=5090512
+t=18s rss_kb=121096 memavail_kb=5098804
+t=24s rss_kb=121096 memavail_kb=5091220
+t=30s rss_kb=121096 memavail_kb=5118488
+t=36s rss_kb=121096 memavail_kb=4942128
+t=42s rss_kb=121096 memavail_kb=4943060
+t=48s rss_kb=121096 memavail_kb=4986308
+t=54s rss_kb=121096 memavail_kb=4968264
+t=60s rss_kb=121100 memavail_kb=4978436
+SOBREVIVIO_60s
+== FIRMA: stderr de la app (panic winit = exit 101 con texto; SIGKILL OOM = 137 en silencio) ==
+[bytes log=802]
+2026-11-17T00:58:10.832Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
+2026-11-17T00:58:10.835Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
+2026-11-17T00:58:10.988Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
+2026-11-17T00:58:10.988Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
+2026-11-17T00:58:11.045Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
+== PSI y oom_kill DESPUES de la prueba (comparar con antes) ==
+oom_kill 0
+== salud ==
 SHELL_VIVO
 FIN_INNER
-VEREDICTO: si SETUID_FALTA, el 127 de pkexec esta EXPLICADO DE RAIZ (proot no soporta setuid) y la solucion DEFINITIVA es el fallback: usuario reintenta en el launcher (fallara igual), luego corre 'bash /usr/local/bin/artcraft-install-fallback' desde Termux con proot, o pedimos al bridge correrlo tras cada intento.
-=== MISION-A54-POLKIT-FALLBACK COMPLETE ===
+VEREDICTO: la firma decide. EXIT=137/9 sin stderr + MemAvailable bajo + oom_kill subiendo = RAM AGOTADA (cura: disciplina de memoria, no parches). EXIT=101 con panic winit = mismo bug del launcher (cura distinta). Leer ambos lados antes de concluir.
+=== MISION-A55-OOM-VS-WINIT COMPLETE ===
 === EXIT=0 ===
