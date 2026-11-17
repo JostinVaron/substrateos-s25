@@ -1,36 +1,31 @@
-=== BRIDGE RUN 2026-11-17T02:05:52Z (v6) ===
-=== MISION-A70-REINICIO-LIMPIO-PRUEBA-FILMCRAFT — reinicio total + prueba de supervivencia real 2026-11-17T02:05:52Z ===
---- 1. loop v6 corriendo? ---
-loop_v6_VIVO pid=4226
---- 2. guardián anti-LMKD activo (re-aplicar por si acaso) ---
-monitor=false OK
-max_phantom=INT_MAX OK
---- 3. reinicio limpio de la sesion (restart49 parcheado mata restos flashback) ---
-gnome49_restart_exit=1
---- 4. salud del escritorio nuevo ---
+=== BRIDGE RUN 2026-11-17T02:07:50Z (v5) ===
+=== MISION-A71-UN-LOOP-PRUEBA-BIEN — un solo loop + prueba de FilmCraft medida bien 2026-11-17T02:07:50Z ===
+--- 1. matar al v5 huérfano (doble loop detectado en A70) ---
+V5_MATADO (pid 24468)
+v5: ausente
+v6: VIVO pid=4226
+--- 2. escritorio: verificar desde dentro del proot ---
+filmcraft_pid=14702
+== WM ==
 WM_REAL: sin WM
-colores=138508
---- 5. broker nativo ---
-cat: /proc/14688/oom_score_adj: No such file or directory
-BROKER_VIVO adj=
---- 6. lanzar FilmCraft via broker (el canal del dock) ---
-filmcraft_pid=NO_NACIO
-== por que no nacio ==
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM pulse
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM jack
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM jack
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM oss
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM oss
---- 8. logcat lmkd en la ventana completa de la prueba (solo si hubo kills) ---
-11-16 20:57:49.725  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.034  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.046  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.058  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.071  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:54.933  1145  1145 I lmkd    : 0(delay), 0(swap), 100(freelimit), 0(reentrymode) memory pressure events were skipped after a kill!
---- 9. estado final ---
+colores=36435
+SHELL_VIVO pid=12029
+== FilmCraft desde dentro ==
+filmcraft_VIVA pid=14702 adj=0 rss=174792kB
+FIN_PARTE1
+--- 3. MONITOREO 4 MIN (mediciones desde dentro del proot) ---
+t+30s MURIO — firma:
+proot info: vpid 1: terminated with signal 9
+proot info: vpid 1: terminated with signal 9
+proot info: vpid 1: terminated with signal 9
+--- 4. logcat FRESCO de la ventana ---
+11-16 21:08:23.472  3325  3636 I ActivityManager: Process PhantomProcessRecord {2b8a9b1 16361:16971:sleep/u0a345} died
+11-16 21:08:23.472  3325  3636 I ActivityManager: Process PhantomProcessRecord {c3a5e96 16360:16971:sleep/u0a345} died
+--- 5. estado final ---
+LOOP_V6_VIVO pid=4226 (unico)
 SHELL_VIVO
+FILMCRAFT_NO
 BROKER_VIVO
-VEREDICTO: FILMCRAFT SOBREVIVIO_4MIN + adj estable (0 o bajo) + sin kills en logcat = caso LMKD cerrado de verdad. Si murio: la firma de logcat de la ventana dice quien y con que adj mato — siguiente frente identificado.
-=== MISION-A70-REINICIO-LIMPIO-PRUEBA-FILMCRAFT COMPLETE ===
+VEREDICTO: un solo loop + FilmCraft VIVA con adj estable tras 4 min + sin kills frescos = sistema verificado en su configuracion final y caso cerrado. Si murio, esta ventana es limpia: un solo loop y medicion interna.
+=== MISION-A71-UN-LOOP-PRUEBA-BIEN COMPLETE ===
 === EXIT=0 ===
