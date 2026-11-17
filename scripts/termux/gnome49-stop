@@ -5,6 +5,18 @@ set -u
 RT="$PREFIX/tmp/rt-dex"
 say() { printf '%s\n' "$*"; }
 
+# 0) Supervisor auto-curativo (solo por PID de pidfile; respeta --observe)
+if [ -f "$RT/supervisor49.pid" ]; then
+  sp=$(cat "$RT/supervisor49.pid" 2>/dev/null || true)
+  if [ -n "${sp:-}" ] && [ -d "/proc/$sp" ]; then
+    sc=$(tr '\0' ' ' 2>/dev/null < "/proc/$sp/cmdline" || true)
+    case "$sc" in
+      *supervisor49.sh*--observe*) say "[P] supervisor en observacion, no se detiene ($sp)" ;;
+      *supervisor49.sh*) kill "$sp" 2>/dev/null && say "[P] supervisor detenido ($sp)" ;;
+    esac
+  fi
+fi
+
 # Nunca matar al shell que invoca este script, a sus ancestros ni a la
 # infraestructura de Termux/OpenCode/SSH/tmux.
 SELF=$$
