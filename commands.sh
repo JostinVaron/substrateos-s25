@@ -1,42 +1,41 @@
-echo "=== MISION-A63-VERIFICACION-BROKER — verificacion completa del arbol nativo $(date -u +%FT%TZ) ==="
+echo "=== MISION-A64-VENTANA-FANTASMA — revivir escritorio y traer ventanas al frente $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
-echo "--- 1. broker nativo: vivo y con adj=0? ---"
-BP=$(pgrep -f app-broker-termux | head -1)
-if [ -n "$BP" ]; then
-  echo "broker_pid=$BP adj=$(cat /proc/$BP/oom_score_adj)"
-else
-  echo "BROKER_MUERTO — relanzando con adj heredado del bridge (0)"
-  setsid nohup bash ~/substrate/bridge/app-broker-termux.sh >> ~/substrate/bridge/broker.log 2>&1 &
-  sleep 1
-  BP=$(pgrep -f app-broker-termux | head -1)
-  echo "broker_relanzado_pid=${BP:-FALLO} adj=$(cat /proc/$BP/oom_score_adj 2>/dev/null)"
-fi
-echo "--- 2. fifo compartido ---"
-[ -p "$PREFIX/tmp/launch.fifo" ] && echo "fifo_OK en $PREFIX/tmp/launch.fifo" || echo "fifo_FALTA"
-echo "--- 3. historial del broker ---"
-tail -4 "$PREFIX/tmp/app-live.log" 2>/dev/null || echo "sin historial"
-echo "--- 4. dentro del proot: cliente e iconos ---"
-proot-distro login ubuntu-gnome --shared-tmp -- bash -c '
-[ -x /usr/local/bin/artcraft-broker-client ] && echo "cliente_OK" || echo "cliente_FALTA"
-grep -l "broker-client" /usr/share/applications/ai.storyteller.*.desktop 2>/dev/null | wc -l | xargs -I{} echo "iconos_apuntando_al_broker={}/4"
-'
-echo "--- 5. prueba en vivo propia: vectorcraft via fifo, 15 s ---"
-pkill -x vectorcraft 2>/dev/null
-echo vectorcraft > "$PREFIX/tmp/launch.fifo"
-sleep 6
-AP=$(pgrep -x vectorcraft | head -1)
-echo "vectorcraft_pid=${AP:-NO}"
-[ -n "$AP" ] && echo "adj_de_la_app=$(cat /proc/$AP/oom_score_adj) (esperado 0) rss_kb=$(ps -o rss= -p $AP | tr -d ' ')"
-if [ -n "$AP" ]; then
-  DEAD=""
-  for i in $(seq 1 5); do sleep 3; kill -0 $AP 2>/dev/null || { echo "MURIO_EN_$((6+i*3))s"; DEAD=si; break; }; done
-  [ -z "$DEAD" ] && echo "SOBREVIVIO_15s_VERIFICACION_BRIDGE"
-  pkill -x vectorcraft 2>/dev/null
-else
-  echo "APP_NO_NACIO — revisar ~/tmp/app-live-vectorcraft.log"
-  tail -5 "$PREFIX/tmp/app-live-vectorcraft.log" 2>/dev/null
-fi
-echo "--- 6. broker sigue vivo ---"
-pgrep -f app-broker-termux >/dev/null && echo BROKER_PERSISTE || echo BROKER_MURIO
-echo "=== MISION-A63-VERIFICACION-BROKER COMPLETE ==="
+T="$PREFIX/tmp"
+echo "--- 0. X server vivo? ---"
+ls "$T/.X11-unix" 2>/dev/null | head -2
+echo "--- 1. relanzar el escritorio (idempotente) ---"
+bash ~/arranque-escritorio.sh > "$T/a64-arranque.log" 2>&1 &
+ARR=$!
+echo "arranque_pid=$ARR"
+echo "--- 2. esperar asentamiento de la sesion (50 s) ---"
+sleep 50
+tail -4 "$T/a64-arranque.log"
+cat > "$T/a64.sh" <<'EOS'
+set -u
+export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
+export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
+echo "== escritorios (el * es el actual) =="
+wmctrl -d
+echo "== ventanas con geometria: id escritorio x y ancho alto host titulo =="
+wmctrl -lG
+echo "== apps vivas dentro del proot (prueba de vida real) =="
+for P in vectorcraft photocraft filmcraft lightcraft artcraft-launcher; do
+  pgrep -x "$P" >/dev/null 2>&1 && echo "$P VIVO pid=$(pgrep -x $P | head -1)"
+done
+echo "== trayendo cada ventana craft al escritorio 0 y activandola =="
+wmctrl -l | grep -iE "craft" | awk '{print $1}' | while read ID; do
+  wmctrl -i -r "$ID" -t 0 2>/dev/null && echo "ventana $ID movida a escritorio 0"
+  wmctrl -i -a "$ID" 2>/dev/null && echo "ventana $ID activada"
+done
+echo "== ventanas despues del movimiento =="
+wmctrl -lG
+echo "== salud =="
+pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO
+EOS
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a64.sh 2>&1
+rm -f "$T/a64.sh"
+echo "--- 3. broker nativo sigue vivo? ---"
+pgrep -f app-broker-termux >/dev/null && echo BROKER_VIVO || { setsid nohup bash ~/substrate/bridge/app-broker-termux.sh >> ~/substrate/bridge/broker.log 2>&1 & sleep 1; pgrep -f app-broker-termux >/dev/null && echo BROKER_RELANZADO || echo BROKER_MUERTO; }
+echo "VEREDICTO: con wmctrl -lG veremos en que escritorio y con que geometria abrio la ventana fantasma. Si estaba en escritorio !=0 o con x/y fuera de pantalla, ya quedo movida y activada — el usuario deberia VER la ventana ahora. Si alguna app no aparece en 'vivas', la lista acorta el siguiente paso."
+echo "=== MISION-A64-VENTANA-FANTASMA COMPLETE ==="
 echo "### BRIDGE MARKER ###"
