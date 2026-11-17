@@ -1,0 +1,17 @@
+#!/bin/bash
+# Broker: nace del bridge/tmux (parent longevo). Toda app que lance hereda ese anclaje.
+# FIX issue #4: el filtro [ ! -x "$APP" ] descartaba nombres (filmcraft no es ruta).
+# Protocolo: una linea "<app> [args...]" por el FIFO.
+export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/home/dexuser
+export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
+mkdir -p /tmp/broker
+[ -p /tmp/broker/launch.fifo ] || { rm -f /tmp/broker/launch.fifo; mkfifo /tmp/broker/launch.fifo; }
+LOG=/tmp/rt-dex/artcraft-broker.log
+echo "[$(date -u +%FT%TZ)] broker arriba pid=$$" >> "$LOG"
+while true; do
+  read -r LINE < /tmp/broker/launch.fifo
+  [ -z "$LINE" ] && continue
+  echo "[$(date -u +%FT%TZ)] peticion: $LINE" >> "$LOG"
+  set -- $LINE
+  /usr/local/bin/artcraft-suite-run "$@" >/dev/null 2>&1 &
+done

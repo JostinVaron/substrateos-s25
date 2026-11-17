@@ -1,0 +1,15 @@
+#!/bin/bash
+# ArtCraft suite - wrapper directo (fix broker FIFO roto — issue #4)
+# El broker original escribía a /tmp/launch.fifo (archivo regular trampa).
+# FilmCraft: usa --graphics low-power (fix wedge del compositor, issue #4 FASE 2).
+# Log: /tmp/rt-dex/artcraft-suite-run.log (stderr de la app, para diagnostico).
+APP="$1"
+[ -z "$APP" ] && { echo "uso: artcraft-suite-run <filmcraft|lightcraft|vectorcraft|photocraft|effectcraft>"; exit 1; }
+shift
+command -v "$APP" >/dev/null 2>&1 || { echo "ERROR: $APP no existe en PATH"; exit 127; }
+LOG=/tmp/rt-dex/artcraft-suite-run.log
+echo "[$(date -u +%FT%TZ)] launch app=$APP args=$* ppid=$PPID" >> "$LOG"
+case "$APP" in
+  filmcraft) exec substrate-gpu-run "$APP" --graphics low-power "$@" >> "$LOG" 2>&1 ;;
+  *)         exec substrate-gpu-run "$APP" "$@" >> "$LOG" 2>&1 ;;
+esac

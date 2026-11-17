@@ -48,6 +48,7 @@ GNOME49_SW=1 gnome49 --restart   # escape hatch llvmpipe/swrast + Cairo
 | Soak 10 min | `VIVO` |
 | 10 min con Text Editor GTK4 | `VIVO` (87 145 colores, `12-idle-gtk4-10min.png`) |
 | Blender 5.0.1 | ventana + shell vivo (`09-blender-zink.png`) |
+| ArtCraft (suite) | dock **arreglado** (FIFO roto → wrapper/broker); abre y se ve; SIGKILL de Android a ~53 s desde dock sin anclar, **mitigado** con broker anclado a tmux — detalles y pendientes en `docs/07-ARTCRAFT-INFORME.md` |
 | Audio | `paplay` rc=0, volumen 50 %, sink `AAudio_sink` |
 | Batería | 56–58 %, discharging, 3.91 V, ~5 h (`upower-stub`) |
 | Brillo | 101→90→101; atajos Super+F1/F2 |

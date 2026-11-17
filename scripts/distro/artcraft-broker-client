@@ -1,0 +1,13 @@
+#!/bin/bash
+# Pide al broker (anclado a tmux) que lance la app. Fallback: wrapper directo.
+# Protocolo: una linea "<app> [args...]" por el FIFO.
+[ $# -eq 0 ] && { echo "uso: artcraft-broker-client <app> [args...]"; exit 1; }
+FIFO=/tmp/broker/launch.fifo
+LOG=/tmp/rt-dex/artcraft-broker-client.log
+if [ -p "$FIFO" ]; then
+  echo "[$(date -u +%FT%TZ)] $* -> broker" >> "$LOG"
+  printf "%s\n" "$*" > "$FIFO"
+  exit 0
+fi
+echo "[$(date -u +%FT%TZ)] broker no disponible, fallback directo: $*" >> "$LOG"
+exec /usr/local/bin/artcraft-suite-run "$@"
