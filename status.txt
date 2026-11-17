@@ -1,5 +1,5 @@
 loop: v6 (pid 4226)
-ts: 2026-11-17T02:04:34Z
-estado: idle
-mision: esperando comandos
+ts: 2026-11-17T02:04:36Z
+estado: corriendo
+mision: MISION-A69
 broker_apps: vivo
