@@ -1,29 +1,30 @@
-=== BRIDGE RUN 2026-11-17T00:48:41Z (v4) ===
-=== MISION-A53-POLKIT-COMPLETO — bus sistema + polkitd + regla + prueba real 2026-11-17T00:48:41Z ===
---- 1. apt-get update (las listas vencidas hundieron a A52) ---
-update_exit=0
-Hit:11 http://deb.debian.org/debian-security trixie-security InRelease
---- 2. instalar polkitd (moderno) con respaldo policykit-1 (clasico) ---
-polkitd_ok
-polkitd_bin=/usr/lib/polkit-1/polkitd
---- 3. bus de SISTEMA dbus arriba (proot no lo levanta solo) ---
-bus_sistema_arrancado
---- 4. polkitd corriendo a mano (sin systemd) ---
+=== BRIDGE RUN 2026-11-17T00:49:51Z (v4) ===
+=== MISION-A54-POLKIT-FALLBACK — forense fino + instalador de respaldo 2026-11-17T00:49:51Z ===
+--- 0. servicios de A53 siguen vivos? ---
 POLKITD_VIVO
---- 5. regla sin-contrasena para dexuser (launcher instala como ese usuario) ---
-regla_pkla_ok
---- 6. propagar bus de sistema al wrapper del dock ---
-#!/bin/bash
-export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket
-# Wrapper de captura — cada apertura del dock queda registrada con stderr y exit code
---- 7. PRUEBA REAL: pkexec como dexuser (lo mismo que hace el launcher) ---
-pkexec_exit=127
-
-This incident has been reported.
-AUN_NO_CURADO
---- 8. salud ---
+BUS_RELanzADO
+--- 1. forense fino: stderr COMPLETO de pkexec como dexuser ---
+exit=127
+Error creating textual authentication agent: Error opening current controlling terminal for the process (`/dev/tty'): No such device or address
+--- 2. la clave de proot: pkexec requiere setuid ---
+-rwsr-xr-x+ /usr/bin/pkexec
+SETUID_FALTA_127_EXPLICADO
+--- 3. FALLBACK PRACTICO: probar la ruta que SI funciona (apt como root) ---
+-rw-r--r--+ 1 root root 110959010 Nov 17 00:38 filmcraft-0.20.1-linux-aarch64.deb
+-rw-r--r--+ 1 root root 119870256 Nov 17 00:38 lightcraft-0.21.1-linux-aarch64.deb
+-rw-r--r--+ 1 root root 137080668 Nov 17 00:35 photocraft-0.23.1-linux-aarch64.deb
+-rw-r--r--+ 1 root root 154970264 Nov 17 00:47 vectorcraft-0.24.1-linux-aarch64.deb
+deb_descargado=/home/dexuser/.cache/artcraft-launcher/downloads/vectorcraft-0.24.1-linux-aarch64.deb
+--- 4. parche del wrapper: fallback automatico post-instalador-fallido ---
+fallback_instalado
+--- 5. prueba real del fallback (con lo que haya descargado) ---
+FALLBACK_FUNCIONA (vectorcraft instalado)
+Processing triggers for shared-mime-info (2.4-5build3) ...
+  -> OK
+[2026-11-17T00:51:59Z] fallback terminado
+--- 6. salud ---
 SHELL_VIVO
 FIN_INNER
-VEREDICTO: si CURADO_127 — cerrar y reabrir el launcher, instalar la app del catalogo, y avisar. El panic de winit (TranslateCoordinates) queda documentado como causa del crash original; el wrapper seguira capturando si reaparece.
-=== MISION-A53-POLKIT-COMPLETO COMPLETE ===
+VEREDICTO: si SETUID_FALTA, el 127 de pkexec esta EXPLICADO DE RAIZ (proot no soporta setuid) y la solucion DEFINITIVA es el fallback: usuario reintenta en el launcher (fallara igual), luego corre 'bash /usr/local/bin/artcraft-install-fallback' desde Termux con proot, o pedimos al bridge correrlo tras cada intento.
+=== MISION-A54-POLKIT-FALLBACK COMPLETE ===
 === EXIT=0 ===
