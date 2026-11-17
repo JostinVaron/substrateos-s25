@@ -1,23 +1,33 @@
-=== BRIDGE RUN 2026-11-17T01:08:35Z (v4) ===
-=== MISION-A59-BLINDAJE-APPS — bajar oom_score_adj al lanzar cada app 2026-11-17T01:08:35Z ===
---- 1. test de permiso: podemos escribir oom_score_adj dentro del proot? ---
-escritura_directa_OK adj=0
---- 2. wrapper de apps v2: blindaje automatico ---
-wrapper_v2_instalado
---- 3. verificacion: adj de un lanzamiento de prueba ---
-app_pid=22124 adj=0
-== log de la prueba ==
-[2026-11-17T01:08:36Z] app=/usr/bin/vectorcraft pid_inicio (blindaje v2)
-2026-11-17T01:08:36.390Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:08:36.391Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
+=== BRIDGE RUN 2026-11-17T01:14:03Z (v4) ===
+=== MISION-A60-BROKER-BLINDADO — lanzar apps desde un padre con adj=0 2026-11-17T01:14:03Z ===
+--- 1. firma de la muerte instantanea: el log mas reciente ---
+== /tmp/app-session-20261117T011249Z.log ==
+[2026-11-17T01:12:49Z] app=vectorcraft pid_inicio (blindaje v2)
+2026-11-17T01:12:49.270Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
+2026-11-17T01:12:49.270Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
+ATTENTION: default value of option vblank_mode overridden by environment.
 MESA-LOADER: failed to retrieve device information
-2026-11-17T01:08:36.564Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:08:36.564Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:08:36.611Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-[2026-11-17T01:08:39Z] rss_kb=2616 adj=0
---- 4. salud ---
+2026-11-17T01:12:49.418Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
+2026-11-17T01:12:49.418Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
+2026-11-17T01:12:49.460Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
+[2026-11-17T01:12:51Z] EXIT_CODE=137 adj_final=
+adj_al_morir=no_sample
+--- 2. demostracion de la regla del kernel: no se puede bajar el adj heredado ---
+BAJO_a_0 (kernel permisivo)
+--- 3. broker blindado: demonio hijo del bridge (adj=0) que lanza apps ---
+broker_pid=23737 adj=0
+--- 4. repuntar los 4 iconos al cliente del broker ---
+vectorcraft -> broker-client (vectorcraft)
+photocraft -> broker-client (photocraft)
+filmcraft -> broker-client (filmcraft)
+lightcraft -> broker-client (lightcraft)
+--- 5. PRUEBA EN VIVO: lanzar vectorcraft via broker y monitorear 20 s ---
+app_pid= adj= (esperado 0)
+MURIO_EN_2s
+--- 6. salud ---
 SHELL_VIVO
+BROKER_PERSISTE
 FIN_INNER
-VEREDICTO: si la prueba muestra adj=0 en la app, el blindaje funciona y el usuario debe probar: abrir VectorCraft desde el dock y USARLA — con Termux:X11 en 'sin optimizacion de bateria' (Ajustes Android) la app deberia sobrevivir. Si escritura_denegada, el blindaje por proceso es imposible sin root y la unica cura es la de Android: desactivar optimizacion de bateria para Termux y Termux:X11 + wake-lock permanente.
-=== MISION-A59-BLINDAJE-APPS COMPLETE ===
+VEREDICTO: si la prueba 5 muestra adj=0 y SOBREVIVIO, el usuario reintenta desde el dock — la app nace del broker, hereda adj=0 y LMKD no la mata. La mitad de Android sigue siendo recomendable: Termux y Termux:X11 en 'Sin restricciones' de bateria para blindar tambien al propio sistema, no solo a las apps.
+=== MISION-A60-BROKER-BLINDADO COMPLETE ===
 === EXIT=0 ===
