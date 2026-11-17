@@ -1,35 +1,35 @@
-=== BRIDGE RUN 2026-11-17T02:01:29Z (v5) ===
-=== MISION-A69-PHANTOM-KILLER — identificar y desactivar al asesino de procesos hijos 2026-11-17T02:01:29Z ===
+=== BRIDGE RUN 2026-11-17T02:04:37Z (v6) ===
+=== MISION-A69-PHANTOM-KILLER — identificar y desactivar al asesino de procesos hijos 2026-11-17T02:04:37Z ===
 --- 1. adb disponible? ---
 adb_ok
-connected to 127.0.0.1:5555
+already connected to 127.0.0.1:5555
 --- 2. FORENSE: ha actuado el phantom killer? ---
 == estado actual del vigilante ==
-monitor_phantom_procs = 0
+monitor_phantom_procs = false
 max_phantom_processes  = 2147483647
 == logcat: muertes phantom y lmkd recientes ==
-11-16 20:57:49.630  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:49.642  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:49.654  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:49.679  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:49.691  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:49.703  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:49.715  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:49.725  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.034  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.046  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.058  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:51.071  1145  1145 D lmkd    : No processes to kill with adj score >= 850
-11-16 20:57:54.933  1145  1145 I lmkd    : 0(delay), 0(swap), 100(freelimit), 0(reentrymode) memory pressure events were skipped after a kill!
-11-16 21:01:30.603 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings get global settings_enable_monitor_phantom_procs'
-11-16 21:01:30.640 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config get activity_manager max_phantom_processes'
+11-16 21:01:31.284 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings put global settings_enable_monitor_phantom_procs false'
+11-16 21:01:31.301  3325  6349 V SettingsShellCmd: putForUser(userId=0, table=global, key=settings_enable_monitor_phantom_procs, value=false, tag=null, makeDefault=false, overrideableByRestore=false)
+11-16 21:01:31.301  3325  6349 D SettingsProvider: PUT_ret(/global/settings_enable_monitor_phantom_procs), callingPackage:com.android.shell
+11-16 21:01:31.348 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config put activity_manager max_phantom_processes 2147483647'
+11-16 21:01:31.380 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings get global settings_enable_monitor_phantom_procs'
+11-16 21:01:31.414 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config get activity_manager max_phantom_processes'
+11-16 21:04:12.614  3325  3636 I ActivityManager: Process PhantomProcessRecord {919e668 3873:16971:sleep/u0a345} died
+11-16 21:04:28.105  3325  3636 I ActivityManager: Process PhantomProcessRecord {1617a40 4025:16971:sleep/u0a345} died
+11-16 21:04:34.285 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings get global settings_enable_monitor_phantom_procs'
+11-16 21:04:34.321 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config get activity_manager max_phantom_processes'
+11-16 21:04:36.780  3325  3636 I ActivityManager: Process PhantomProcessRecord {4299255 4343:16971:gh/u0a345} died
+11-16 21:04:36.780  3325  3636 I ActivityManager: Process PhantomProcessRecord {307646a 4342:16971:bash/u0a345} died
+11-16 21:04:38.257  3325  3636 I ActivityManager: Process PhantomProcessRecord {8462010 4384:16971:sh/u0a345} died
+11-16 21:04:38.283 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings get global settings_enable_monitor_phantom_procs'
+11-16 21:04:38.313 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config get activity_manager max_phantom_processes'
 == dumpsys: procstate y adj de termux AHORA ==
   *APP* UID 10354 ProcessRecord{b1b18b9 15911:com.termux.x11/u0a354}
     class=com.termux.x11.LorieApp
     dir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk publicDir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk data=/data/user/0/com.termux.x11
     packageList={com.termux.x11}
         -> ContentProviderRecord{fcb21c7 u0 com.termux.x11/androidx.startup.InitializationProvider}
-      - 412fe2c/com.android.providers.settings/.SettingsProvider->15911:com.termux.x11/u0a354 s1/1 u0/0 +1h37m5s939ms
+      - 412fe2c/com.android.providers.settings/.SettingsProvider->15911:com.termux.x11/u0a354 s1/1 u0/0 +1h40m13s576ms
       - ActivityRecord{225114455 u0 com.termux.x11/.MainActivity t3254}
   *APP* UID 10345 ProcessRecord{2262afa 16971:com.termux/u0a345}
     class=com.termux.app.TermuxApplication
