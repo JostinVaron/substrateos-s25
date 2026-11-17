@@ -6,6 +6,26 @@ Este repositorio es la **identidad operativa** de la máquina: qué hay, cómo a
 
 > **Estado actual: compositor GPU Zink/Turnip con ventanas visibles (parche definitivo V3).** GNOME Shell 49 compone en la Adreno 830 vía Zink sobre Turnip (`/dev/kgsl-3d0`) y las ventanas de apps se componen **pixel-exactas** (`COGL_DISABLE_TFP=1`: sin DRI3 el TFP de zink no puede importar los pixmaps; mutter los lee por CPU). Verificado con el gate RMSE (`scripts/distro/test-visibilidad.sh`): **RMSE=0 / AE=0** y damage vivo al mover ventanas. Apps GTK4 en `GSK_RENDERER=gl`. Escape hatch software: `GNOME49_SW=1 gnome49 --restart`. Bug abierto: SIGKILL silencioso en ~13% de arranques en frío (I-12; mitigación pendiente = supervisor). Detalle en [`docs/05-ISSUES-ROADMAP.md`](docs/05-ISSUES-ROADMAP.md).
 
+> ## ⛔ CONFIGURACIÓN OFICIAL CONGELADA — 2026-11-17
+>
+> Esta es la **única versión válida** de SubstrateOS y **no se modifica hasta nuevo
+> aviso**. No ejecutar experimentos de supervisor auto-curativo ni series de
+> variantes GPU: se probaron y **rompieron la sesión** (commit `b44179a` y siguientes,
+> revertidos en `025b89c`).
+>
+> **Huella de la config congelada** (debe coincidir exactamente):
+> - `/etc/profile.d/zz-adreno-gpu.sh` = `scripts/distro/zz-adreno-gpu.sh`:
+>   `GALLIUM_DRIVER=zink`, `MESA_LOADER_DRIVER_OVERRIDE=zink`,
+>   `LIBGL_ALWAYS_SOFTWARE=0`, `MESA_VK_WSI_PRESENT_MODE=immediate`,
+>   **`COGL_DISABLE_TFP=1`**.
+> - `session49.sh` **sin** `unset COGL_DISABLE_TFP` (línea 41 solo `FD_*`).
+> - `gnome49 status` → `WM: GNOME Shell OK`, `kgsl_fds=1`.
+> - `test-visibilidad.sh xlogo` → **RMSE=0, AE=0, VEREDICTO: VISIBLE**.
+>
+> Si algo se desvía de esta huella, restaurar desde `scripts/` y los respaldos
+> `~/.local/share/substrate/rt-dex/` (sin variantes). Ante muerte del shell:
+> `gnome49 --restart` manual (X sigue vivo).
+
 - Fecha de esta instantánea: **2026-11-17**
 - Equipo: **Samsung Galaxy S25**, SoC Snapdragon 8 Elite, GPU **Adreno 830v1**
 - Rootfs: contenedor proot-distro **`ubuntu-gnome`**

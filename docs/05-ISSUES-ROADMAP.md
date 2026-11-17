@@ -204,14 +204,15 @@ siguen en GPU (Zink/Turnip).
 ventana-vs-pantalla). Ver `evidence/16-visibilidad-rmse.txt`.
 Capturas: `evidence/17-app-invisible-antes.png` / `18-app-visible-despues.png`.
 
-**Mejora opcional:** ruta zero-copy (TFP nativo) con la Mesa de Termux 26.2.7
-(parches kgsl + soporte DRI3 de Termux:X11) para eliminar el readback CPU.
+**Mejora opcional (⛔ aplazada — config congelada):** ruta zero-copy (TFP nativo)
+con la Mesa de Termux 26.2.7 para eliminar el readback CPU. No ejecutar hasta
+nuevo aviso.
 
-### I-12 — SIGKILL silencioso en arranque en frío (~13%) — **ABIERTO**
+### I-12 — SIGKILL silencioso en arranque en frío (~13%) — **ABIERTO / CONGELADO**
 
-**Estado:** abierto; causa invisible sin root. **Mitigación pendiente: supervisor
-auto-curativo (issue #2, fase A).**  
-**Severidad:** alta (el arranque puede morir), mitigable con reintento automático.
+**Estado:** abierto; causa invisible sin root. **⛔ CONGELADO: no se trabaja en
+esta configuración.**  
+**Severidad:** media en la práctica (el humano reintenta con `gnome49 --restart`).
 
 Medido en 15 arranques en frío instrumentados (2026-11-17): **2 muertes
 (13.3%)**, siempre al pintar la UI inicial (~t+20–28 s), con `SHELL_EXIT=137`.
@@ -228,10 +229,13 @@ Hipótesis abiertas (sin visibilidad de dmesg/`/proc/vmstat` sin root):
 2. reaper silencioso de **Samsung Freecess** (Termux:X11 corre como
    PhantomProcessRecord hijo de com.termux).
 
-Plan de mitigación: serie de 15 arranques por variante (`TU_DEBUG=noubwc`,
-`noltoc`, `MESA_VK_WSI_PRESENT_MODE=fifo`) + supervisor que detecte la muerte,
-guarde forense y relance con backoff (3 intentos → modo software + notificación).
-Datos crudos: `evidence/14-boot-series.csv`, `evidence/15-watcher-muerte-boot8.txt`.
+Plan de mitigación (⛔ NO EJECUTAR — probado y revertido): se implementó un
+supervisor con reintentos automáticos + screening de variantes (`TU_DEBUG=noubwc`,
+`noltoc`, `MESA_VK_WSI_PRESENT_MODE=fifo`) en los commits `b44179a` y `6c71cf9`;
+provocó reinicios en bucle y shell negro y se revirtió en `0be9344` y `025b89c`.
+**La mitigación oficial es manual: ante shell muerto, `gnome49 --restart`.**
+Datos crudos conservados: `evidence/14-boot-series.csv`,
+`evidence/15-watcher-muerte-boot8.txt`.
 
 ---
 

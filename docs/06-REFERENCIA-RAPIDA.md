@@ -15,7 +15,12 @@ gnome49
 gnome49 status
 ```
 
-Esperado: shell + WM + `kgsl_fds=0` (software).
+Esperado: shell + WM + `kgsl_fds=1` (GPU). `kgsl_fds=0` solo en el escape hatch
+software. **La visibilidad se valida con `test-visibilidad.sh` (RMSE=0).**
+
+> **CONFIGURACIÓN OFICIAL CONGELADA (2026-11-17).** No ejecutar experimentos de
+> supervisor/variantes. La única versión válida es la documentada en
+> `FINAL-STATUS.md` y los scripts de `scripts/`.
 
 ## Reiniciar / parar
 

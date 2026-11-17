@@ -27,17 +27,21 @@ proot comparte `/proc`; esos patrones pueden matar SSH/tmux/OpenCode/Termux.
 gnome49 status
 ```
 
-Salida esperada en el modo estable actual:
+Salida esperada en el modo estable oficial (GPU):
 
 ```
 [X] Servidor :0 OK
 [S] Sesion activa: gnome-shell pid=...
 [W] WM: GNOME Shell OK
-    kgsl_fds=0
+    kgsl_fds=1
 [V] Ventanas visibles:
 ```
 
-`kgsl_fds=0` **no es un error** en el modo software. Significa que el compositor no está usando kgsl; las apps GPU lo usan por separado.
+`kgsl_fds>=1` significa que el compositor usa GPU (Zink/Turnip). `kgsl_fds=0`
+solo es válido en el escape hatch software (`GNOME49_SW=1`).
+
+**La visibilidad de ventanas se verifica con `test-visibilidad.sh` (RMSE=0), no
+con conteo de colores** — ver §13.
 
 Comprobación X:
 

@@ -91,18 +91,19 @@ y la compone igual; stage/efectos siguen en GPU). Se eliminó el
 - Backups: `/etc/profile.d/zz-adreno-gpu.sh.pre-tfp-*`; copias en
   `/tmp/rt-dex/` y `~/.local/share/substrate/rt-dex/`.
 
-**Pendientes que abre (I-12 y opcionales):**
-1. Supervisor auto-curativo (issue #2, fase A): detectar shell muerto → forense →
-   reintento con backoff → 3 fallos = modo software + notificación; re-aplicar
-   phantom-kill settings cada 10 min.
-2. Serie de 15 arranques por variante (`TU_DEBUG=noubwc`, `noltoc`,
-   `WSI=fifo`) para atacar el SIGKILL silencioso del cold boot (2/15 medido).
+**Pendientes que abre (I-12 y opcionales) — ⛔ CONGELADOS, NO EJECUTAR:**
+1. Supervisor auto-curativo: **se implementó y se revirtió** (commits `b44179a`,
+   `6c71cf9`; reverts `0be9344`, `025b89c`) porque provocaba reinicios en bucle y
+   shell negro. Ante muerte del shell: `gnome49 --restart` **manual**.
+2. Series de variantes (`TU_DEBUG`, `WSI`) — **no ejecutar**: el screening rompió
+   la estabilidad. La tasa 2/15 del cold boot queda documentada, sin mitigar.
    Datos crudos: `evidence/14-boot-series.csv`, `evidence/15-watcher-muerte-boot8.txt`.
-3. Ruta zero-copy opcional: TFP nativo con Mesa de Termux 26.2.7 para quitar el
-   readback CPU en animaciones.
-4. Regla permanente: toda verificación de visibilidad usa RMSE, nunca conteo de
-   colores. `gnome-control-center` requiere `XDG_CURRENT_DESKTOP=ubuntu:GNOME` y
-   aún aborta en `cc_object_storage` (usar paneles individuales).
+3. Ruta zero-copy (TFP nativo con Mesa de Termux) — **no ejecutar** en esta
+   config congelada; queda como idea futura.
+4. Reglas permanentes que SÍ aplican: toda verificación de visibilidad usa RMSE,
+   nunca conteo de colores. `gnome-control-center` requiere
+   `XDG_CURRENT_DESKTOP=ubuntu:GNOME` y aún aborta en `cc_object_storage`
+   (usar paneles individuales).
 
 ## Rollback
 

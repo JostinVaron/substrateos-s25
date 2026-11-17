@@ -265,7 +265,7 @@ Luego se puede buscar “Blender (GPU)” en overview. **No usar el .desktop nor
 6. Si una app 3D va lenta, comprobar que no está en llvmpipe (`glxinfo`).
 7. No instalar servicios systemd esperando que arranquen solos.
 8. Si el compositor Zink se vuelve inestable: `GNOME49_SW=1 gnome49 --restart`
-   (vuelve a llvmpipe/swrast, el estado dorado anterior).
+   (escape hatch a llvmpipe/swrast; no es un modo de trabajo diario).
 
 ---
 

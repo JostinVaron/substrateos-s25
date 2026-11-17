@@ -304,13 +304,14 @@ No ejecutar `systemctl`. No se necesita `systemd-logind`.
 
 ## 9. GPU: receta Zink/Turnip y escape hatch
 
-`/etc/profile.d/zz-adreno-gpu.sh` de referencia (v4):
+`/etc/profile.d/zz-adreno-gpu.sh` oficial (v4, **congelada**):
 
 ```sh
 export GALLIUM_DRIVER=zink
 export MESA_LOADER_DRIVER_OVERRIDE=zink
 export LIBGL_ALWAYS_SOFTWARE=0
 export MESA_VK_WSI_PRESENT_MODE=immediate
+export COGL_DISABLE_TFP=1   # I-11: sin DRI3, zink no importa pixmaps (TFP)
 ```
 
 `session49.sh` fuente este archivo y limpia restos freedreno. El subshell del
@@ -365,9 +366,10 @@ DISPLAY=:0 xdpyinfo | head
 Criterio de éxito:
 
 - `WM: GNOME Shell OK`;
+- `kgsl_fds>=1` (compositor en GPU; `0` solo en el escape hatch software);
 - captura con color (>100.000 colores);
-- `kgsl_fds=0` es normal en modo software;
-- Text Editor abre y cierra sin matar el shell.
+- **visibilidad real**: `test-visibilidad.sh xlogo` → `RMSE=0` (ver docs/04 §13);
+- Text Editor abre/cierra sin matar el shell y **se ve** (no basta el conteo de colores).
 
 ---
 
