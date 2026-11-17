@@ -1,4 +1,4 @@
 loop: v4 (pid 24951)
-ts: 2026-11-17T00:45:46Z
-estado: corriendo
+ts: 2026-11-17T00:45:53Z
+estado: subiendo output
 mision: MISION-A52
