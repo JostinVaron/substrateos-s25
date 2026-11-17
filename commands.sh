@@ -1,51 +1,56 @@
-echo "=== MISION-A52-INSTALLER-127 — forense y cura del error 127 $(date -u +%FT%TZ) ==="
+echo "=== MISION-A53-POLKIT-COMPLETO — bus sistema + polkitd + regla + prueba real $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
 T="$PREFIX/tmp"
-cat > "$T/a52.sh" <<'EOS'
+cat > "$T/a53.sh" <<'EOS'
 set -u
 export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
 export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
-echo "--- 0. A51: vivo, muerto o colgado + limpieza de restos ---"
-pgrep -f "fore.sh" >/dev/null && echo A51_VIVO || echo A51_NO_CORRE
-for P in $(pgrep -f "python3 -c" 2>/dev/null); do kill -9 "$P" 2>/dev/null; echo "alloc_limpiado_pid=$P"; done
-free -m | head -2
-echo "--- 1. que comando de instalador busca el launcher (127 = command not found) ---"
-for CMD in pkexec pkcon apt-get dpkg flatpak gdebi; do
-  W=$(command -v $CMD 2>/dev/null); echo "$CMD => ${W:-FALTA}"
-done
-echo "strings_installer_hints:"
-strings /usr/local/bin/artcraft-launcher 2>/dev/null | grep -oE "pkexec|pkcon|packagekit|apt-get|dpkg -i|flatpak install|gdebi|polkit" | sort | uniq -c | sort -rn | head -6
-echo "--- 2. toolkit (paso que A51 no llego a reportar) ---"
-strings /usr/local/bin/artcraft-launcher 2>/dev/null | grep -im1 -E "winit|iced-|egui|slint|libgtk|gtk-3|gtk4"
-ldd /usr/local/bin/artcraft-launcher 2>&1 | grep -iE "gtk|adw" | head -4
-echo "--- 3. logs del usuario (incluye tu error 127 capturado) ---"
-for L in $(ls -t /tmp/artcraft-session-*.log 2>/dev/null | head -3); do
-  echo "== $L =="; grep -vE "ureq_proto" "$L" | tail -6
-done
-echo "--- 4. LA CURA: instalar policykit + packagekit ---"
-apt-get install -y policykit-1 packagekit >/tmp/apt52.log 2>&1; echo "apt_exit=$?"
-grep -iE "^E:|unable|not found" /tmp/apt52.log | head -3
-W=$(command -v pkcon); echo "pkcon_ahora=${W:-SIGUE_FALTA}"
-echo "--- 5. agente polkit vivo en el bus de sesion ---"
-if [ -x /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 ]; then
-  /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 >/dev/null 2>&1 &
-  sleep 1; echo agente_gnome_ok
-elif command -v lxpolkit >/dev/null 2>&1; then
-  lxpolkit >/dev/null 2>&1 & sleep 1; echo lxpolkit_ok
-else
-  echo SIN_AGENTE_POLKIT
+echo "--- 1. apt-get update (las listas vencidas hundieron a A52) ---"
+apt-get update >/tmp/aptu53.log 2>&1; echo "update_exit=$?"
+tail -2 /tmp/aptu53.log | head -1
+echo "--- 2. instalar polkitd (moderno) con respaldo policykit-1 (clasico) ---"
+apt-get install -y polkitd >/tmp/aptp53.log 2>&1 && echo polkitd_ok || { apt-get install -y policykit-1 >>/tmp/aptp53.log 2>&1 && echo policykit1_ok || echo AMBOS_FALLAN; }
+grep -iE "^E:" /tmp/aptp53.log | head -2
+PD=$(find /usr/lib /usr/libexec -name polkitd -type f 2>/dev/null | head -1); echo "polkitd_bin=${PD:-NO_ENCONTRADO}"
+echo "--- 3. bus de SISTEMA dbus arriba (proot no lo levanta solo) ---"
+if [ -S /run/dbus/system_bus_socket ]; then echo bus_sistema_ya_existe; else
+  mkdir -p /run/dbus
+  dbus-daemon --system --fork --nopidfile >/tmp/dbus53.log 2>&1; sleep 1
+  [ -S /run/dbus/system_bus_socket ] && echo bus_sistema_arrancado || { echo bus_sistema_FALLO; tail -3 /tmp/dbus53.log; }
 fi
-echo "--- 6. prueba REAL del mecanismo (paquete inofensivo 'sl') ---"
-timeout 150 pkcon -p --noninteractive install sl >/tmp/pkcon-test.log 2>&1; EC=$?
-echo "pkcon_exit=$EC"
-tail -3 /tmp/pkcon-test.log
-dpkg -l sl >/dev/null 2>&1 && echo MECANISMO_INSTALACION_OK || echo MECANISMO_FALLA
-echo "--- 7. salud ---"
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket
+echo "--- 4. polkitd corriendo a mano (sin systemd) ---"
+pgrep -x polkitd >/dev/null || { "$PD" --no-debug >/tmp/polkitd53.log 2>&1 & sleep 2; }
+pgrep -x polkitd >/dev/null && echo POLKITD_VIVO || { echo POLKITD_MUERTO; tail -4 /tmp/polkitd53.log; }
+echo "--- 5. regla sin-contrasena para dexuser (launcher instala como ese usuario) ---"
+mkdir -p /etc/polkit-1/localauthority/50-local.d
+cat > /etc/polkit-1/localauthority/50-local.d/90-artcraft.pkla <<'EOP'
+[Allow artcraft installs for dexuser]
+Identity=unix-user:dexuser
+Action=*
+ResultAny=yes
+ResultInactive=yes
+ResultActive=yes
+EOP
+echo regla_pkla_ok
+echo "--- 6. propagar bus de sistema al wrapper del dock ---"
+grep -q DBUS_SYSTEM_BUS_ADDRESS /usr/local/bin/artcraft-dock-launch || sed -i '2i export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket' /usr/local/bin/artcraft-dock-launch
+head -3 /usr/local/bin/artcraft-dock-launch
+echo "--- 7. PRUEBA REAL: pkexec como dexuser (lo mismo que hace el launcher) ---"
+if command -v runuser >/dev/null; then
+  runuser -u dexuser -- env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket pkexec /usr/bin/id >/tmp/pk53.log 2>&1; EC=$?
+else
+  su -s /bin/bash dexuser -c "DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket pkexec /usr/bin/id" >/tmp/pk53.log 2>&1; EC=$?
+fi
+echo "pkexec_exit=$EC"
+tail -2 /tmp/pk53.log
+[ "$EC" = "0" ] && echo CURADO_127 || echo AUN_NO_CURADO
+echo "--- 8. salud ---"
 pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO
 echo "FIN_INNER"
 EOS
-proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a52.sh 2>&1
-rm -f "$T/a52.sh"
-echo "VEREDICTO: si strings muestra pkcon/pkexec y ahora existen + prueba sl OK, el 127 esta curado. PROXIMO PASO HUMANO: reintentar instalar la app desde el launcher (cerrarlo y reabrirlo primero) y avisar."
-echo "=== MISION-A52-INSTALLER-127 COMPLETE ==="
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a53.sh 2>&1
+rm -f "$T/a53.sh"
+echo "VEREDICTO: si CURADO_127 — cerrar y reabrir el launcher, instalar la app del catalogo, y avisar. El panic de winit (TranslateCoordinates) queda documentado como causa del crash original; el wrapper seguira capturando si reaparece."
+echo "=== MISION-A53-POLKIT-COMPLETO COMPLETE ==="
 echo "### BRIDGE MARKER ###"
