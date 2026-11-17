@@ -1,4 +1,5 @@
-loop: v4 (pid 24951)
-ts: 2026-11-17T01:14:11Z
+loop: v5 (pid 24468)
+ts: 2026-11-17T01:15:55Z
 estado: idle
 mision: esperando comandos
+broker_apps: muerto
