@@ -93,9 +93,10 @@ y la compone igual; stage/efectos siguen en GPU). Se eliminó el
 
 **Pendientes que abre (I-12 y opcionales):**
 1. ~~Supervisor auto-curativo (issue #2, fase A)~~ **HECHO 2026-11-17**:
-   `supervisor49.sh` + `forensics-snapshot.sh` integrados en `gnome49`/
-   `gnome49-stop`; prueba real de muerte → recuperación en 20 s con forense.
-   Pendiente: probar los caminos X-caído y 3 fallos → modo SW.
+   `supervisor49.sh` + `forensics-snapshot.sh` instalados; **opt-in**
+   (`gnome49 --supervised`) tras corregir un incidente de reinicios en bucle
+   (falta de singleton + sondas agresivas). Prueba real de muerte → recuperación
+   en 20 s con forense. Pendiente: probar los caminos X-caído y 3 fallos → modo SW.
 2. Serie de 15 arranques por variante (`TU_DEBUG=noubwc`, `noltoc`,
    `WSI=fifo`) para atacar el SIGKILL silencioso del cold boot (2/15 medido).
    Screening de 5/variante ya hecho: 20/20 OK, 0 muertes
