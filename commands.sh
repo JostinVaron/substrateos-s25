@@ -1,56 +1,60 @@
-echo "=== MISION-A53-POLKIT-COMPLETO — bus sistema + polkitd + regla + prueba real $(date -u +%FT%TZ) ==="
+echo "=== MISION-A54-POLKIT-FALLBACK — forense fino + instalador de respaldo $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
 T="$PREFIX/tmp"
-cat > "$T/a53.sh" <<'EOS'
+cat > "$T/a54.sh" <<'EOS'
 set -u
 export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
 export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
-echo "--- 1. apt-get update (las listas vencidas hundieron a A52) ---"
-apt-get update >/tmp/aptu53.log 2>&1; echo "update_exit=$?"
-tail -2 /tmp/aptu53.log | head -1
-echo "--- 2. instalar polkitd (moderno) con respaldo policykit-1 (clasico) ---"
-apt-get install -y polkitd >/tmp/aptp53.log 2>&1 && echo polkitd_ok || { apt-get install -y policykit-1 >>/tmp/aptp53.log 2>&1 && echo policykit1_ok || echo AMBOS_FALLAN; }
-grep -iE "^E:" /tmp/aptp53.log | head -2
-PD=$(find /usr/lib /usr/libexec -name polkitd -type f 2>/dev/null | head -1); echo "polkitd_bin=${PD:-NO_ENCONTRADO}"
-echo "--- 3. bus de SISTEMA dbus arriba (proot no lo levanta solo) ---"
-if [ -S /run/dbus/system_bus_socket ]; then echo bus_sistema_ya_existe; else
-  mkdir -p /run/dbus
-  dbus-daemon --system --fork --nopidfile >/tmp/dbus53.log 2>&1; sleep 1
-  [ -S /run/dbus/system_bus_socket ] && echo bus_sistema_arrancado || { echo bus_sistema_FALLO; tail -3 /tmp/dbus53.log; }
-fi
 export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket
-echo "--- 4. polkitd corriendo a mano (sin systemd) ---"
-pgrep -x polkitd >/dev/null || { "$PD" --no-debug >/tmp/polkitd53.log 2>&1 & sleep 2; }
-pgrep -x polkitd >/dev/null && echo POLKITD_VIVO || { echo POLKITD_MUERTO; tail -4 /tmp/polkitd53.log; }
-echo "--- 5. regla sin-contrasena para dexuser (launcher instala como ese usuario) ---"
-mkdir -p /etc/polkit-1/localauthority/50-local.d
-cat > /etc/polkit-1/localauthority/50-local.d/90-artcraft.pkla <<'EOP'
-[Allow artcraft installs for dexuser]
-Identity=unix-user:dexuser
-Action=*
-ResultAny=yes
-ResultInactive=yes
-ResultActive=yes
-EOP
-echo regla_pkla_ok
-echo "--- 6. propagar bus de sistema al wrapper del dock ---"
-grep -q DBUS_SYSTEM_BUS_ADDRESS /usr/local/bin/artcraft-dock-launch || sed -i '2i export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket' /usr/local/bin/artcraft-dock-launch
-head -3 /usr/local/bin/artcraft-dock-launch
-echo "--- 7. PRUEBA REAL: pkexec como dexuser (lo mismo que hace el launcher) ---"
-if command -v runuser >/dev/null; then
-  runuser -u dexuser -- env DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket pkexec /usr/bin/id >/tmp/pk53.log 2>&1; EC=$?
+echo "--- 0. servicios de A53 siguen vivos? ---"
+pgrep -x polkitd >/dev/null && echo POLKITD_VIVO || { /usr/lib/polkit-1/polkitd >/tmp/polkitd54.log 2>&1 & sleep 2; pgrep -x polkitd >/dev/null && echo POLKITD_RELanzADO || echo POLKITD_MUERTO; }
+[ -S /run/dbus/system_bus_socket ] && echo BUS_SISTEMA_OK || { mkdir -p /run/dbus; dbus-daemon --system --fork --nopidfile >/dev/null 2>&1; sleep 1; [ -S /run/dbus/system_bus_socket ] && echo BUS_RELanzADO || echo BUS_MUERTO; }
+echo "--- 1. forense fino: stderr COMPLETO de pkexec como dexuser ---"
+su -s /bin/bash dexuser -c "DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket pkexec /usr/bin/id" > /tmp/pk54.log 2>&1; EC=$?
+echo "exit=$EC"; cat /tmp/pk54.log
+echo "--- 2. la clave de proot: pkexec requiere setuid ---"
+ls -l /usr/bin/pkexec | awk '{print $1, $NF}'
+[ -x /usr/bin/pkexec ] && [ "$(stat -c %a /usr/bin/pkexec | cut -c4)" = "4" ] 2>/dev/null && echo SETUID_OK || echo SETUID_FALTA_127_EXPLICADO
+echo "--- 3. FALLBACK PRACTICO: probar la ruta que SI funciona (apt como root) ---"
+ls -la /home/dexuser/.cache/artcraft-launcher/downloads/ 2>/dev/null | tail -4
+DEB=$(ls -t /home/dexuser/.cache/artcraft-launcher/downloads/*.deb 2>/dev/null | head -1)
+echo "deb_descargado=${DEB:-NINGUNO_AUN}"
+echo "--- 4. parche del wrapper: fallback automatico post-instalador-fallido ---"
+cat > /usr/local/bin/artcraft-install-fallback <<'EOF'
+#!/bin/bash
+# Instala los .deb que el launcher ya descargo pero no pudo instalar (127).
+# Corre como root dentro del proot. Idempotente: dpkg no reinstala lo ya instalado.
+LOG=/tmp/artcraft-fallback.log
+echo "[$(date -u +%FT%TZ)] fallback manual invocado" >> "$LOG"
+for DEB in /home/dexuser/.cache/artcraft-launcher/downloads/*.deb; do
+  [ -f "$DEB" ] || continue
+  NOMBRE=$(dpkg-deb -f "$DEB" Package 2>/dev/null)
+  if dpkg -s "$NOMBRE" >/dev/null 2>&1; then
+    echo "[$(date -u +%FT%TZ)] $NOMBRE ya instalado, skip" >> "$LOG"
+  else
+    echo "[$(date -u +%FT%TZ)] instalando $NOMBRE desde $DEB" >> "$LOG"
+    apt-get -y install "$DEB" >> "$LOG" 2>&1 && echo "  -> OK" >> "$LOG" || echo "  -> FALLO" >> "$LOG"
+  fi
+done
+echo "[$(date -u +%FT%TZ)] fallback terminado" >> "$LOG"
+EOF
+chmod 755 /usr/local/bin/artcraft-install-fallback
+echo fallback_instalado
+echo "--- 5. prueba real del fallback (con lo que haya descargado) ---"
+if [ -n "$DEB" ]; then
+  /usr/local/bin/artcraft-install-fallback
+  N=$(dpkg-deb -f "$DEB" Package 2>/dev/null)
+  dpkg -s "$N" >/dev/null 2>&1 && echo "FALLBACK_FUNCIONA ($N instalado)" || echo FALLO_FALLBACK
+  tail -3 /tmp/artcraft-fallback.log
 else
-  su -s /bin/bash dexuser -c "DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket pkexec /usr/bin/id" >/tmp/pk53.log 2>&1; EC=$?
+  echo "sin deb para probar aun — se probara cuando el usuario reintente desde el launcher"
 fi
-echo "pkexec_exit=$EC"
-tail -2 /tmp/pk53.log
-[ "$EC" = "0" ] && echo CURADO_127 || echo AUN_NO_CURADO
-echo "--- 8. salud ---"
+echo "--- 6. salud ---"
 pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO
 echo "FIN_INNER"
 EOS
-proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a53.sh 2>&1
-rm -f "$T/a53.sh"
-echo "VEREDICTO: si CURADO_127 — cerrar y reabrir el launcher, instalar la app del catalogo, y avisar. El panic de winit (TranslateCoordinates) queda documentado como causa del crash original; el wrapper seguira capturando si reaparece."
-echo "=== MISION-A53-POLKIT-COMPLETO COMPLETE ==="
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/a54.sh 2>&1
+rm -f "$T/a54.sh"
+echo "VEREDICTO: si SETUID_FALTA, el 127 de pkexec esta EXPLICADO DE RAIZ (proot no soporta setuid) y la solucion DEFINITIVA es el fallback: usuario reintenta en el launcher (fallara igual), luego corre 'bash /usr/local/bin/artcraft-install-fallback' desde Termux con proot, o pedimos al bridge correrlo tras cada intento."
+echo "=== MISION-A54-POLKIT-FALLBACK COMPLETE ==="
 echo "### BRIDGE MARKER ###"
