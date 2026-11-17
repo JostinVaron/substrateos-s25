@@ -1,22 +1,29 @@
-=== BRIDGE RUN 2026-11-17T00:59:50Z (v4) ===
-=== MISION-A56-TRAMPA-APPS — trampa de captura para las 4 apps 2026-11-17T00:59:50Z ===
---- 1. wrapper de captura para apps ---
-wrapper_ok
---- 2. repuntar los .desktop de las 4 apps al wrapper ---
-vectorcraft: /usr/share/applications/ai.storyteller.vectorcraft.desktop -> trampa (vectorcraft)
-photocraft: /usr/share/applications/ai.storyteller.photocraft.desktop -> trampa (photocraft)
-filmcraft: /usr/share/applications/ai.storyteller.filmcraft.desktop -> trampa (filmcraft)
-lightcraft: /usr/share/applications/ai.storyteller.lightcraft.desktop -> trampa (lightcraft)
---- 3. verificar trampas activas ---
-/usr/share/applications/ai.storyteller.filmcraft.desktop
-/usr/share/applications/ai.storyteller.lightcraft.desktop
-/usr/share/applications/ai.storyteller.photocraft.desktop
-/usr/share/applications/ai.storyteller.vectorcraft.desktop
---- 4. borrar logs viejos de app (mantener los nuevos limpios) ---
-limpieza_ok
---- 5. salud ---
+=== BRIDGE RUN 2026-11-17T01:06:29Z (v4) ===
+=== MISION-A57-FIRMA-VECTORCRAFT — leer la firma del crash capturado 2026-11-17T01:06:29Z ===
+--- 1. todos los logs de sesiones de app (mas recientes primero) ---
+-rw-r--r--+ 1 root root 1020 Nov 17 01:05 /tmp/app-session-20261117T010547Z.log
+-rw-r--r--+ 1 root root  802 Nov 17 00:58 /tmp/app-session-20261117T005810Z.log
+--- 2. FIRMA COMPLETA del ultimo crash: /tmp/app-session-20261117T010547Z.log ---
+[2026-11-17T01:05:47Z] app=vectorcraft pid_inicio
+2026-11-17T01:05:47.355Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
+2026-11-17T01:05:47.363Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
+ATTENTION: default value of option vblank_mode overridden by environment.
+MESA-LOADER: failed to retrieve device information
+2026-11-17T01:05:47.711Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
+2026-11-17T01:05:47.711Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
+2026-11-17T01:05:47.798Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
+[2026-11-17T01:05:50Z] rss_kb=189220 memavail_kb=4645256
+[2026-11-17T01:05:50Z] EXIT_CODE=137
+--- 3. interpretacion de la firma ---
+exit_code=137
+FIRMA: SIGKILL — matado por memoria (OOM) o por gestion de Android. Ver memavail en los ultimos samples.
+--- 4. RAM justo antes de morir (ultimos 3 samples) ---
+[2026-11-17T01:05:50Z] rss_kb=189220 memavail_kb=4645256
+--- 5. si el launcher o algo la relanzo, salud general ---
 SHELL_VIVO
+               total        used        free      shared  buff/cache   available
+Mem:           11113        6485        2166         108        2669        4627
 FIN_INNER
-VEREDICTO: trampas puestas. PROXIMO PASO HUMANO: abrir cada app desde el dock, usarla hasta que crashee (si crashea), y avisar — cada crash quedara grabado en /tmp/app-session-*.log con exit code y RAM en vivo: panic winit = exit 101 con texto; RAM agotada = exit 137 con memavail desplomado. Con la firma de UN crash se decide la cura.
-=== MISION-A56-TRAMPA-APPS COMPLETE ===
+VEREDICTO: la firma capturada decide la cura. PANIC winit (101) = mismos workarounds que el launcher. SIGKILL (137) con memavail caido = disciplina de memoria. SIGSEGV (139) = frente nuevo: driver Vulkan/Adreno bajo proot.
+=== MISION-A57-FIRMA-VECTORCRAFT COMPLETE ===
 === EXIT=0 ===
