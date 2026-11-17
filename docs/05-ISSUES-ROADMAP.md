@@ -209,7 +209,8 @@ Capturas: `evidence/17-app-invisible-antes.png` / `18-app-visible-despues.png`.
 
 ### I-12 — SIGKILL silencioso en arranque en frío (~13%) — **ABIERTO**
 
-**Estado:** mitigado (2026-11-17) con supervisor auto-curativo; causa raíz aún invisible sin root.  
+**Estado:** abierto; causa invisible sin root. **Mitigación pendiente: supervisor
+auto-curativo (issue #2, fase A).**  
 **Severidad:** alta (el arranque puede morir), mitigable con reintento automático.
 
 Medido en 15 arranques en frío instrumentados (2026-11-17): **2 muertes
@@ -227,41 +228,10 @@ Hipótesis abiertas (sin visibilidad de dmesg/`/proc/vmstat` sin root):
 2. reaper silencioso de **Samsung Freecess** (Termux:X11 corre como
    PhantomProcessRecord hijo de com.termux).
 
-Plan de mitigación: supervisor auto-curativo (implementado) + serie de variantes
-(`TU_DEBUG=noubwc`, `noltoc`, `MESA_VK_WSI_PRESENT_MODE=fifo`) para buscar una
-configuración con 0 muertes. Datos crudos: `evidence/14-boot-series.csv`,
-`evidence/15-watcher-muerte-boot8.txt`.
-
-**Implementado (2026-11-17, issue #3 fase A):**
-
-- `scripts/termux/supervisor49.sh` (Termux nativo, setsid + `supervisor49.pid`):
-  - cada 2 s vigila el PID de `shell49.pid`; si muere → `forensics-snapshot.sh` y
-    relanza `gnome49 --restart` con backoff 2/5/10 s (máx 3 intentos); tras 3
-    fallos → `GNOME49_SW=1` + `termux-notification`;
-  - cada 10 s `xdpyinfo` (timeout 4) → relanza `termux-x11 :0`; y
-    `_NET_SUPPORTING_WM_CHECK` → cura "shell vivo sin UI";
-  - cada 10 min re-aplica/verifica la config phantom vía adb y loguea reversiones;
-  - contadores se resetean si la sesión vive ≥10 min;
-  - `--observe` registra muertes + forense **sin** relanzar (series de medición).
-- `scripts/termux/forensics-snapshot.sh` → `$RT/forensics/<TAG>-<epoch>/`
-  (watcher tail, sysfs kgsl, shell49 tail, logcat `-b all`, meminfo, procstats,
-  exit-info, ps).
-- Integración: `gnome49` lo arranca al declarar OK (`SUBSTRATE_NO_SUPERVISOR=1`
-  lo desactiva); `gnome49-stop` lo mata por PID del pidfile, respetando
-  `--observe`. **Sin `pkill -f` en ningún punto.**
-
-**Prueba de aceptación (medida):** `kill -9` al shell por PID 18613 →
-forense `DEATH-1794945480` guardada y sesión recuperada en **20 s** (límite: 30 s).
-
-**Screening de variantes (2026-11-17, comprimido a 5 arranques/variante):**
-20/20 arranques OK, **0 muertes** en base, `v1-noubwc`, `v2-noltoc` y `v3-fifo`
-(`evidence/19-screening-variantes.csv`). Sin significancia para elegir variante:
-se mantiene la base (Zink/Turnip + `COGL_DISABLE_TFP=1`); `TU_DEBUG=noubwc`
-queda como candidata a confirmar con la serie completa.
-
-**Pendiente para cerrar I-12:** serie de 15 arranques por variante (criterio 0/15),
-soak de 1 h con apps abiertas + RMSE, y prueba de los caminos X-caído y 3 fallos
-→ modo SW del supervisor.
+Plan de mitigación: serie de 15 arranques por variante (`TU_DEBUG=noubwc`,
+`noltoc`, `MESA_VK_WSI_PRESENT_MODE=fifo`) + supervisor que detecte la muerte,
+guarde forense y relance con backoff (3 intentos → modo software + notificación).
+Datos crudos: `evidence/14-boot-series.csv`, `evidence/15-watcher-muerte-boot8.txt`.
 
 ---
 

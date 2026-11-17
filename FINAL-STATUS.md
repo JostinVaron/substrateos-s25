@@ -92,14 +92,11 @@ y la compone igual; stage/efectos siguen en GPU). Se eliminó el
   `/tmp/rt-dex/` y `~/.local/share/substrate/rt-dex/`.
 
 **Pendientes que abre (I-12 y opcionales):**
-1. ~~Supervisor auto-curativo (issue #2, fase A)~~ **HECHO 2026-11-17**:
-   `supervisor49.sh` + `forensics-snapshot.sh` integrados en `gnome49`/
-   `gnome49-stop`; prueba real de muerte → recuperación en 20 s con forense.
-   Pendiente: probar los caminos X-caído y 3 fallos → modo SW.
+1. Supervisor auto-curativo (issue #2, fase A): detectar shell muerto → forense →
+   reintento con backoff → 3 fallos = modo software + notificación; re-aplicar
+   phantom-kill settings cada 10 min.
 2. Serie de 15 arranques por variante (`TU_DEBUG=noubwc`, `noltoc`,
    `WSI=fifo`) para atacar el SIGKILL silencioso del cold boot (2/15 medido).
-   Screening de 5/variante ya hecho: 20/20 OK, 0 muertes
-   (`evidence/19-screening-variantes.csv`); falta la serie completa 0/15.
    Datos crudos: `evidence/14-boot-series.csv`, `evidence/15-watcher-muerte-boot8.txt`.
 3. Ruta zero-copy opcional: TFP nativo con Mesa de Termux 26.2.7 para quitar el
    readback CPU en animaciones.
