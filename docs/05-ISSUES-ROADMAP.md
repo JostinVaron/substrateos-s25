@@ -234,37 +234,21 @@ configuración con 0 muertes. Datos crudos: `evidence/14-boot-series.csv`,
 
 **Implementado (2026-11-17, issue #3 fase A):**
 
-- `scripts/termux/supervisor49.sh` (Termux nativo, `setsid` + `supervisor49.pid`):
-  - **opt-in**: solo arranca con `gnome49 --supervised` o `SUBSTRATE_SUPERVISOR=1`;
-    por defecto `gnome49` NO lo inicia;
-  - singleton real con `flock` (evita duplicados en cada recuperación);
-  - cada 2 s vigila el PID de `shell49.pid`; solo actúa tras **2 muestras
-    seguidas** sin PID (≥4 s) → `forensics-snapshot.sh` + `gnome49 --restart`
-    con backoff 2/5/10 s (máx 3); tras 3 fallos → `GNOME49_SW=1` +
-    `termux-notification`; cooldown de 120 s entre reinicios;
-  - sondas `xdpyinfo`/WM: cada 60 s, con timeout 15 s y **3 fallos consecutivos**
-    (≥3 min) antes de tocar nada; nunca reinicia por una sonda aislada;
+- `scripts/termux/supervisor49.sh` (Termux nativo, setsid + `supervisor49.pid`):
+  - cada 2 s vigila el PID de `shell49.pid`; si muere → `forensics-snapshot.sh` y
+    relanza `gnome49 --restart` con backoff 2/5/10 s (máx 3 intentos); tras 3
+    fallos → `GNOME49_SW=1` + `termux-notification`;
+  - cada 10 s `xdpyinfo` (timeout 4) → relanza `termux-x11 :0`; y
+    `_NET_SUPPORTING_WM_CHECK` → cura "shell vivo sin UI";
   - cada 10 min re-aplica/verifica la config phantom vía adb y loguea reversiones;
   - contadores se resetean si la sesión vive ≥10 min;
-  - `--observe` registra muertes + forense **sin** relanzar (series de medición);
-  - `--stop` o el fichero `$RT/supervisor.off` lo detienen.
+  - `--observe` registra muertes + forense **sin** relanzar (series de medición).
 - `scripts/termux/forensics-snapshot.sh` → `$RT/forensics/<TAG>-<epoch>/`
   (watcher tail, sysfs kgsl, shell49 tail, logcat `-b all`, meminfo, procstats,
   exit-info, ps).
-- Integración: `gnome49 --supervised` (o `SUBSTRATE_SUPERVISOR=1`) lo arranca;
-  `gnome49-stop` lo mata por PID del pidfile, respetando `--observe`.
-  **Sin `pkill -f` en ningún punto.**
-
-**Incidente 2026-11-17 (corregido):** la primera versión actuaba con una sola
-sonda fallida cada 10 s y `gnome49 --restart` volvía a arrancar otro supervisor
-(sin singleton). Resultado: reinicios en bucle durante el uso normal
-("el escritorio se reinicia solo"). Corregido con `flock`, debounce
-(2 muestras/3 sondas), cooldown 120 s, `SUBSTRATE_NO_SUPERVISOR=1` en las
-recuperaciones y arranque opt-in. El camino de prueba `test-visibilidad.sh`
-lanza la app en un **proot efímero**; en esta ROM eso mata también el árbol de la
-sesión (artefacto conocido: un proot lanzador que sale mata sus phantom), por lo
-que las pruebas de apps deben hacerse como las lanza el dock, no con logins
-efímeros.
+- Integración: `gnome49` lo arranca al declarar OK (`SUBSTRATE_NO_SUPERVISOR=1`
+  lo desactiva); `gnome49-stop` lo mata por PID del pidfile, respetando
+  `--observe`. **Sin `pkill -f` en ningún punto.**
 
 **Prueba de aceptación (medida):** `kill -9` al shell por PID 18613 →
 forense `DEATH-1794945480` guardada y sesión recuperada en **20 s** (límite: 30 s).

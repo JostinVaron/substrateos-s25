@@ -11,12 +11,10 @@ BK="$HOME/.local/share/substrate/rt-dex"
 DISP=":0"
 RESTART=0
 STATUS=0
-SUPERVISED=0
 
 case "${1:-}" in
   "")                    ;;
   --restart)             RESTART=1 ;;
-  --supervised)          SUPERVISED=1 ;;
   status|--status)       STATUS=1 ;;
   -h|--help)
     printf '%s\n' \
@@ -307,9 +305,8 @@ say "Estado:   gnome49 status"
 say "Parar:    gnome49-stop"
 say "Reiniciar: gnome49 --restart"
 
-# --- 6) supervisor auto-curativo (opt-in: --supervised o SUBSTRATE_SUPERVISOR=1) ---
-if [ -x "$RT/supervisor49.sh" ] && { [ "${SUBSTRATE_SUPERVISOR:-0}" = 1 ] || [ "${SUPERVISED:-0}" = 1 ]; } \
-   && [ "${SUBSTRATE_NO_SUPERVISOR:-0}" != 1 ]; then
+# --- 6) supervisor auto-curativo (issue #3, fase A) ---
+if [ -x "$RT/supervisor49.sh" ] && [ "${SUBSTRATE_NO_SUPERVISOR:-0}" != 1 ]; then
   _sup=$(cat "$RT/supervisor49.pid" 2>/dev/null || true)
   if [ -z "${_sup:-}" ] || ! kill -0 "$_sup" 2>/dev/null; then
     setsid bash "$RT/supervisor49.sh" >/dev/null 2>&1 < /dev/null &
@@ -317,6 +314,4 @@ if [ -x "$RT/supervisor49.sh" ] && { [ "${SUBSTRATE_SUPERVISOR:-0}" = 1 ] || [ "
   else
     say "[P] Supervisor ya activo (pid $_sup)"
   fi
-elif [ -x "$RT/supervisor49.sh" ]; then
-  say "[P] Supervisor NO iniciado (opt-in: gnome49 --supervised)"
 fi
