@@ -1,36 +1,29 @@
-=== BRIDGE RUN 2026-11-17T01:30:27Z (v5) ===
-=== MISION-A64-VENTANA-FANTASMA — revivir escritorio y traer ventanas al frente 2026-11-17T01:30:27Z ===
---- 0. X server vivo? ---
-X0
---- 1. relanzar el escritorio (idempotente) ---
-arranque_pid=31228
---- 2. esperar asentamiento de la sesion (50 s) ---
-  X OK en :0
-[2/4] sesion persistente del escritorio
-  lanzando sesion completa en proot persistente...
-  esperando que levante (50s)...
-== escritorios (el * es el actual) ==
-0  * DG: 1600x900  VP: 0,0  WA: 0,24 1600x876  Workspace 1
-1  - DG: 1600x900  VP: N/A  WA: 0,24 1600x876  Workspace 2
-== ventanas con geometria: id escritorio x y ancho alto host titulo ==
-0x00c00002  0 0    98   1600 839  localhost VectorCraft
-0x00a00007 -1 0    0    1600 24   localhost Top Expanded Edge Panel
-0x00e00003 -1 0    0    1600 924  localhost Desktop
-0x02000003 -1 0    0    133  900  localhost plank
-== apps vivas dentro del proot (prueba de vida real) ==
-vectorcraft VIVO pid=28057
-== trayendo cada ventana craft al escritorio 0 y activandola ==
-ventana 0x00c00002 movida a escritorio 0
-ventana 0x00c00002 activada
-== ventanas despues del movimiento ==
-0x00c00002  0 0    98   1600 839  localhost VectorCraft
-0x00a00007 -1 0    0    1600 24   localhost Top Expanded Edge Panel
-0x00e00003 -1 0    0    1600 924  localhost Desktop
-0x02000003 -1 0    0    133  900  localhost plank
+=== BRIDGE RUN 2026-11-17T01:31:56Z (v5) ===
+=== MISION-A65-SHELL-COMPACTO — completar el levantamiento del Shell 2026-11-17T01:31:56Z ===
+--- 0. esperar asentamiento extra del arranque A64 (30 s) ---
+== estado del shell ==
+SHELL_MUERTO
+== relanzando con la receta canonica (gnome49) ==
+/data/data/com.termux/files/usr/bin/gnome49
+/data/data/com.termux/files/usr/bin/gnome49: line 9: PREFIX: unbound variable
+== relanzamiento directo como dexuser ==
+SHELL_NO_NACIO
+libmutter-Message: 01:32:27.163: Running GNOME Shell (using mutter 49.0) as a X11 window and compositing manager
+Xlib:  extension "DPMS" missing on display ":0".
+Xlib:  extension "DPMS" missing on display ":0".
+Failed to connect to session bus: The given address is empty
+== verificacion final: ventanas y activa ==
+0x00c00002  0 localhost VectorCraft
+0x00a00007 -1 localhost Top Expanded Edge Panel
+0x00e00003 -1 localhost Desktop
+0x02000003 -1 localhost plank
+vectorcraft_activada_al_frente
 == salud ==
 SHELL_MUERTO
---- 3. broker nativo sigue vivo? ---
+APP_VIVA
+FIN_INNER
+--- broker ---
 BROKER_VIVO
-VEREDICTO: con wmctrl -lG veremos en que escritorio y con que geometria abrio la ventana fantasma. Si estaba en escritorio !=0 o con x/y fuera de pantalla, ya quedo movida y activada — el usuario deberia VER la ventana ahora. Si alguna app no aparece en 'vivas', la lista acorta el siguiente paso.
-=== MISION-A64-VENTANA-FANTASMA COMPLETE ===
+VEREDICTO: si SHELL_VIVO + APP_VIVA + vectorcraft al frente, el ciclo completo esta cerrado: escritorio arriba, app visible e inmune. El usuario deberia VER la ventana de VectorCraft ahora mismo en su pantalla.
+=== MISION-A65-SHELL-COMPACTO COMPLETE ===
 === EXIT=0 ===
