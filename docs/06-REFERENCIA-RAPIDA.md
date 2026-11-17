@@ -45,7 +45,7 @@ proot-distro login ubuntu-gnome --shared-tmp -- bash -lc '
 proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc '
   export HOME=/home/dexuser DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex
   export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr)
-  export GSK_RENDERER=cairo GTK_A11Y=none NO_AT_BRIDGE=1
+  export GSK_RENDERER=gl GTK_A11Y=none NO_AT_BRIDGE=1
   exec gnome-text-editor
 '
 ```
@@ -105,10 +105,12 @@ Usar PID exacto. No matar `sshd`, `tmux`, `termux`, `node`, `opencode`, `sv`.
 
 | Componente | Render |
 |---|---|
-| gnome-shell | llvmpipe/swrast |
-| GTK4 | Cairo, software |
-| Blender/ArtCraft | Adreno freedreno/kgsl |
+| gnome-shell | Zink sobre Turnip (GPU, kgsl) |
+| GTK4 | `GSK_RENDERER=gl` sobre Zink |
+| Blender/ArtCraft | Zink/Turnip vía `substrate-gpu-run` |
 | X11 | Termux:X11 |
+
+Escape hatch software: `GNOME49_SW=1 gnome49 --restart` → llvmpipe/swrast + Cairo.
 
 ## Documentos
 

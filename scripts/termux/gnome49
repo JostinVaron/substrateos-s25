@@ -21,7 +21,8 @@ case "${1:-}" in
       "Uso: gnome49 [--restart|status]" \
       "  (sin argumentos) arranca si hace falta" \
       "  --restart        reinicia la sesion desde cero" \
-      "  status           solo muestra el estado"
+      "  status           solo muestra el estado" \
+      "  GNOME49_SW=1     fuerza el perfil software estable (llvmpipe/swrast)"
     exit 0 ;;
   *)
     printf 'Opcion desconocida: %s\nUso: gnome49 [--restart|status]\n' "$1" >&2
@@ -203,6 +204,11 @@ fi
 ensure_x || exit 1
 if ! wait_x_stable; then
   say "[X] AVISO: la resolucion de :0 no se estabilizo; sigo con cuidado"
+fi
+
+# --- 2b) audio (PulseAudio Termux + puente TCP para el proot) ---
+if [ -x "$RT/substrate-audio-up" ]; then
+  bash "$RT/substrate-audio-up" 2>/dev/null || say "[A] AVISO: audio no disponible"
 fi
 
 # --- 3) sesion ---

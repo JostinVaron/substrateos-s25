@@ -2,6 +2,9 @@
 # restart49.sh - reinicia la sesion GNOME 49 X11 de forma segura.
 # Uso: restart49.sh [terminal|files|editor|calc ...]
 # Corre en Termux nativo. NO toca el servidor X.
+# PATCH-A67: tambien mata restos de sesiones Flashback genericas (metacity,
+# gnome-panel, plank, gnome-flashback, arranque-escritorio) que sobrevivian al
+# reinicio y tapaban el escritorio Tahoe.
 set -u
 
 RT="$PREFIX/tmp/rt-dex"
@@ -29,7 +32,7 @@ for p in $(ps -eo pid=,comm= 2>/dev/null | awk '$2=="proot"{print $1}'); do
   esac
 done
 
-# restos con patrones anclados (apps e helpers)
+# restos con patrones anclados (apps, helpers y sesiones genericas)
 for q in /proc/[0-9]*; do
   p=${q#/proc/}
   [ "$p" = "$$" ] && continue
@@ -40,7 +43,12 @@ for q in /proc/[0-9]*; do
     gnome-text-editor*|nautilus*|/usr/bin/nautilus*|\
     *org.gnome.NautilusPreviewer*|*ding.js*|mutter-x11-frames*|\
     nm-stub.py*|python3\ /usr/local/share/substrate/nm-stub.py*|\
-    bash\ /tmp/rt-dex/session-inner.sh*|bash\ /tmp/rt-dex/warmup49.sh*)
+    bash\ /tmp/rt-dex/session-inner.sh*|bash\ /tmp/rt-dex/warmup49.sh*|\
+    metacity*|/usr/bin/metacity*|\
+    gnome-panel*|/usr/bin/gnome-panel*|/usr/libexec/gnome-panel*|\
+    plank*|/usr/bin/plank*|\
+    *gnome-flashback*|\
+    *arranque-escritorio*)
       kill -9 "$p" 2>/dev/null && say "[S] resto detenido ($p)"
       ;;
     *ubuntu-gnome*pipewire*|*ubuntu-gnome*wireplumber*|*exec\ pipewire*|*exec\ wireplumber*)

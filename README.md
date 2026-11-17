@@ -4,13 +4,13 @@
 
 Este repositorio es la **identidad operativa** de la máquina: qué hay, cómo arranca, qué se modificó, qué está verificado, qué falla y cómo reconstruirla desde cero. Está pensado para que otra IA o una persona pueda entender el sistema sin haber estado en esta conversación.
 
-> **Estado actual: funcional y estable con compositor software.** La GPU Adreno 830 sí está disponible y verificada para aplicaciones OpenGL, pero el compositor de GNOME se dejó en llvmpipe porque el compositor acelerado con GTK4/ARGB terminaba en `SIGKILL` en pruebas reproducibles. Ver [Motivo del fallback](#motivo-del-fallback) y el roadmap.
+> **Estado actual: compositor GPU Zink/Turnip estable.** GNOME Shell 49 compone en la Adreno 830 vía Zink sobre Turnip (`/dev/kgsl-3d0`), con 120 FPS vblank-locked, apps GTK4 en `GSK_RENDERER=gl` y **0 SIGKILL** en stress + soak + 10 min con ventana GTK4 abierta. El bug I-01 de freedreno-gallium con ARGB/GTK4 se rodea por diseño. Escape hatch software: `GNOME49_SW=1 gnome49 --restart`. Detalle en [`docs/05-ISSUES-ROADMAP.md`](docs/05-ISSUES-ROADMAP.md).
 
-- Fecha de esta instantánea: **2026-11-16**
+- Fecha de esta instantánea: **2026-11-17**
 - Equipo: **Samsung Galaxy S25**, SoC Snapdragon 8 Elite, GPU **Adreno 830v1**
 - Rootfs: contenedor proot-distro **`ubuntu-gnome`**
 - X server: **Termux:X11** en `:0`
-- Última sesión medida: `gnome-shell` **PID 27693**, `kgsl_fds=0`, UI **2000x1200**, captura con **145651 colores**
+- Última sesión medida: `kgsl_fds=1`, `zink` ×4 en maps, `llvmpipe=0`, captura con **93 315–94 847 colores**
 - Evidencia: [`evidence/`](evidence/)
 
 ---
@@ -84,10 +84,10 @@ Termux nativo
                           ├─ gsd-* (power, media-keys, xsettings, sound, ...)
                           ├─ xdg-desktop-portal + -gtk
                           ├─ gnome-keyring
-                          └─ gnome-shell --x11  (compositor software)
+                          └─ gnome-shell --x11  (compositor Zink/Turnip)
                                 ├─ GNOME Shell 49 + Ubuntu Dock + user-theme
                                 ├─ MacTahoe: shell, GTK, iconos, wallpaper
-                                └─ apps: GTK4 con Cairo; apps GPU vía substrate-gpu-run
+                                └─ apps: GTK4 con GSK=gl sobre Zink; GPU vía substrate-gpu-run
 ```
 
 Detalle completo: [`docs/01-ARQUITECTURA.md`](docs/01-ARQUITECTURA.md).
@@ -102,9 +102,9 @@ Detalle completo: [`docs/01-ARQUITECTURA.md`](docs/01-ARQUITECTURA.md).
 | Kernel visible | `Linux 6.17.0-PRoot-Distro aarch64` |
 | Distro | Ubuntu 26.04.1 LTS (proot) |
 | Escritorio | GNOME Shell 49.0, X11 |
-| Compositor | Mutter, **software/llvmpipe en la sesión actual** |
-| GPU | **Adreno 830v1**, Mesa **26.3.0-devel** |
-| OpenGL/GLSL | **4.6 Core / 4.60**; GLES 3.2 |
+| Compositor | Mutter, **Zink sobre Turnip (GPU real, kgsl)** |
+| GPU | **Adreno 830v1**, Mesa **26.3.0-devel** (zink + turnip) |
+| OpenGL/GLSL | **4.6 Compatibility**; GLES 3.2 |
 | Memoria | 10 GiB totales (disponible observado: 3.8 GiB) |
 | CPU visible | 8 núcleos |
 | X | 2000x1200, `:0` |
@@ -114,20 +114,33 @@ Detalle completo: [`docs/01-ARQUITECTURA.md`](docs/01-ARQUITECTURA.md).
 
 Detalle: [`docs/00-IDENTIDAD.md`](docs/00-IDENTIDAD.md).
 
-### Motivo del fallback
+### Cómo se resolvió I-01 (Zink/Turnip)
 
-El compositor acelerado (freedreno/kgsl) funciona para `xclock`, GTK3, LibreOffice y `glxinfo` (Adreno OpenGL 4.6), pero al mapear una ventana **GTK4** (Text Editor, Calculator, Widget Factory) el `gnome-shell` recibía **`SIGKILL` (137)** a los 2–60 s. Probamos, entre otras cosas:
+El compositor acelerado con **freedreno-gallium** moría con `SIGKILL` al mapear
+una ventana **GTK4** (ARGB/CSD). Se probaron, sin éxito determinista:
+`COGL_DISABLE_TFP`, `LIBGL_DRI3_DISABLE`, `COGL_DEBUG=...`,
+`MUTTER_DEBUG_FORCE_LINEAR_BLENDING`, `FD_MESA_DEBUG=nolrz`, sesión `dexuser`,
+sin bus, sin CSD, sin sombras.
 
-- `COGL_DISABLE_TFP=1`
-- `GSK_RENDERER=cairo` + `GTK_A11Y=none` + `NO_AT_BRIDGE=1`
-- `LIBGL_DRI3_DISABLE=1`
-- `COGL_DEBUG=disable-shared-atlas,disable-batching,disable-atlas,disable-pbos,disable-software-clip`
-- `COGL_DEBUG=disable-offscreen`
-- `MUTTER_DEBUG_FORCE_LINEAR_BLENDING=1`
-- `FD_MESA_DEBUG=nolrz`
-- sesión completa como `dexuser`, app en proot separado, sin bus, sin CSD, sin sombra CSS
+La solución fue cambiar de ruta: **Zink sobre Turnip** emite otro stream de
+comandos (Vulkan) y no dispara el bug.
 
-`FD_MESA_DEBUG=nolrz` (desactivar LRZ) mejoró la supervivencia y permitió sesiones de 30–60 s con GTK4, pero **no fue determinista**. La solución estable elegida es **compositor software**; las apps OpenGL siguen usando la GPU por separado mediante `substrate-gpu-run`. El fallo residual y el camino para recuperar hardware están en [`docs/05-ISSUES-ROADMAP.md`](docs/05-ISSUES-ROADMAP.md).
+```sh
+# /etc/profile.d/zz-adreno-gpu.sh (v4)
+GALLIUM_DRIVER=zink
+MESA_LOADER_DRIVER_OVERRIDE=zink
+LIBGL_ALWAYS_SOFTWARE=0
+MESA_VK_WSI_PRESENT_MODE=immediate
+# session-inner.sh
+GSK_RENDERER=gl     # ngl mata el shell; cairo es fallback
+GTK_A11Y=none
+NO_AT_BRIDGE=1
+```
+
+Un `SIGKILL` que apareció durante el stress inicial **no era GPU**: Android mató
+el árbol de la sesión por una explosión de procesos at-spi/ibus. Con a11y
+desactivado desaparece. Resultados: 2 bloques de stress sin muertes, soak de
+10 min, 10 min con GTK4 abierta, Blender 5.0.1 abierto, 120 FPS vblank-locked.
 
 ---
 
@@ -145,10 +158,12 @@ docs/
   05-ISSUES-ROADMAP.md
   06-REFERENCIA-RAPIDA.md
 scripts/
-  termux/       gnome49, gnome49-stop, restart49.sh, mactahoe-on/off
+  termux/       gnome49, gnome49-stop, restart49.sh, substrate-audio-up,
+                mactahoe-on/off
   distro/       session49.sh, session-inner.sh, zz-adreno-gpu.sh,
-                substrate-gpu-run, fake-login1.py, nm-stub.py,
-                gnome-moderno.sh, substrate-flashback.sh
+                zz-adreno-gpu.software.sh, substrate-gpu-run,
+                substrate-brightness, upower-stub.py, fake-login1.py,
+                nm-stub.py, gnome-moderno.sh, substrate-flashback.sh
 patches/
 evidence/
 ```
@@ -164,7 +179,9 @@ Los scripts son **copias de la configuración funcional** de esta máquina, no u
 3. **No reiniciar Termux:X11** si ya está sirviendo `:0`; se perdería la sesión. Si el servidor X no responde, se pide a la persona que abra la app.
 4. **No declarar éxito por “proceso vivo”.** Éxito = shell + WM + captura con color + app que abre y cierra.
 5. **Guardar PIDs/estado en `/tmp/rt-dex/` antes de cualquier prueba destructiva.**
-6. **Para apps con GPU, no confiar en el entorno del dock:** el shell está en software. Usar `substrate-gpu-run`.
+6. **Para apps con GPU, usar `substrate-gpu-run`** (fija HOME, DBUS, audio y a11y).
+7. **No `GSK_RENDERER=ngl`**: mata el shell. Usar `gl`; `cairo` como fallback.
+8. **No `GNOME49_SW=1` salvo emergencia**: es el escape hatch a llvmpipe.
 
 ---
 
@@ -184,9 +201,11 @@ proot-distro login ubuntu-gnome --shared-tmp -- bash -lc \
 Criterios usados en esta máquina:
 
 - `gnome49 status` muestra `WM: GNOME Shell OK`.
-- Captura con **>100.000 colores** (la última: 145.651).
+- Captura con **>90.000 colores** (últimas: 93 315, 94 137, 94 847).
+- `kgsl_fds>=1` y `zink` en `/proc/<shell>/maps`; `llvmpipe=0`.
 - Text Editor (GTK4) abre y cierra sin que el shell muera.
-- `substrate-gpu-run glxinfo -B` muestra `Adreno (TM) 830v1` y OpenGL 4.6.
+- `substrate-gpu-run glxinfo -B` muestra
+  `zink Vulkan 1.4(Adreno (TM) 830v1 (MESA_TURNIP))` y GL 4.6.
 
 ---
 
@@ -212,15 +231,16 @@ Resumen:
 
 La regla es:
 
-- **App GTK4/GTK3 del escritorio:** abrir normal; ya llevan `GSK_RENDERER=cairo`, `GTK_A11Y=none`, `NO_AT_BRIDGE=1`.
+- **App GTK4/GTK3 del escritorio:** abrir normal; llevan `GSK_RENDERER=gl`, `GTK_A11Y=none`, `NO_AT_BRIDGE=1`.
 - **App que necesita OpenGL/GPU** (Blender, visores 3D, ArtCraft, etc.): lanzar con:
 
   ```bash
-  proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc \
+  proot-distro login ubuntu-gnome --shared-tmp -- bash -lc \
     'substrate-gpu-run blender'
   ```
 
-`substrate-gpu-run` exporta la sesión, carga `/etc/profile.d/zz-adreno-gpu.sh` y fuerza hardware (`freedreno/kgsl`, `FD_MESA_DEBUG=nolrz`), evitando el llvmpipe del compositor.
+`substrate-gpu-run` fija `DISPLAY`, `HOME`, `XDG_RUNTIME_DIR`, bus, audio TCP y
+a11y, carga `/etc/profile.d/zz-adreno-gpu.sh` (Zink) y ejecuta la app.
 
 Guía detallada, limitaciones de Cycles/OpenGL y pruebas: [`docs/03-APPS-GPU.md`](docs/03-APPS-GPU.md).
 
@@ -231,27 +251,32 @@ Guía detallada, limitaciones de Cycles/OpenGL y pruebas: [`docs/03-APPS-GPU.md`
 | Prueba | Resultado |
 |---|---|
 | Arranque limpio `gnome49 --restart` | OK, sin ventanas de prueba |
-| `gnome49 status` | Sesión activa, WM GNOME Shell OK |
-| Captura con color | 145.651 colores |
-| Text Editor GTK4 abre/cierra | OK con shell software, 30 s + cierre |
-| Calculator GTK4 | OK en pruebas de shell software |
-| Widget Factory GTK4 | OK con hardware + `nolrz` durante 60 s (modo experimental) |
-| `xclock`, `zenity` | OK con hardware |
+| `gnome49 status` | Sesión activa, WM GNOME Shell OK, `kgsl_fds=1` |
+| Captura con color | 93 315–94 847 colores |
+| Compositor | Zink/Turnip, `llvmpipe=0`, `swrast=0` |
+| Text Editor / Calculator / Widget Factory | OK con `GSK_RENDERER=gl` sobre Zink |
+| Stress I-01 (2 bloques, 11 apps + arrastre + escritorios) | OK, 0 SIGKILL |
+| Soak 10 min | `VIVO` |
+| 10 min con Text Editor GTK4 abierta | `VIVO` |
+| `xclock`, `zenity` | OK |
+| Blender 5.0.1 (`substrate-gpu-run`) | Ventana mapeada, shell vivo |
 | LibreOffice desde dock | Abre proceso; renderizado estable |
-| Idle 120 s | Shell y UI sobreviven |
-| `substrate-gpu-run glxinfo` | Adreno 830v1, OpenGL 4.6 |
-| GPU shell acelerado | **No estable** con GTK4; ver roadmap |
+| `substrate-gpu-run glxinfo` | zink Vulkan 1.4 / Adreno 830v1, GL 4.6 |
+| Audio | PulseAudio Termux + TCP loopback; `paplay` rc=0, volumen 50% |
+| Batería | `upower-stub` con % real (56–58%, discharging) |
+| Brillo | `substrate-brightness` 101→90→101; atajos Super+F1/F2 |
+| GPU shell acelerado | **Estable** (I-01 cerrado) |
 
 ---
 
 ## Limitaciones conocidas
 
-- **Compositor software** por el fallo LRZ/ARGB descrito. El escritorio es estable, pero no es la máxima aceleración posible.
-- **shell ejecutándose como root** dentro del proot: aparece la notificación “Logged in as a privileged user”. Las apps lanzadas directamente como `dexuser` evitan parte del problema, pero el shell sigue siendo root.
-- **Audio/volumen:** PipeWire entra en bucle `ENOSYS` en proot; no hay slider de volumen.
+- **Compositor GPU Zink/Turnip** (I-01 cerrado). `ngl` sigue roto; usar `gl`. Escape hatch `GNOME49_SW=1`.
+- **shell ejecutándose como root** dentro del proot: aparece la notificación “Logged in as a privileged user”. I-02 sigue abierto (ver roadmap).
+- **Audio:** PulseAudio + TCP loopback funciona (slider y `paplay` rc=0); falta confirmación humana de audibilidad.
 - **Bluetooth:** sin adaptador BlueZ ni `/dev/rfkill`; el tile no aparece.
-- **Brillo/batería:** sin hardware/backlight accesible desde el proot.
-- **Wi-Fi:** el tile muestra la red simulada `SubstrateOS`; el chevron del submenú no abre en MacTahoe.
+- **Brillo/batería:** resueltos vía ADB (brillo) y `termux-battery-status` + stub UPower (batería).
+- **Wi-Fi:** el tile muestra la red simulada `SubstrateOS`; el chevron del submenú sigue sin abrir en MacTahoe (CSS del tema).
 - **DING** y **snapd-prompting** desactivados; escritorio limpio.
 - **Apps Flatpak/snap** no son el camino recomendado; usar deb/AppImage.
 - **Ciclos de render GPU en Blender** (Cycles con CUDA/HIP/OpenCL) no están soportados por Adreno; Eevee/Workbench y la UI sí pueden usar OpenGL.

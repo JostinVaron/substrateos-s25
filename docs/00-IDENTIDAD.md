@@ -18,7 +18,7 @@ No hay virtualización: los procesos comparten el kernel Android/Linux `6.17.0-P
 |---|---|
 | Equipo | Samsung Galaxy S25 |
 | SoC | Snapdragon 8 Elite |
-| GPU | Adreno 830v1, driver Mesa freedreno vía kgsl |
+| GPU | Adreno 830v1, driver **Zink sobre Turnip (Vulkan) vía kgsl** |
 | RAM visible | 10 GiB |
 | CPU visible | 8 núcleos |
 | Pantalla X actual | 2000x1200 |
@@ -52,8 +52,8 @@ OpenGL ES profile version string: OpenGL ES 3.2
 | Comunicación | D-Bus de sistema dedicado + D-Bus de sesión |
 | Login | `fake-login1.py` (no systemd/logind real) |
 | Red | `nm-stub.py` (NetworkManager simulado) |
-| Compositor actual | llvmpipe/swrast (software) |
-| GPU para apps | freedreno/kgsl + `FD_MESA_DEBUG=nolrz` |
+| Compositor actual | **Zink sobre Turnip (Adreno 830, kgsl)** |
+| GPU para apps | Zink/Turnip (mismo stack que el compositor) |
 
 ## 4. Modelo de usuarios
 
@@ -69,31 +69,27 @@ Hay dos planos distintos:
 
 ### 5.1 Compositor
 
-El shell usa **software**:
+El shell usa **GPU real vía Zink sobre Turnip**:
 
 ```
-LIBGL_ALWAYS_SOFTWARE=1
-GALLIUM_DRIVER=llvmpipe
-MESA_LOADER_DRIVER_OVERRIDE=swrast
-LIBGL_DRI3_DISABLE=1
+GALLIUM_DRIVER=zink
+MESA_LOADER_DRIVER_OVERRIDE=zink
+LIBGL_ALWAYS_SOFTWARE=0
+MESA_VK_WSI_PRESENT_MODE=immediate
 ```
 
-Se aplica **solo al subshell de `gnome-shell`** en `session-inner.sh`. `gnome49 status` mostrará `kgsl_fds=0`; es esperado.
+`gnome49 status` debe mostrar `kgsl_fds>=1` y `zink` en
+`/proc/<pid>/maps`. Escape hatch: `GNOME49_SW=1 gnome49 --restart` vuelve a
+llvmpipe/swrast (perfil `zz-adreno-gpu.software.sh`).
 
 ### 5.2 Apps
 
-`/etc/profile.d/zz-adreno-gpu.sh` exporta:
+`/etc/profile.d/zz-adreno-gpu.sh` (v4) exporta el mismo stack Zink/Turnip.
+Para apps GTK4: `GSK_RENDERER=gl`, `GTK_A11Y=none`, `NO_AT_BRIDGE=1`
+(`ngl` mata el shell; `cairo` es fallback).
 
-```
-LIBGL_ALWAYS_SOFTWARE=0
-GALLIUM_DRIVER=freedreno
-MESA_LOADER_DRIVER_OVERRIDE=kgsl
-FD_FORCE_KGSL=1
-FD_MESA_DEBUG=nolrz
-LIBGL_DRI3_DISABLE=1
-```
-
-`substrate-gpu-run` carga ese perfil, quita `LIBGL_ALWAYS_SOFTWARE` y lanza la app. Así Blender/ArtCraft/visores 3D usan la Adreno, no llvmpipe.
+`substrate-gpu-run` fija HOME/DBUS/audio/a11y, carga el perfil y lanza la app.
+Así Blender/ArtCraft/visores 3D usan la Adreno.
 
 ## 6. Identidad visual
 
@@ -129,8 +125,8 @@ LIBGL_DRI3_DISABLE=1
 
 ## 9. Estado actual
 
-- Sesión estable con compositor software.
-- GPU disponible para apps vía `substrate-gpu-run`.
+- Sesión estable con compositor **Zink/Turnip** (GPU real).
+- Apps GTK4 con `GSK_RENDERER=gl`; GPU 3D vía `substrate-gpu-run`.
 - Tema MacTahoe oscuro y wallpaper diurno restaurados.
-- Captura final con 145.651 colores.
+- Captura final con 93 315–94 847 colores.
 - Documento de estado: `FINAL-STATUS.md`.

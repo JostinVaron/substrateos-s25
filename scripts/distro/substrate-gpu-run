@@ -1,14 +1,17 @@
 #!/bin/bash
-# substrate-gpu-run - lanza una app con Mesa freedreno/kgsl (hardware).
+# substrate-gpu-run - lanza una app con el stack GL de SubstrateOS (Zink/Turnip).
 # Uso: substrate-gpu-run blender
 set -u
 export DISPLAY="${DISPLAY:-:0}"
 export HOME=/home/dexuser
 export USER=dexuser
 export XDG_RUNTIME_DIR=/tmp/rt-dex
+# Apps estables: a11y off (at-spi multiplica procesos y Android mata la sesion).
+export GTK_A11Y=none
+export NO_AT_BRIDGE=1
+export PULSE_SERVER="${RT_PULSE_SERVER:-tcp:127.0.0.1:4713}"
 if [ -f /tmp/rt-dex/session-bus.addr ]; then
   export DBUS_SESSION_BUS_ADDRESS="$(cat /tmp/rt-dex/session-bus.addr)"
 fi
 . /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null || true
-unset LIBGL_ALWAYS_SOFTWARE
 exec "$@"

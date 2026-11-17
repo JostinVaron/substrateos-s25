@@ -149,15 +149,18 @@ El bus de sesión es necesario para portales, notificaciones, GApplication, keyr
 `/etc/profile.d/zz-adreno-gpu.sh` contiene:
 
 ```sh
+export GALLIUM_DRIVER=zink
+export MESA_LOADER_DRIVER_OVERRIDE=zink
 export LIBGL_ALWAYS_SOFTWARE=0
-export GALLIUM_DRIVER=freedreno
-export MESA_LOADER_DRIVER_OVERRIDE=kgsl
-export FD_FORCE_KGSL=1
-export FD_MESA_DEBUG=nolrz
-export LIBGL_DRI3_DISABLE=1
+export MESA_VK_WSI_PRESENT_MODE=immediate
 ```
 
-Se carga automáticamente en shells de login dentro del proot. `session49.sh` la fuente y luego hace `unset LIBGL_DRI3_DISABLE` para el compositor (histórico). El compositor actual usa software por el fallback; las apps usan `substrate-gpu-run`.
+Se carga automáticamente en shells de login dentro del proot. `session49.sh` la
+fuente y limpia restos freedreno (`FD_MESA_DEBUG`, `COGL_DISABLE_TFP`,
+`LIBGL_DRI3_DISABLE`). Compositor y apps comparten Zink/Turnip.
+
+Escape hatch: `GNOME49_SW=1` usa `/tmp/rt-dex/zz-adreno-gpu.software.sh`
+(llvmpipe/swrast + Cairo).
 
 ### `substrate-gpu-run`
 
@@ -192,29 +195,27 @@ DISPLAY=:0
 XDG_RUNTIME_DIR=/tmp/rt-dex
 XDG_CURRENT_DESKTOP=ubuntu:GNOME
 XDG_SESSION_TYPE=x11
-GSK_RENDERER=cairo
+GSK_RENDERER=gl
 GTK_A11Y=none
 NO_AT_BRIDGE=1
-FD_MESA_DEBUG=nolrz
+PULSE_SERVER=tcp:127.0.0.1:4713
 ```
 
 En el subshell del compositor:
 
 ```
-LIBGL_ALWAYS_SOFTWARE=1
-GALLIUM_DRIVER=llvmpipe
-MESA_LOADER_DRIVER_OVERRIDE=swrast
-LIBGL_DRI3_DISABLE=1
-```
-
-En apps GPU:
-
-```
+GALLIUM_DRIVER=zink
+MESA_LOADER_DRIVER_OVERRIDE=zink
 LIBGL_ALWAYS_SOFTWARE=0
-GALLIUM_DRIVER=freedreno
-MESA_LOADER_DRIVER_OVERRIDE=kgsl
-FD_FORCE_KGSL=1
-FD_MESA_DEBUG=nolrz
+MESA_VK_WSI_PRESENT_MODE=immediate
+```
+
+En apps GPU (`substrate-gpu-run`):
+
+```
+GALLIUM_DRIVER=zink
+MESA_LOADER_DRIVER_OVERRIDE=zink
+LIBGL_ALWAYS_SOFTWARE=0
 ```
 
 ## 10. Por qué no se usa systemd
@@ -230,9 +231,9 @@ proot no puede arrancar systemd como PID 1 real. Por eso:
 ## 11. Flujo de una app del dock
 
 1. El dock usa `GAppInfo` del `.desktop`.
-2. Lanza el proceso como hijo del shell (root) y hereda el entorno del compositor software.
-3. Si es GTK4, `GSK_RENDERER=cairo` evita GSK GL.
-4. Si necesita OpenGL real, hay que lanzarla con `substrate-gpu-run` desde un terminal/sesión, no desde el dock, salvo que se cree un `.desktop` GPU específico.
+2. Lanza el proceso como hijo del shell (root) y hereda el entorno del compositor (Zink/Turnip, `GSK_RENDERER=gl`, a11y off, audio TCP).
+3. Si es GTK4, `GSK_RENDERER=gl` usa GL sobre Zink; `ngl` mata el shell y `cairo` es fallback.
+4. Si necesita OpenGL real, `substrate-gpu-run` fija HOME/DBUS/audio/a11y; no es obligatorio salir del dock, pero sí recomendable para 3D.
 5. El cierre se hace con el botón de la ventana o `xdotool windowclose`; nunca `pkill -f`.
 
 ## 12. Watchdogs y límites Android
@@ -242,7 +243,10 @@ Android puede matar procesos “phantom” si el monitor está activo. En esta m
 - `settings_enable_monitor_phantom_procs=false/0`;
 - `max_phantom_processes=2147483647`;
 - no se pudo fijar `persist.sys.fflag...` sin root;
-- aun así, el fallo de GTK4 producía `SIGKILL` (137) en el shell. Se descartó OOM/LMKD/phantom como causa primaria; el detonante es la ruta GPU del compositor.
+- el fallo de GTK4 original venía de la ruta freedreno-gallium (resuelto con Zink);
+- durante la migración, un pico de procesos **at-spi/ibus** sí provocó un kill del
+  árbol por gestión de procesos Android. Se evita con `GTK_A11Y=none` +
+  `NO_AT_BRIDGE=1`.
 
 No usar Perfetto/perf para señales: sin root no se habilitan eventos `signal_generate`; el trace queda vacío.
 
@@ -251,5 +255,6 @@ No usar Perfetto/perf para señales: sin root no se habilitan eventos `signal_ge
 - Si el shell muere: `gnome49 --restart`.
 - Si X no responde: pedir a la persona que abra Termux:X11; luego `termux-x11` si hace falta.
 - Si la UI está negra: revisar `/tmp/rt-dex/shell49.log` y `session49-launch.log`.
-- Si una app GTK4 mata el shell: usar el compositor software actual; no volver a hardware sin leer issues.
+- Si una app GTK4 mata el shell: probar `GSK_RENDERER=cairo` (nunca `ngl`) y leer `docs/05-ISSUES-ROADMAP.md`.
+- Si el compositor Zink se vuelve inestable: `GNOME49_SW=1 gnome49 --restart`.
 - Si se borra `/tmp/rt-dex`: `gnome49` restaura scripts desde `~/.local/share/substrate/rt-dex/`.

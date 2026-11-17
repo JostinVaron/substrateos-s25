@@ -1,0 +1,16 @@
+== ANTES (swrast/llvmpipe) ==
+   PID USER         PR  NI VIRT  RES  SHR S[%CPU] %MEM     TIME+ ARGS
+ 15907 u0_a345      10 -10 4.9G 326M 123M S  0.0   2.9   0:19.00 gnome-shell
+fps:
+2379 frames in 5.0 seconds = 475.742 FPS
+2450 frames in 5.0 seconds = 489.882 FPS
+colores: 90268
+
+== DESPUES (zink/turnip) ==
+   PID USER         PR  NI VIRT  RES  SHR S[%CPU] %MEM     TIME+ ARGS
+ 31654 u0_a345      20   0 6.1G 242M 125M S  0.0   2.1   1:27.13 gnome-shell
+fps:
+approximately the same as the monitor refresh rate.
+601 frames in 5.0 seconds = 120.052 FPS
+600 frames in 5.0 seconds = 119.851 FPS
+colores: 93315

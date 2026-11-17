@@ -1,6 +1,21 @@
 # Evidencia
 
-Capturas reales de la máquina en la instantánea del 2026-11-16. No son renders ni maquetas.
+Capturas reales de la máquina. No son renders ni maquetas.
+
+## Instantánea 2026-11-17 (compositor Zink/Turnip)
+
+| Archivo | Qué muestra |
+|---|---|
+| `06-desktop-software-antes.png` | Escritorio con compositor **software** (llvmpipe/swrast), línea base. 90 268 colores. |
+| `07-desktop-zink-despues.png` | Escritorio con compositor **Zink/Turnip**. 93 315 colores. |
+| `08-mactahoe-zink.png` | Tema MacTahoe-Dark sobre Zink (`kgsl_fds=1`). 94 137 colores. |
+| `09-blender-zink.png` | Blender 5.0.1 abierto vía `substrate-gpu-run` sobre Zink. 94 847 colores. |
+| `10-bench-delta.txt` | `glxgears` + RSS + colores antes/después. |
+| `11-logcat-phantom-kill.txt` | Extracto de logcat: Android matando el árbol de la sesión durante el stress inicial (pico de procesos at-spi/ibus). |
+| `12-idle-gtk4-10min.png` | Text Editor GTK4 abierto durante 10 min sin morir (87 145 colores). |
+| `13-arranque-frio-zink.png` | Arranque en frío `gnome49-stop` + `gnome49` con los scripts finales (92 762 colores). |
+
+## Instantánea 2026-11-16 (compositor software)
 
 | Archivo | Qué muestra |
 |---|---|
@@ -9,8 +24,13 @@ Capturas reales de la máquina en la instantánea del 2026-11-16. No son renders
 | `03-widgetfactory-hardware-nolrz.png` | Widget Factory GTK4 con compositor hardware + `FD_MESA_DEBUG=nolrz` (modo experimental). |
 | `04-editor-software.png` | Text Editor GTK4 en la primera prueba estable con compositor software. |
 | `05-calculator-software.png` | Calculator GTK4 con compositor software. |
+| `05-mactahoe-zink.png` | Primera captura MacTahoe ya con Zink (2026-11-17). |
 
-Criterio de color: >100.000 colores únicos. La captura final midió **145.651**.
+## Criterio de color
+
+- Compositor software: ~90 268 colores.
+- Compositor Zink: 93 315–94 847 colores.
+- En ambos casos >90 000 indica UI real pintada (no pantalla negra).
 
 Las capturas se tomaron con:
 
@@ -18,4 +38,5 @@ Las capturas se tomaron con:
 DISPLAY=:0 scrot -o /tmp/rt-dex/archivo.png
 ```
 
-No se incluyen logs completos para no exponer rutas/estado efímero; los logs viven en `/tmp/rt-dex/` y se describen en `docs/04-OPERACION-TESTS.md`.
+No se incluyen logcat completos (decenas de MB); se guarda un extracto con la
+evidencia del kill. Los logs completos viven en `/tmp/rt-dex/`.

@@ -6,10 +6,17 @@ Hay dos rutas:
 
 | Tipo de app | Cómo lanzarla | Render |
 |---|---|---|
-| GTK4/GTK3 de escritorio | dock, overview o `gnome-text-editor` | GTK4 con `GSK_RENDERER=cairo`; compositor software |
-| OpenGL/3D (Blender, ArtCraft, visores) | `substrate-gpu-run ...` | freedreno/kgsl, Adreno 830 |
+| GTK4/GTK3 de escritorio | dock, overview o `gnome-text-editor` | GTK4 `GSK_RENDERER=gl` sobre Zink/Turnip; compositor Zink |
+| OpenGL/3D (Blender, ArtCraft, visores) | `substrate-gpu-run ...` | Zink sobre Turnip/kgsl, Adreno 830 |
 
-**No lanzar Blender desde el dock** con el entorno actual: heredaría `LIBGL_ALWAYS_SOFTWARE=1` del compositor y usaría llvmpipe. Lanzarlo desde un login `dexuser` con `substrate-gpu-run`.
+El compositor y las apps comparten el mismo stack: **Zink sobre Turnip** (Vulkan)
+usando `/dev/kgsl-3d0`. Ya no hay ruta freedreno-gallium ni compositor software
+por defecto. Escape hatch: `GNOME49_SW=1 gnome49 --restart` vuelve a
+llvmpipe/swrast + Cairo.
+
+**No lanzar Blender desde el dock** si se quiere GPU: usa
+`substrate-gpu-run blender` (el dock hereda el entorno, que ya es Zink, pero el
+wrapper fija HOME/DBUS/audio correctos).
 
 ---
 
@@ -18,21 +25,26 @@ Hay dos rutas:
 La sesión exporta:
 
 ```sh
-GSK_RENDERER=cairo
+GSK_RENDERER=gl        # ngl y cairo: ver nota de estabilidad
 GTK_A11Y=none
 NO_AT_BRIDGE=1
+PULSE_SERVER=tcp:127.0.0.1:4713
 ```
 
 Motivo:
 
-- GSK GL/EGL en GTK4 disparaba el fallo del compositor Adreno al mapear la primera ventana.
-- at-spi podía tumbar el shell bajo proot.
-- Cairo mantiene GTK4 funcional y oscuro con MacTahoe.
+- `GSK_RENDERER=ngl` reproducidamente mata el shell con SIGKILL al mapear la
+  primera ventana GTK4 (I-01). `gl` sobre Zink sí es estable (3 editores +
+  2 Widget Factory, y 10 min con Text Editor abierto).
+- at-spi multiplica procesos (ibus, at-spi registry, gjs) y Android termina
+  matando el árbol de la sesión. `GTK_A11Y=none` + `NO_AT_BRIDGE=1` lo evitan.
+- El fallback `cairo` sigue disponible si una app GTK4 concreta falla.
 
-Apps verificadas:
+Apps verificadas (compositor Zink, `GSK_RENDERER=gl`):
 
 - **Text Editor** (`gnome-text-editor`) — abre/cierra, traffic lights.
 - **Calculator** (`gnome-calculator`) — abre/cierra.
+- **Widget Factory** (`gtk4-widget-factory`) — abre/cierra.
 - **Nautilus** (Files) — abre; puede tener problemas si se lanza como root según el flujo.
 - **gnome-terminal** — GTK3; abre.
 - **LibreOffice** — abre desde dock; no es GTK4.
@@ -59,12 +71,9 @@ Resultado de esta máquina:
 
 ```
 direct rendering: Yes
-Device: Adreno (TM) 830v1 (0xffffffff)
-Video memory: 11113MB
-OpenGL renderer string: Adreno (TM) 830v1
-OpenGL core profile version string: 4.6 (Core Profile) Mesa 26.3.0-devel
-OpenGL core profile shading language version string: 4.60
-OpenGL ES profile version string: OpenGL ES 3.2
+Device: zink Vulkan 1.4(Adreno (TM) 830v1 (MESA_TURNIP)) (0x44050001)
+OpenGL renderer string: zink Vulkan 1.4(Adreno (TM) 830v1 (MESA_TURNIP))
+OpenGL version string: 4.6 (Compatibility Profile) Mesa 26.3.0-devel
 ```
 
 `substrate-gpu-run` hace:
@@ -73,24 +82,35 @@ OpenGL ES profile version string: OpenGL ES 3.2
 DISPLAY=:0
 HOME=/home/dexuser
 XDG_RUNTIME_DIR=/tmp/rt-dex
+GTK_A11Y=none
+NO_AT_BRIDGE=1
+PULSE_SERVER=tcp:127.0.0.1:4713
 DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr)
 . /etc/profile.d/zz-adreno-gpu.sh
-unset LIBGL_ALWAYS_SOFTWARE
 exec "$@"
 ```
 
-La receta `zz-adreno-gpu.sh` incluye:
+La receta `zz-adreno-gpu.sh` (v4) es:
 
 ```sh
+GALLIUM_DRIVER=zink
+MESA_LOADER_DRIVER_OVERRIDE=zink
 LIBGL_ALWAYS_SOFTWARE=0
-GALLIUM_DRIVER=freedreno
-MESA_LOADER_DRIVER_OVERRIDE=kgsl
-FD_FORCE_KGSL=1
-FD_MESA_DEBUG=nolrz
-LIBGL_DRI3_DISABLE=1
+MESA_VK_WSI_PRESENT_MODE=immediate
 ```
 
-`FD_MESA_DEBUG=nolrz` desactiva LRZ, que fue el detonante más probable del fallo ARGB/GTK4. Para apps 3D se mantiene; el compositor estable no lo usa porque corre software.
+**Por qué Zink/Turnip:** el bug I-01 vivía en la ruta freedreno-gallium al
+componer superficies ARGB de GTK4. Zink emite otro stream de comandos (Vulkan
+Turnip) y no dispara el fallo. No se parcheó freedreno ni se trasplantó Mesa de
+Termux: todo viene de `libgl1-mesa-dri` del distro (`kgsl_dri.so`,
+`zink_dri.so`, Turnip).
+
+Benchmark medido (glxgears, 1040x704):
+
+| Estado | FPS | RSS shell | Colores captura |
+|---|---|---|---|
+| Antes (llvmpipe/swrast) | 475–490 | 326 MB | 90 268 |
+| Después (Zink/Turnip) | 120 (vblank 120 Hz) | 242 MB | 93 315 |
 
 ---
 
@@ -221,23 +241,28 @@ Luego se puede buscar “Blender (GPU)” en overview. **No usar el .desktop nor
 
 ## 7. Reglas para no romper la sesión
 
-1. Abrir GTK4 con Cairo.
-2. No poner el compositor en freedreno con GTK4 hasta resolver el fallo de LRZ/ARGB.
-3. No usar `pkill -f`.
+1. GTK4 con `GSK_RENDERER=gl`; **nunca `ngl`** (mata el shell). Si algo falla, `cairo`.
+2. Mantener `GTK_A11Y=none` y `NO_AT_BRIDGE=1`: at-spi/ibus multiplican procesos
+   y Android mata el árbol de la sesión.
+3. No usar `pkill -f`; matar solo por PID de `/tmp/rt-dex/*.pid`.
 4. Guardar los archivos antes de probar apps 3D pesadas.
 5. Si el shell muere, `gnome49 --restart`; X sigue vivo.
 6. Si una app 3D va lenta, comprobar que no está en llvmpipe (`glxinfo`).
 7. No instalar servicios systemd esperando que arranquen solos.
+8. Si el compositor Zink se vuelve inestable: `GNOME49_SW=1 gnome49 --restart`
+   (vuelve a llvmpipe/swrast, el estado dorado anterior).
 
 ---
 
 ## 8. Rendimiento: expectativas honestas
 
-- **Compositor software:** estable, pero el escritorio a 2000x1200 no es la vía de máximo rendimiento. Es el precio de evitar el SIGKILL.
-- **GPU apps:** usan Adreno real; Blender/Eevee/Workbench pueden beneficiarse.
+- **Compositor Zink/Turnip:** 120 FPS vblank-locked, 242 MB RSS del shell,
+  `kgsl_fds=1`, `zink`/`vulkan_freedreno` en `/proc/<pid>/maps`.
+- **GPU apps:** usan Adreno real vía Zink; Blender 5.0.1 abrió ventana y se
+  mantuvo 25 s sin SIGKILL.
 - **CPU:** 8 núcleos; proot añade overhead de syscalls.
-- **RAM:** 10 GiB; el escritorio + servicios + apps pueden dejar poco margen. Cerrar apps no usadas.
-- **No hay benchmarks FPS formales en este repo**; `glxinfo` y las capturas son la evidencia disponible. Añadir benchmarks es parte del roadmap.
+- **RAM:** 10 GiB; el escritorio + servicios + apps pueden dejar poco margen.
+- **Benchmarks:** `glxgears` antes/después en `evidence/` y `docs/03`.
 
 ---
 

@@ -13,9 +13,13 @@ export XDG_SESSION_DESKTOP=ubuntu
 export XDG_SESSION_ID=substrate
 export DESKTOP_SESSION=ubuntu
 export GNOME_SHELL_SESSION_MODE=ubuntu
-# Apps GTK4: Cairo evita el fallo de GPU al mapear; a11y off evita que
-# at-spi tumbe el shell bajo este proot. El compositor no usa GSK.
-export GSK_RENDERER=cairo
+# Apps GTK4: gl (GL acelerado) sobre Zink. ngl mata el shell (I-01); cairo es
+# el fallback. a11y off evita que at-spi multiplique procesos y Android mate.
+if [ "${GNOME49_SW:-0}" = "1" ]; then
+  export GSK_RENDERER=cairo
+else
+  export GSK_RENDERER=gl
+fi
 export GTK_A11Y=none
 export NO_AT_BRIDGE=1
 
@@ -37,8 +41,13 @@ gsettings set org.gnome.desktop.background picture-uri-dark "file:///home/dexuse
 # llavero (secrets) para apps que lo piden
 ( printf '\n' | gnome-keyring-daemon --start --components=secrets ) >>"$RT/keyring.log" 2>&1 || true
 
-# audio: PipeWire entra en bucle bajo proot (ENOSYS, ~90% CPU). Desactivado por defecto.
-# Para probar audio: RT_ENABLE_AUDIO=1 gnome49 --restart
+# audio: PulseAudio de Termux por TCP local. El socket unix falla bajo proot
+# (SCM_RIGHTS -> "Protocol error"); el modulo tcp lo arranca substrate-audio-up.
+# Forzado: el profile del proot hereda PULSE_SERVER=127.0.0.1 (sin puerto).
+export PULSE_SERVER="${RT_PULSE_SERVER:-tcp:127.0.0.1:4713}"
+
+# audio alternativo: PipeWire entra en bucle bajo proot (ENOSYS, ~90% CPU).
+# Desactivado por defecto. Para probar: RT_ENABLE_AUDIO=1 gnome49 --restart
 if [ "${RT_ENABLE_AUDIO:-0}" = "1" ] && command -v pipewire >/dev/null 2>&1; then
   export PULSE_SERVER="unix:$RT/pulse/native"
   setsid nohup pipewire >>"$RT/pipewire.log" 2>&1 </dev/null &
@@ -86,12 +95,15 @@ rm -f "$RT/gnome-shell-disable-extensions"
 # si el shell muere por si solo (137 = SIGKILL, 139 = SIGSEGV, etc.).
 (
   trap '' HUP
-  # Compositor estable: el compositor usa llvmpipe; las apps pueden usar
-  # freedreno/kgsl por separado (ver /etc/profile.d/zz-adreno-gpu.sh).
-  export LIBGL_ALWAYS_SOFTWARE=1
-  export GALLIUM_DRIVER=llvmpipe
-  export MESA_LOADER_DRIVER_OVERRIDE=swrast
-  export LIBGL_DRI3_DISABLE=1
+  # Compositor acelerado: Zink sobre Turnip/kgsl (Adreno 830).
+  # freedreno-gallium mataba el shell con ARGB/GTK4 (I-01); zink lo rodea.
+  # GNOME49_SW=1 -> perfil software estable (escape hatch).
+  if [ "${GNOME49_SW:-0}" = "1" ] && [ -f "$RT/zz-adreno-gpu.software.sh" ]; then
+    . "$RT/zz-adreno-gpu.software.sh"
+  else
+    . /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null || true
+    unset LIBGL_ALWAYS_SOFTWARE FD_MESA_DEBUG FD_FORCE_KGSL
+  fi
   gnome-shell >"$RT/shell49.log" 2>&1 &
   spid=$!
   echo "$spid" > "$RT/shell49.pid"

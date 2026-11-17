@@ -1,0 +1,36 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# substrate-audio-up - asegura PulseAudio de Termux con socket estable y TCP local.
+# El proot no puede usar el socket unix (SCM_RIGHTS -> "Protocol error"); los
+# clientes del proot hablan tcp:127.0.0.1:4713 (auth-anonymous, solo loopback).
+set -u
+RT="$PREFIX/tmp/rt-dex"
+RUNDIR="$PREFIX/tmp/pulse"
+mkdir -p "$RT" "$RUNDIR"
+chmod 700 "$RUNDIR"
+
+ok() { PULSE_RUNTIME_PATH="$RUNDIR" timeout 5 pactl info >/dev/null 2>&1; }
+
+if ! ok; then
+  # Matar SOLO procesos cuyo comm sea exactamente pulseaudio (por PID de /proc).
+  for q in /proc/[0-9]*; do
+    c=$(cat "$q/comm" 2>/dev/null) || continue
+    [ "$c" = "pulseaudio" ] || continue
+    p=${q#/proc/}
+    kill "$p" 2>/dev/null && echo "[A] pulseaudio previo detenido ($p)"
+  done
+  sleep 1
+  PULSE_RUNTIME_PATH="$RUNDIR" setsid nohup pulseaudio --start --exit-idle-time=-1 \
+    >"$RT/pulse-start.log" 2>&1
+  for _ in $(seq 1 10); do ok && break; sleep 1; done
+fi
+
+if ok; then
+  echo "[A] pulseaudio OK: $(PULSE_RUNTIME_PATH="$RUNDIR" pactl info 2>/dev/null | sed -n 's/^Default Sink: //p')"
+  PULSE_RUNTIME_PATH="$RUNDIR" pactl list short modules 2>/dev/null \
+    | grep -q module-native-protocol-tcp || \
+    PULSE_RUNTIME_PATH="$RUNDIR" pactl load-module module-native-protocol-tcp \
+      port=4713 auth-anonymous=1 listen=127.0.0.1 >/dev/null 2>&1 || true
+  exit 0
+fi
+echo "[A] ERROR: pulseaudio no arranco; ver $RT/pulse-start.log" >&2
+exit 1

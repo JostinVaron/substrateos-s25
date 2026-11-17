@@ -1,82 +1,68 @@
 # FINAL STATUS — SubstrateOS S25
 
-**Fecha:** 2026-11-16  
-**Estado:** sesión GNOME 49 X11 activa, estable, compositor software, apps GTK4 verificadas.  
-**No dejar procesos de prueba abiertos.**
+**Fecha:** 2026-11-17  
+**Estado:** GNOME Shell 49 X11 con **compositor GPU Zink/Turnip**, apps GTK4
+estables (`GSK_RENDERER=gl`), audio por PulseAudio+TCP, batería real y brillo
+por ADB. I-01 cerrado.
 
-## Sesión actual
+> Los PID son volátiles. Comprobar siempre con `gnome49 status`.
+
+## Sesión actual (arranque en frío verificado)
 
 | Campo | Valor |
 |---|---|
-| `gnome-shell` | PID **27693** (volátil; comprobar con `gnome49 status`) |
-| X | `:0`, 2000x1200 |
+| `gnome-shell` | PID **21254** (volátil) |
+| X | `:0`, 1040x704 (ventana Termux:X11) |
 | WM | GNOME Shell OK |
-| `kgsl_fds` | **0** (compositor software) |
-| `LIBGL_ALWAYS_SOFTWARE` | `1` en el proceso del shell |
-| `GALLIUM_DRIVER` | `llvmpipe` en el shell |
-| `MESA_LOADER_DRIVER_OVERRIDE` | `swrast` en el shell |
-| Shell user | root dentro del proot |
+| Compositor | **Zink sobre Turnip** (`GALLIUM_DRIVER=zink`) |
+| `kgsl_fds` | **1** |
+| `/proc/<shell>/maps` | `zink`/`vulkan_freedreno` ×4, `llvmpipe`=0, `swrast`=0 |
+| `GSK_RENDERER` | **gl** (apps GTK4) |
+| `GTK_A11Y` / `NO_AT_BRIDGE` | none / 1 |
+| `PULSE_SERVER` | `tcp:127.0.0.1:4713` |
+| Shell user | root dentro del proot (I-02 abierto) |
 | Home lógico | `/home/dexuser` |
 | Tema | MacTahoe-Dark; iconos MacTahoe-dark; wallpaper MacTahoe-day |
-| Captura | 145.651 colores |
+| Captura | **92 762 colores** (`13-arranque-frio-zink.png`) |
 | Ventanas de prueba | ninguna |
 
 ## Comandos
 
 ```bash
-gnome49            # arranca / garantiza sesión
-gnome49 status     # estado + WM + ventanas
+gnome49            # arranca / garantiza sesión (audio incluido)
+gnome49 status     # estado + WM + kgsl + ventanas
 gnome49 --restart  # reinicia completo (X intacto)
 gnome49-stop       # detiene sesión; conserva X
+GNOME49_SW=1 gnome49 --restart   # escape hatch llvmpipe/swrast + Cairo
 ```
 
-## Qué se verificó
+## Evidencia de las fases (2026-11-17)
 
-- Arranque limpio, sin apps automáticas.
-- Shell y WM reales; captura con >100.000 colores.
-- Text Editor GTK4 abre, permanece 30 s y cierra con el shell vivo.
-- Calculator GTK4 y Widget Factory GTK4 estables en pruebas controladas.
-- Widget Factory GTK4 abre 60 s con hardware + `FD_MESA_DEBUG=nolrz` (modo experimental).
-- `xclock`, `zenity` y LibreOffice abren con hardware.
-- Idle 120 s mantiene shell y UI.
-- `substrate-gpu-run glxinfo -B`: Adreno 830v1, Mesa 26.3.0-devel, OpenGL 4.6.
-- Cierre de app con `xdotool ... windowclose`; no usar `pkill -f`.
+| Prueba | Resultado |
+|---|---|
+| Baseline software | 475–490 FPS, 90 268 colores, RSS 326 MB |
+| Compositor Zink | 120 FPS vblank, 93 315 colores, RSS 242 MB |
+| Stress I-01 (2 bloques) | 0 SIGKILL |
+| Soak 10 min | `VIVO` |
+| 10 min con Text Editor GTK4 | `VIVO` (87 145 colores, `12-idle-gtk4-10min.png`) |
+| Blender 5.0.1 | ventana + shell vivo (`09-blender-zink.png`) |
+| Audio | `paplay` rc=0, volumen 50 %, sink `AAudio_sink` |
+| Batería | 56–58 %, discharging, 3.91 V, ~5 h (`upower-stub`) |
+| Brillo | 101→90→101; atajos Super+F1/F2 |
+| Arranque en frío | OK (`13-arranque-frio-zink.png`) |
 
-## Decisión técnica
+## Pendiente de confirmación humana
 
-El compositor acelerado con GTK4 ARGB → `SIGKILL` del shell (Android/GPU). `FD_MESA_DEBUG=nolrz` mejoró pero no eliminó el fallo. Se eligió **compositor software** para garantizar estabilidad. Las apps que necesitan OpenGL usan hardware por separado:
+1. Audio **audible** en el altavoz (servidor/sink activos; el agente no oye).
+2. Pulsar `Super+F1` / `Super+F2` para confirmar el cambio de brillo.
+3. Fase 5 (`dexuser`): no ejecutada; opcional/no bloqueante, requiere sesión
+   parada, `chown` y rollback. I-02 sigue abierto.
+4. I-06: chevron Wi‑Fi en MacTahoe (CSS del tema), documentado como limitación.
 
-```bash
-proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc \
-  'substrate-gpu-run blender'
-```
+## Rollback
 
-## Limitaciones abiertas
-
-- Notificación “Logged in as a privileged user” (shell root).
-- Sin audio/volumen, Bluetooth, brillo ni batería real.
-- Wi-Fi simulado `SubstrateOS`; chevron del submenú no abre.
-- GPU acelerada del compositor: experimental, no por defecto.
-- Blender: OpenGL/Eevee/Workbench; Cycles GPU no soportado por Adreno.
-
-## Evidencia
-
-- `evidence/01-editor-dark-software-shell.png`
-- `evidence/02-escritorio-limpio.png`
-- `evidence/03-widgetfactory-hardware-nolrz.png`
-- `evidence/04-editor-software.png`
-- `evidence/05-calculator-software.png`
-
-## Si hay que recuperar
-
-1. Leer `docs/04-OPERACION-TESTS.md`.
-2. `gnome49 status`; si no hay sesión, `gnome49 --restart`.
-3. Si X no responde, pedir a la persona que abra Termux:X11 y ejecutar `termux-x11` en Termux.
-4. No borrar `/tmp/rt-dex`; los scripts se restauran desde `~/.local/share/substrate/rt-dex/`.
-5. Para reinstalación completa: `docs/02-INSTALACION-LIMPIA.md`.
-
-## Respaldos
-
-- Scripts persistentes: `~/.local/share/substrate/rt-dex/`
-- Rootfs: `/data/data/com.termux/files/usr/var/lib/proot-distro/containers/ubuntu-gnome/rootfs`
-- Repositorio: este directorio.
+- Código: `git revert` del commit de Zink.
+- Scripts: copias `.pre-zink-*` en `/tmp/rt-dex` y respaldo persistente en
+  `~/.local/share/substrate/rt-dex/`.
+- Sesión: `GNOME49_SW=1 gnome49 --restart` (estado dorado anterior).
+- GPU: restaurar `zz-adreno-gpu.sh` desde `zz-adreno-gpu.sh.golden-sw-*`.

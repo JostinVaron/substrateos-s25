@@ -302,20 +302,21 @@ No ejecutar `systemctl`. No se necesita `systemd-logind`.
 
 ---
 
-## 9. GPU: receta y fallback
+## 9. GPU: receta Zink/Turnip y escape hatch
 
-`/etc/profile.d/zz-adreno-gpu.sh` de referencia:
+`/etc/profile.d/zz-adreno-gpu.sh` de referencia (v4):
 
 ```sh
+export GALLIUM_DRIVER=zink
+export MESA_LOADER_DRIVER_OVERRIDE=zink
 export LIBGL_ALWAYS_SOFTWARE=0
-export GALLIUM_DRIVER=freedreno
-export MESA_LOADER_DRIVER_OVERRIDE=kgsl
-export FD_FORCE_KGSL=1
-export FD_MESA_DEBUG=nolrz
-export LIBGL_DRI3_DISABLE=1
+export MESA_VK_WSI_PRESENT_MODE=immediate
 ```
 
-`session49.sh` fuente este archivo. El subshell del compositor en `session-inner.sh` **sobrescribe a software**:
+`session49.sh` fuente este archivo y limpia restos freedreno. El subshell del
+compositor en `session-inner.sh` usa el mismo perfil Zink. Para volver al estado
+software: `GNOME49_SW=1 gnome49 --restart` (usa
+`/tmp/rt-dex/zz-adreno-gpu.software.sh`):
 
 ```sh
 export LIBGL_ALWAYS_SOFTWARE=1
@@ -323,8 +324,6 @@ export GALLIUM_DRIVER=llvmpipe
 export MESA_LOADER_DRIVER_OVERRIDE=swrast
 export LIBGL_DRI3_DISABLE=1
 ```
-
-No cambiar esto a hardware sin leer `docs/05-ISSUES-ROADMAP.md`: puede reproducir el `SIGKILL` con GTK4.
 
 Verificar GPU:
 
@@ -380,7 +379,7 @@ GTK4:
 proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc '
   export HOME=/home/dexuser DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex
   export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr)
-  export GSK_RENDERER=cairo GTK_A11Y=none NO_AT_BRIDGE=1
+  export GSK_RENDERER=gl GTK_A11Y=none NO_AT_BRIDGE=1
   exec gnome-text-editor
 '
 ```
@@ -410,12 +409,12 @@ Nunca cerrar con `pkill -f`.
 |---|---|---|
 | `X no responde` | Termux:X11 no está abierto o `termux-x11` no arrancó | abrir app; `termux-x11`; `xdpyinfo` |
 | Shell arranca sin UI | Mutter/GL/DBus | `gnome49 --restart`; revisar logs |
-| Shell muere al abrir GTK4 | compositor hardware | dejar software; no forzar freedreno en shell |
+| Shell muere al abrir GTK4 | `GSK_RENDERER=ngl` o pico at-spi | usar `gl` + `GTK_A11Y=none`; `cairo` fallback |
 | Apps sin tema MacTahoe | gsettings/dconf en HOME incorrecto | `HOME=/home/dexuser`; ejecutar gsettings |
-| `kgsl_fds=0` | compositor software | esperado |
-| `SHELL_EXIT=137` | SIGKILL Android/GPU | usar software; revisar roadmap |
-| Audio ENOSYS | PipeWire bajo proot | no habilitar |
-| Sin brillo/batería | hardware no expuesto | limitación |
+| `kgsl_fds=0` | compositor en software (`GNOME49_SW=1`) | quitar GNOME49_SW |
+| `SHELL_EXIT=137` | SIGKILL Android (a11y/GPU) | revisar logcat y `docs/05`; escape hatch software |
+| Audio ENOSYS | PipeWire bajo proot | usar `substrate-audio-up` (PulseAudio TCP) |
+| Sin brillo/batería | stub/ADB no arrancó | `substrate-audio-up`; revisar `upowerd.log` |
 | Bluetooth ausente | sin `/dev/rfkill` | limitación |
 | App no abre como root | política de la app | lanzar con `--user dexuser` |
 | D-Bus no encontrado | sesión no arrancada | `cat /tmp/rt-dex/session-bus.addr` |

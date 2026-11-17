@@ -55,7 +55,7 @@ proot-distro login ubuntu-gnome --shared-tmp -- bash -lc '
 '
 ```
 
-Criterio: **>100.000 colores**. La última medición: **145.651**.
+Criterio: **>90.000 colores** (compositor Zink). Últimas mediciones: 93.315 / 94.137 / 94.847.
 
 ---
 
@@ -67,7 +67,7 @@ Criterio: **>100.000 colores**. La última medición: **145.651**.
 proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc '
   export HOME=/home/dexuser DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex
   export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr)
-  export GSK_RENDERER=cairo GTK_A11Y=none NO_AT_BRIDGE=1
+  export GSK_RENDERER=gl GTK_A11Y=none NO_AT_BRIDGE=1
   exec gnome-text-editor
 '
 ```
@@ -100,7 +100,7 @@ gnome49 status
 proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc '
   export HOME=/home/dexuser DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex
   export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr)
-  export GSK_RENDERER=cairo GTK_A11Y=none NO_AT_BRIDGE=1
+  export GSK_RENDERER=gl GTK_A11Y=none NO_AT_BRIDGE=1
   exec gnome-calculator
 '
 ```
@@ -117,7 +117,7 @@ DISPLAY=:0 xdotool search --name "Calculator" windowclose
 proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc '
   export HOME=/home/dexuser DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex
   export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr)
-  export GSK_RENDERER=cairo GTK_A11Y=none NO_AT_BRIDGE=1
+  export GSK_RENDERER=gl GTK_A11Y=none NO_AT_BRIDGE=1
   exec gtk4-widget-factory
 '
 ```
@@ -170,7 +170,7 @@ proot-distro login ubuntu-gnome --shared-tmp --user dexuser -- bash -lc \
   'substrate-gpu-run glxinfo -B'
 ```
 
-Debe aparecer **Adreno (TM) 830v1** y **OpenGL 4.6**. Si aparece llvmpipe, se está usando el entorno del compositor, no el wrapper GPU.
+Debe aparecer **zink Vulkan 1.4 (Adreno (TM) 830v1 (MESA_TURNIP))** y **OpenGL 4.6**. Si aparece llvmpipe, se está usando el escape hatch `GNOME49_SW=1` o un perfil software.
 
 ### 4.4 Hardware + GTK4 (experimental)
 
@@ -306,7 +306,7 @@ Una sesión se considera buena solo si:
 
 ## 11. Qué no probar sin leer issues
 
-- Forzar el compositor a freedreno con GTK4.
+- Forzar `GSK_RENDERER=ngl` (mata el shell) o quitar `GTK_A11Y=none`.
 - `COGL_DEBUG` masivos sin backup.
 - `strace -f` anidado bajo proot: puede dejar el shell en `tl` y UI negra.
 - Perfetto/perf para señales: sin root no hay `signal_generate`.
@@ -321,8 +321,9 @@ Una sesión se considera buena solo si:
 |---|---|
 | `gnome49 --restart` | OK |
 | `gnome49 status` | OK |
-| Color de captura | 145.651 |
-| Text Editor GTK4 30 s + cierre | OK |
+| Color de captura | 93.315–94.847 |
+| Compositor | Zink/Turnip, `kgsl_fds=1` |
+| Text Editor GTK4 30 s + cierre | OK (`GSK_RENDERER=gl`) |
 | Calculator GTK4 | OK (pruebas previas) |
 | Widget Factory GTK4 | OK con hardware/nolrz 60 s (experimental) |
 | Idle 120 s | OK |

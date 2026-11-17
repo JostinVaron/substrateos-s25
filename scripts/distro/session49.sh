@@ -31,14 +31,15 @@ export LANG=C.UTF-8
 export LC_ALL=C.UTF-8
 export RT_SYSTEM_BUS=/tmp/rt-dex/system-bus49
 
-# Receta GPU Adreno (freedreno/kgsl); el compositor necesita DRI3/TFP -> unset.
-. /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null || true
-unset LIBGL_DRI3_DISABLE
-export COGL_DISABLE_TFP=1
-# Adreno 830: LRZ (compresion de render target) corrompe el contexto GPU al
-# componer ventanas GTK4 ARGB y Android termina el compositor con SIGKILL.
-# nolrz desactiva esa compresion y mantiene freedreno/kgsl estables.
-export FD_MESA_DEBUG=nolrz
+# Receta GPU Adreno v4: Zink sobre Turnip/kgsl (Adreno 830).
+# Escape hatch: GNOME49_SW=1 -> perfil software estable (llvmpipe/swrast).
+if [ "${GNOME49_SW:-0}" = "1" ] && [ -f "$RT/zz-adreno-gpu.software.sh" ]; then
+  . "$RT/zz-adreno-gpu.software.sh"
+else
+  . /etc/profile.d/zz-adreno-gpu.sh 2>/dev/null || true
+fi
+unset FD_MESA_DEBUG FD_FORCE_KGSL COGL_DISABLE_TFP
+[ "${GNOME49_SW:-0}" = "1" ] || unset LIBGL_DRI3_DISABLE
 export MESA_VK_WSI_PRESENT_MODE=immediate
 export vblank_mode=0
 
@@ -89,7 +90,12 @@ echo $! > "$RT/nm-stub.pid"
 sleep 1
 
 # --- servicios de sistema ---
-if [ -x /usr/libexec/upowerd ]; then
+# upower: stub propio con la bateria real del telefono (termux-battery-status).
+# El upowerd real solo ve /sys falso bajo proot -> 0% y battery-missing.
+if [ -f /usr/local/share/substrate/upower-stub.py ]; then
+  setsid nohup python3 /usr/local/share/substrate/upower-stub.py >>"$RT/upowerd.log" 2>&1 </dev/null &
+  echo $! > "$RT/upowerd.pid"
+elif [ -x /usr/libexec/upowerd ]; then
   setsid nohup /usr/libexec/upowerd >>"$RT/upowerd.log" 2>&1 </dev/null &
   echo $! > "$RT/upowerd.pid"
 fi

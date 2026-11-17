@@ -4,73 +4,96 @@
 
 ### I-01 — `SIGKILL` del compositor con GTK4 (hardware)
 
-**Estado:** abierto; mitigado con compositor software.  
-**Severidad:** alta si se fuerza hardware; actualmente no afecta al modo por defecto.
+**Estado:** **cerrado** (2026-11-17). Compositor acelerado Zink/Turnip estable.  
+**Severidad:** resuelta; el modo por defecto ya es hardware.
 
-Síntoma:
+Síntoma original:
 
-- `gnome-shell` recibe `SIGKILL` (`SHELL_EXIT=137`) al mapear una ventana GTK4 en el compositor acelerado.
-- Ocurre con Text Editor, Calculator y Widget Factory.
-- No ocurre con `xclock`, `zenity` (GTK3) ni, en general, GTK3.
-- Con `FD_MESA_DEBUG=nolrz` sobrevive 30–60 s en algunas ejecuciones, pero también murió a los 2 s en otras.
+- `gnome-shell` recibía `SIGKILL` (`SHELL_EXIT=137`) al mapear una ventana GTK4
+  con el compositor freedreno-gallium.
+- Ocurría con Text Editor, Calculator y Widget Factory.
+- No ocurría con `xclock`, `zenity` (GTK3) ni, en general, GTK3.
 
-Evidencia reunida:
+Diagnóstico final (medido):
 
-- GTK4 usa CSD/ARGB; `_GTK_FRAME_EXTENTS` y `_NET_WM_OPAQUE_REGION`.
-- `xclock`/zenity usan ventana con frame del WM o 24-bit; GTK4 no.
-- `GSK_RENDERER=cairo`, `GTK_A11Y=none`, `NO_AT_BRIDGE=1` no bastan.
-- `LIBGL_DRI3_DISABLE=1`, `COGL_DISABLE_TFP=1`, COGL debug flags y sombras CSS no bastan.
-- `MUTTER_DEBUG_FORCE_LINEAR_BLENDING=1` alarga la vida, pero no elimina el fallo.
-- El software compositor es estable.
-- Perfetto no habilita `signal_generate` sin root; `perf` no puede abrir eventos; `strace` anidado deja el shell en `tl`.
-- Phantom process killer fue descartado como causa primaria (monitor desactivado y máximos enormes; el patrón de muerte coincide con GPU/GTK4).
+- La ruta **freedreno-gallium** moría al componer superficies ARGB/GTK4.
+- **Zink sobre Turnip** (Vulkan, `/dev/kgsl-3d0`) usa otro stream de comandos y
+  no dispara el fallo: `direct rendering: Yes`,
+  `Device: zink Vulkan 1.4 (Adreno (TM) 830v1 (MESA_TURNIP))`, GL 4.6.
+- El SIGKILL que se veía en el stress inicial de la migración **no era GPU**:
+  Android mató el árbol de la sesión durante una explosión de procesos
+  at-spi/ibus. Con `GTK_A11Y=none` + `NO_AT_BRIDGE=1` el patrón desaparece.
+- `GSK_RENDERER=ngl` sigue matando el shell; **`gl` es el renderer válido**
+  sobre Zink. `cairo` queda como fallback.
 
-Hipótesis principal:
+Configuración ganadora:
 
-- Bug de **LRZ / compresión de render target / sRGB** en la ruta freedreno/kgsl al componer una superficie ARGB de GTK4. `nolrz` cambia el comportamiento, pero hay otra ruta afectada.
+```sh
+# /etc/profile.d/zz-adreno-gpu.sh (v4)
+GALLIUM_DRIVER=zink
+MESA_LOADER_DRIVER_OVERRIDE=zink
+LIBGL_ALWAYS_SOFTWARE=0
+MESA_VK_WSI_PRESENT_MODE=immediate
+# session-inner.sh
+GSK_RENDERER=gl
+GTK_A11Y=none
+NO_AT_BRIDGE=1
+```
 
-Mitigación actual:
+Evidencia:
 
-- Compositor en llvmpipe/swrast.
-- Apps GPU por `substrate-gpu-run`.
-- No prometer compositor acelerado estable.
+- `kgsl_fds=1`, `zink|vulkan_freedreno` ×4 en `/proc/<shell>/maps`,
+  `llvmpipe=0`, `swrast=0`.
+- 2 bloques de stress: 5× editor, 3× Widget Factory, 3× calculadora,
+  arrastre + 5 cambios de escritorio; **0 muertes**.
+- Soak de 10 min: `VIVO`.
+- 10 min con Text Editor GTK4 abierto: `VIVO`, `SHELL_EXIT=137` ausente.
+- Blender 5.0.1: ventana mapeada, captura 94 847 colores, shell vivo.
+- Benchmark: 475–490 FPS software → **120 FPS vblank-locked**, RSS 326→242 MB.
+- Capturas en `evidence/05-mactahoe-zink.png`, `06-blender-zink.png`.
 
-Posibles siguientes pasos:
+Rollback / escape hatch:
 
-1. Probar `FD_MESA_DEBUG=nolrzfc`, `nobypass`, `gmem`, `nopreempt`, combinaciones con linear blending.
-2. Probar un compositor Wayland/GNOME bajo Weston (otra ruta de buffer).
-3. Forzar server-side frame para GTK4 (parche Mutter/GTK4 o window wrapper).
-4. Usar un compositor alternativo para el escritorio (sway/weston) y GNOME solo como apps.
-5. Capturar GPU fault con `kgsl`/ftrace desde root o Shizuku si se habilita.
-6. Reportar a Mesa freedreno con traza mínima.
+- `GNOME49_SW=1 gnome49 --restart` restaura llvmpipe/swrast + Cairo.
+- Backups `.pre-zink-*` en `/tmp/rt-dex` y en el respaldo persistente.
 
 ### I-02 — Notificación “Logged in as a privileged user”
 
-**Estado:** abierto.  
+**Estado:** abierto (no bloqueante).  
 **Causa:** `gnome-shell` corre como root dentro del proot; GNOME lo detecta y avisa.  
 **Impacto:** cosmético/seguridad; no rompe apps.
 
 Intentos:
 
-- Ejecutar la sesión como `dexuser`: arrancó, pero en una prueba Text Editor no mapeó ventana y el shell murió al abrir una app; se revirtió.
+- Ejecutar la sesión como `dexuser`: arrancó, pero en una prueba Text Editor no mapeó ventana y el shell murió al abrir una app; se revirtió (ver `restart49.sh.pre-dexuser-*`).
 - El texto está dentro de `libshell-17.so`; no hay gsetting directo.
 
 Futuro:
 
-- Resolver la sesión completa como `dexuser` con D-Bus, X, /tmp y portales.
+- Resolver la sesión completa como `dexuser` con D-Bus, X, /tmp y portales
+  (precondición: `chown -R dexuser:dexuser /home/dexuser /tmp/rt-dex` con la sesión parada).
 - O parchear el aviso en GNOME Shell (no recomendado como primera opción).
 
 ### I-03 — Audio/volumen
 
-**Estado:** bloqueado.  
-PipeWire entra en bucle `ENOSYS` bajo proot; puede consumir CPU. La sesión no arranca audio salvo `RT_ENABLE_AUDIO=1` (no recomendado). No hay slider de volumen.
+**Estado:** **cerrado** (2026-11-17).  
+PulseAudio 17 de Termux con `module-aaudio-sink`. El proot **no puede** usar el
+socket unix (proot rompe SCM_RIGHTS → `Protocol error`), así que se usa el
+puente **TCP loopback**:
 
-Futuro:
+```sh
+# Termux (~/…/usr/etc/pulse/default.pa)
+load-module module-native-protocol-tcp port=4713 auth-anonymous=1 listen=127.0.0.1
+# sesión proot (session-inner.sh)
+PULSE_SERVER=tcp:127.0.0.1:4713
+```
 
-- PulseAudio en modo usuario con socket.
-- PipeWire con `--no-rt` y módulos mínimos.
-- Un puente Android audio (difícil sin root).
-- Aceptar que el audio no es parte del MVP.
+`substrate-audio-up` (Termux) arranca/verifica PulseAudio antes de cada sesión;
+`gnome49` lo invoca. `paplay` de `bell.oga` desde el proot devuelve 0 y
+`pactl set-sink-volume @DEFAULT_SINK@ 50%` aplica el slider.
+
+Pendiente de confirmación humana: que el sonido sea **audible** en el altavoz
+(el servidor y el sink están activos; la app no puede oír).
 
 ### I-04 — Bluetooth
 
@@ -84,22 +107,31 @@ Futuro:
 
 ### I-05 — Brillo/batería
 
-**Estado:** bloqueado.  
-El proot no expone backlight ni batería del S25. No hay slider real.
+**Estado:** **cerrado** para la parte real; cosmético Wi-Fi sigue en I-06.  
+Implementado:
 
-Futuro:
+- **Batería:** `upower-stub.py` sustituye a `upowerd` y sirve
+  `org.freedesktop.UPower` con `termux-battery-status` cada 60 s
+  (Percentage, State, Energy, Voltage, Temperature, TimeToEmpty).
+  Medido en vivo: 56–58 %, `discharging`, 3.91 V, 29–31 °C.
+- **Brillo:** `/usr/local/bin/substrate-brightness` usa ADB inalámbrico
+  (`settings put system screen_brightness`). Probado 101→90→101.
+- Atajos `Super+F1` (−25) y `Super+F2` (+25) vía
+  `org.gnome.settings-daemon.plugins.media-keys custom-keybindings`.
 
-- Leer Battery/backlight vía Termux:API + puente D-Bus.
-- Stub solo si se acepta que no controla hardware.
+Pendiente: pulsar los atajos en el dispositivo (la sesión ya los tiene cargados).
 
 ### I-06 — Wi-Fi simulado y chevron
 
 **Estado:** parcial.  
-`nm-stub.py` muestra `SubstrateOS` y el tile Wi-Fi; el chevron del submenú no abre en MacTahoe.
+`nm-stub.py` muestra `SubstrateOS` y el tile Wi-Fi; el chevron del submenú no
+abre en MacTahoe. El `gnome-shell.css` de MacTahoe-Dark solo define
+`.popup-menu-content`; no hay reglas `popup-submenu`. Queda documentado como
+limitación del tema (no se tocó CSS a ciegas).
 
 Futuro:
 
-- Corregir el popup del submenú en el tema.
+- Corregir el popup del submenú en el tema (requiere inspección visual del árbol St).
 - Conectar NetworkManager real si se puede compartir la red Android.
 
 ### I-07 — Root/dock y apps
@@ -112,16 +144,17 @@ Futuro:
 - Sesión como `dexuser` o wrapper de lanzamiento por app.
 - `.desktop` con `substrate-gpu-run` para apps 3D.
 
-### I-08 — Rendimiento del compositor software
+### I-08 — Rendimiento del compositor
 
-**Estado:** aceptado como tradeoff.  
-El escritorio estable usa CPU para componer 2000x1200. Puede notarse en animaciones y arrastre de ventanas.
+**Estado:** **cerrado** (2026-11-17).  
+El escritorio compone en GPU vía Zink/Turnip: 120 FPS vblank-locked, shell con
+242 MB RSS (antes 326 MB en software). `glxgears` software daba 475–490 FPS
+sin vsync (número engañoso: CPU, no pantalla); ahora está limitado a 120 Hz.
 
 Futuro:
 
-- Recuperar compositor hardware (I-01).
-- Reducir resolución/escala.
-- Benchmark formal de FPS/CPU.
+- Reducir resolución/escala si se quiere más batería.
+- Benchmark formal sostenido (30 min) y perfilado de CPU.
 - Optimizar servicios y RAM.
 
 ### I-09 — Snap/Flatpak
@@ -139,13 +172,21 @@ Solo se simula lo mínimo. Apps que llamen a `systemctl` o logind avanzado puede
 ## 2. Cosas que ya se descartaron
 
 - **Perfetto/perf/simpleperf para señales:** sin root no hay `signal_generate`; el trace no sirve.
-- **Phantom process killer como causa primaria:** monitor desactivado, máximos enormes; el fallo coincide con GTK4/GPU.
-- **OOM/LMKD:** no aparece `am_kill`/`lmkd` relevante; el patrón es GPU.
-- **Cerrar con `wmctrl` como causa:** el shell muere antes o alrededor del cierre; no es la causa.
+- **freedreno-gallium para el compositor:** muere con ARGB/GTK4. Sustituido por Zink/Turnip.
+- **`FD_MESA_DEBUG=nolrz` como solución:** alargaba la vida, no eliminaba el fallo.
+- **OOM/LMKD:** no aparece `am_kill`/`lmkd` relevante.
+- **Phantom process killer como causa del fallo GTK4:** el monitor está desactivado
+  y los máximos son enormes. Pero **sí** mató el árbol de la sesión durante el
+  stress inicial: lo que moría era un pico de procesos at-spi/ibus, no la GPU.
+  Con `GTK_A11Y=none` + `NO_AT_BRIDGE=1` desaparece.
+- **`GSK_RENDERER=ngl`:** mata el shell al primer editor. `gl` es el bueno.
+- **Cerrar con `wmctrl` como causa:** no era la causa.
 - **D-Bus/portal como única causa:** se probó app sin bus y también murió.
 - **CSD visible con `GTK_CSD=0`:** GTK4 lo ignora; no cambió el resultado.
 - **Sombras CSS:** quitarlas no evitó el fallo.
-- **Software selectivo:** el compositor software es la única configuración determinista encontrada.
+- **Mesa de Termux / trasplantes:** innecesario; el Mesa del distro ya trae
+  `kgsl_dri.so`, `zink_dri.so` y Turnip.
+- **PipeWire bajo proot:** bucle `ENOSYS`; se usa PulseAudio + TCP loopback.
 
 ---
 
@@ -179,15 +220,16 @@ Solo se simula lo mínimo. Apps que llamen a `systemctl` o logind avanzado puede
 
 ## 4. Criterios para declarar “resuelto” I-01
 
-- Compositor hardware (`kgsl_fds=4`).
-- Abrir/cerrar Text Editor, Calculator y Widget Factory 10 veces.
-- 10 minutos de idle con ventana GTK4 abierta.
-- Sin `SHELL_EXIT=137`.
-- Captura con color y sombras/animaciones.
-- Apps GPU siguen usando Adreno.
-- Sin regresiones en dock/tema.
+- [x] Compositor hardware (`kgsl_fds>=1`, `zink`/`vulkan_freedreno` en maps).
+- [x] Abrir/cerrar Text Editor, Calculator y Widget Factory repetidamente
+      (2 bloques de 5+3+3 con arrastre y cambios de escritorio).
+- [x] 10 minutos de idle con ventana GTK4 abierta.
+- [x] Sin `SHELL_EXIT=137` en la configuración final.
+- [x] Captura con color (93 315 / 94 137 / 94 847 colores) y tema MacTahoe.
+- [x] Apps GPU siguen usando Adreno (`substrate-gpu-run glxinfo -B`).
+- [x] Sin regresiones en dock/tema (captura P2.4).
 
-Hasta entonces, **software es el modo soportado**.
+**Nota:** `GSK_RENDERER=ngl` no cumple; `gl` sí. `cairo` es fallback aceptado.
 
 ---
 

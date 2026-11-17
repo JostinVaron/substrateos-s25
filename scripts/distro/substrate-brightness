@@ -1,0 +1,8 @@
+#!/bin/bash
+# substrate-brightness - brillo real del panel via ADB inalambrico (Shizuku).
+# Uso: substrate-brightness [0-255]   (sin argumento: solo consulta)
+ADB="${ADB:-/data/data/com.termux/files/usr/bin/adb}"
+[ -x "$ADB" ] || ADB="$(command -v adb || true)"
+[ -n "$ADB" ] || { echo "adb no encontrado" >&2; exit 1; }
+[ -n "${1:-}" ] && "$ADB" -s 127.0.0.1:5555 shell settings put system screen_brightness "$1" >/dev/null 2>&1
+"$ADB" -s 127.0.0.1:5555 shell settings get system screen_brightness
