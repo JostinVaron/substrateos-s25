@@ -1,44 +1,60 @@
-=== BRIDGE RUN 2026-11-17T02:09:17Z (v6) ===
-=== MISION-A72-CAZADOR-EN-VIVO — capturar al asesino con escena limpia 2026-11-17T02:09:17Z ===
---- 0. estado de flags phantom (re-verificar que sigan) ---
-monitor_phantom_procs=false
-max_phantom_processes=2147483647
---- 1. logcat en streaming desde AHORA (captura al asesino en el acto) ---
-captura_iniciada pid=18052 -> /data/data/com.termux/files/usr/tmp/a72-logcat.cap
---- 2. procstate de termux antes de la prueba ---
---- 3. UNA SOLA sesion proot: lanzar FilmCraft y monitorear en su loop interno ---
-filmcraft_pid=18132
-MURIO_EN_t+10s pid_era=18132
-RESULTADO: MURIO_EN_MONITOREO
---- 4. procstate de termux despues de la prueba ---
-  *APP* UID 10354 ProcessRecord{b1b18b9 15911:com.termux.x11/u0a354}
-    class=com.termux.x11.LorieApp
-    dir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk publicDir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk data=/data/user/0/com.termux.x11
-    packageList={com.termux.x11}
-        -> ContentProviderRecord{fcb21c7 u0 com.termux.x11/androidx.startup.InitializationProvider}
-      - 412fe2c/com.android.providers.settings/.SettingsProvider->15911:com.termux.x11/u0a354 s1/1 u0/0 +1h45m17s533ms
---- 5. LA EVIDENCIA: logcat capturado en la ventana (decisiones de kill) ---
-11-16 21:08:05.494 I/ActivityManager( 3325): Process PhantomProcessRecord {63b49f6 14697:16971:proot/u0a345} died
-11-16 21:08:05.495 I/ActivityManager( 3325): Process PhantomProcessRecord {20ba1f7 14717:16971:proot/u0a345} died
-11-16 21:08:07.195 D/FreecessHandler( 3325): skipping freeze com.termux.api(10345) result : 41
-11-16 21:08:07.195 D/FreecessHandler( 3325): stop trying to freeze com.termux.api
-11-16 21:08:07.230 D/FreecessHandler( 3325): skipping freeze org.mozilla.firefox(10381) result : 41
-11-16 21:08:07.230 D/FreecessHandler( 3325): stop trying to freeze org.mozilla.firefox
-11-16 21:08:23.472 I/ActivityManager( 3325): Process PhantomProcessRecord {2b8a9b1 16361:16971:sleep/u0a345} died
-11-16 21:08:23.472 I/ActivityManager( 3325): Process PhantomProcessRecord {c3a5e96 16360:16971:sleep/u0a345} died
-11-16 21:08:24.347 I/ActivityManager( 3325): Process PhantomProcessRecord {9e59946 16198:16971:bash/u0a345} died
-11-16 21:08:24.347 I/ActivityManager( 3325): Process PhantomProcessRecord {d99c707 16192:16971:bash/u0a345} died
-11-16 21:09:18.171 I/adbd    (16714): adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings get global settings_enable_monitor_phantom_procs'
-11-16 21:09:18.204 I/adbd    (16714): adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config get activity_manager max_phantom_processes'
-11-16 21:09:37.693 D/FreecessHandler( 3325): skipping freeze org.mozilla.firefox(10381) result : 41
-11-16 21:09:37.693 D/FreecessHandler( 3325): stop trying to freeze org.mozilla.firefox
-11-16 21:09:42.297 I/lmkd    ( 1145): check proc pid launching app : 19505
-== kills de lmkd (aunque digan 'no processes') ==
-intentos_barrido_lmkd=219
---- 6. estado final ---
+=== BRIDGE RUN 2026-11-17T02:10:39Z (v6) ===
+=== MISION-A73-DIFERENCIAL-EN-SESION — camino viejo en-sesion vs broker, logcat limpio 2026-11-17T02:10:39Z ===
+--- 0. limpiar logcat y contar phantoms ANTES ---
+logcat_limpiado
+phantom_records_antes=114
+--- 1. UNA sola sesion proot: lanzar FilmCraft EN-SESION (camino de los 18min) y monitorear adentro ---
+SHELL_VIVO
+lanzando filmcraft EN-SESION (mismo arbol que el escritorio)...
+filmcraft_pid=20170
+adj_al_nacer=0
+t+30s VIVA adj=0 rss=175144kB
+t+60s VIVA adj=0 rss=175144kB
+t+91s VIVA adj=0 rss=175076kB
+t+121s VIVA adj=0 rss=175076kB
+t+151s VIVA adj=0 rss=175076kB
+t+181s VIVA adj=0 rss=175076kB
+t+211s VIVA adj=0 rss=175076kB
+t+241s VIVA adj=0 rss=175076kB
+RESULTADO: SOBREVIVIO_4MIN_EN_SESION
+ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM jack
+ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM oss
+ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM oss
+--- 2. phantoms DESPUES ---
+phantom_records_despues=115
+--- 3. firma de muerte: ventana COMPLETA sin filtrar (todas las lineas alrededor de kills) ---
+6297:11-16 21:11:18.886 W/SettingsEdm(15366): projectionArgs:isKillingActivitiesOnLeaveAllowed/1
+6377:11-16 21:11:18.922 D/SecContentProvider( 3325): query(), uri = 16 selection = isKillingActivitiesOnLeaveAllowed
+6379:11-16 21:11:18.922 D/SecContentProvider( 3325): isKillingActivitiesOnLeaveAllowed return = true callingUid : 1000
+6380:11-16 21:11:18.922 W/SettingsEdm(15366): projectionArgs:isKillingActivitiesOnLeaveAllowed/1
+10591:11-16 21:11:38.856 D/FreecessController( 3325): BG freezed, skip OLAF unfreeze for (com.sec.android.app.voicenote, 10335)
+17040:11-16 21:12:14.289 D/SecContentProvider( 3325): query(), uri = 16 selection = isKillingActivitiesOnLeaveAllowed
+17042:11-16 21:12:14.289 D/SecContentProvider( 3325): isKillingActivitiesOnLeaveAllowed return = true callingUid : 1000
+17043:11-16 21:12:14.290 W/SettingsEdm(15366): projectionArgs:isKillingActivitiesOnLeaveAllowed/1
+17122:11-16 21:12:14.306 D/SecContentProvider( 3325): query(), uri = 16 selection = isKillingActivitiesOnLeaveAllowed
+17124:11-16 21:12:14.306 D/SecContentProvider( 3325): isKillingActivitiesOnLeaveAllowed return = true callingUid : 1000
+17125:11-16 21:12:14.307 W/SettingsEdm(15366): projectionArgs:isKillingActivitiesOnLeaveAllowed/1
+25343:11-16 21:12:53.660 I/ActivityManager( 3325): Process PhantomProcessRecord {19e753 22848:22601:com.clarocolombia.miclaro/u0a362} died
+26098:11-16 21:12:55.332 I/ActivityManager( 3325): Process PhantomProcessRecord {1011174 22624:22601:com.clarocolombia.miclaro/u0a362} died
+27496:11-16 21:12:58.140 D/FreecessController( 3325): BG freezed, skip OLAF unfreeze for (com.sec.android.app.voicenote, 10335)
+33733:11-16 21:13:39.590 D/SecContentProvider( 3325): query(), uri = 16 selection = isKillingActivitiesOnLeaveAllowed
+33735:11-16 21:13:39.590 D/SecContentProvider( 3325): isKillingActivitiesOnLeaveAllowed return = true callingUid : 1000
+33736:11-16 21:13:39.590 W/SettingsEdm(15366): projectionArgs:isKillingActivitiesOnLeaveAllowed/1
+33815:11-16 21:13:39.626 D/SecContentProvider( 3325): query(), uri = 16 selection = isKillingActivitiesOnLeaveAllowed
+33817:11-16 21:13:39.626 D/SecContentProvider( 3325): isKillingActivitiesOnLeaveAllowed return = true callingUid : 1000
+33818:11-16 21:13:39.627 W/SettingsEdm(15366): projectionArgs:isKillingActivitiesOnLeaveAllowed/1
+36733:11-16 21:13:40.861 D/FreecessController( 3325): BG freezed, skip OLAF unfreeze for (com.sec.android.app.voicenote, 10335)
+37437:11-16 21:13:42.287 D/FreecessController( 3325): BG freezed, skip OLAF unfreeze for (com.sec.android.app.voicenote, 10335)
+50946:11-16 21:14:26.053 D/FreecessController( 3325): BG freezed, skip OLAF unfreeze for (com.sec.android.app.voicenote, 10335)
+54100:11-16 21:14:35.207 D/FreecessController( 3325): BG freezed, skip OLAF unfreeze for (com.sec.android.app.voicenote, 10335)
+56076:11-16 21:14:53.293 I/ActivityManager( 3325): Process PhantomProcessRecord {4548df9 22637:22601:com.clarocolombia.miclaro/u0a362} died
+== lmkd activity (resumen) ==
+barridos_sin_victimas=0
+== dmesg (kernel: OOM o lmkd nativo) ==
+--- 4. estado final ---
 FILMCRAFT_MUERTA
 SHELL_VIVO
 BROKER_VIVO
-VEREDICTO: si SOBREVIVIO con sesion unica — el monitoreo intensivo era parte del problema y el usuario prueba en uso normal. Si MURIO — la ventana capturada en $CAP nombra al asesino exacto (lmkd con adj, phantom killer, o freezer) y eso define la cura definitiva.
-=== MISION-A72-CAZADOR-EN-VIVO COMPLETE ===
+VEREDICTO: SOBREVIVIO_EN_SESION = el broker (arbol proot separado) es la vulnerabilidad — cura: mover el lanzamiento del broker a dentro de la sesion (fifo escrito por dock, sesion consume y lanza en su arbol). MURIO tambien en sesion = la firma completa de la ventana dice quien (FreecessHandler/lmkd/AMS) y apuntamos alla.
+=== MISION-A73-DIFERENCIAL-EN-SESION COMPLETE ===
 === EXIT=0 ===
