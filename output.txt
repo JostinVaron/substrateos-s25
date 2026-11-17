@@ -1,50 +1,29 @@
-=== BRIDGE RUN 2026-11-17T00:45:51Z (v4) ===
-=== MISION-A52-INSTALLER-127 — forense y cura del error 127 2026-11-17T00:45:51Z ===
---- 0. A51: vivo, muerto o colgado + limpieza de restos ---
-A51_NO_CORRE
-               total        used        free      shared  buff/cache   available
-Mem:           11113        7227        1137          70        2930        3886
---- 1. que comando de instalador busca el launcher (127 = command not found) ---
-pkexec => /usr/bin/pkexec
-pkcon => FALTA
-apt-get => /usr/bin/apt-get
-dpkg => /usr/bin/dpkg
-flatpak => FALTA
-gdebi => FALTA
-strings_installer_hints:
---- 2. toolkit (paso que A51 no llego a reportar) ---
---- 3. logs del usuario (incluye tu error 127 capturado) ---
-== /tmp/artcraft-session-20261117T003035Z.log ==
-[2026-11-17T00:38:49Z ERROR artcraft_launcher_native::install] FilmCraft: installation failed: the system installer stopped with error 127 (usually refused permission or no polkit authentication agent)
-[2026-11-17T00:41:02Z INFO  artcraft_launcher_native::backend] VectorCraft: starting install/update job
-[2026-11-17T00:41:02Z INFO  artcraft_launcher_native::install] VectorCraft: starting install to 0.24.1 (Debian package (.deb))
-[2026-11-17T00:41:03Z INFO  artcraft_launcher_native::install] VectorCraft: download ready (/home/dexuser/.cache/artcraft-launcher/downloads/vectorcraft-0.24.1-linux-aarch64.deb), running installer...
-Error getting authority: Error initializing authority: Could not connect: No such file or directory
-[2026-11-17T00:41:03Z ERROR artcraft_launcher_native::install] VectorCraft: installation failed: the system installer stopped with error 127 (usually refused permission or no polkit authentication agent)
-== /tmp/artcraft-session-20261117T000628Z.log ==
-[2026-11-17T00:06:28Z] apertura desde dock, HOME=/root
-[2026-11-17T00:06:28Z INFO  artcraft_launcher] ArtCraft Launcher 0.19.2, log file /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log
-MESA-LOADER: failed to retrieve device information
-== /tmp/artcraft-session-20261116T235742Z.log ==
-MESA-LOADER: failed to retrieve device information
-[2026-11-16T23:57:47Z ERROR artcraft_launcher::logging] internal error: panicked at /home/runner/.cargo/git/checkouts/winit-0b02aa607dc0343f/a517b38/src/platform_impl/linux/x11/window.rs:1200:14:
-    called `Result::unwrap()` on an `Err` value: X11(X11Error { error_kind: Window, error_code: 3, sequence: 2344, bad_value: 12582914, minor_opcode: 0, major_opcode: 40, extension_name: None, request_name: Some("TranslateCoordinates") })
-os_same_file_description couldn't determine if two DRM fds reference the same file description. (Function not implemented)
-Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
-[2026-11-16T23:57:47Z] EXIT_CODE=101
---- 4. LA CURA: instalar policykit + packagekit ---
-apt_exit=100
-E: Package 'policykit-1' has no installation candidate
-pkcon_ahora=SIGUE_FALTA
---- 5. agente polkit vivo en el bus de sesion ---
-SIN_AGENTE_POLKIT
---- 6. prueba REAL del mecanismo (paquete inofensivo 'sl') ---
-pkcon_exit=127
-timeout: failed to execute process: No such file or directory (os error 2)
-MECANISMO_FALLA
---- 7. salud ---
+=== BRIDGE RUN 2026-11-17T00:48:41Z (v4) ===
+=== MISION-A53-POLKIT-COMPLETO — bus sistema + polkitd + regla + prueba real 2026-11-17T00:48:41Z ===
+--- 1. apt-get update (las listas vencidas hundieron a A52) ---
+update_exit=0
+Hit:11 http://deb.debian.org/debian-security trixie-security InRelease
+--- 2. instalar polkitd (moderno) con respaldo policykit-1 (clasico) ---
+polkitd_ok
+polkitd_bin=/usr/lib/polkit-1/polkitd
+--- 3. bus de SISTEMA dbus arriba (proot no lo levanta solo) ---
+bus_sistema_arrancado
+--- 4. polkitd corriendo a mano (sin systemd) ---
+POLKITD_VIVO
+--- 5. regla sin-contrasena para dexuser (launcher instala como ese usuario) ---
+regla_pkla_ok
+--- 6. propagar bus de sistema al wrapper del dock ---
+#!/bin/bash
+export DBUS_SYSTEM_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket
+# Wrapper de captura — cada apertura del dock queda registrada con stderr y exit code
+--- 7. PRUEBA REAL: pkexec como dexuser (lo mismo que hace el launcher) ---
+pkexec_exit=127
+
+This incident has been reported.
+AUN_NO_CURADO
+--- 8. salud ---
 SHELL_VIVO
 FIN_INNER
-VEREDICTO: si strings muestra pkcon/pkexec y ahora existen + prueba sl OK, el 127 esta curado. PROXIMO PASO HUMANO: reintentar instalar la app desde el launcher (cerrarlo y reabrirlo primero) y avisar.
-=== MISION-A52-INSTALLER-127 COMPLETE ===
+VEREDICTO: si CURADO_127 — cerrar y reabrir el launcher, instalar la app del catalogo, y avisar. El panic de winit (TranslateCoordinates) queda documentado como causa del crash original; el wrapper seguira capturando si reaparece.
+=== MISION-A53-POLKIT-COMPLETO COMPLETE ===
 === EXIT=0 ===
