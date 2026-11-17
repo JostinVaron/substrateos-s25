@@ -1,57 +1,66 @@
-echo "=== MISION-A70-REINICIO-LIMPIO-PRUEBA-FILMCRAFT — reinicio total + prueba de supervivencia real $(date -u +%FT%TZ) ==="
+echo "=== MISION-A71-UN-LOOP-PRUEBA-BIEN — un solo loop + prueba de FilmCraft medida bien $(date -u +%FT%TZ) ==="
 termux-wake-lock 2>/dev/null
 RT="$PREFIX/tmp/rt-dex"
-echo "--- 1. loop v6 corriendo? ---"
-LOCKV6="$HOME/substrate/bridge/v6.lock"
-[ -f "$LOCKV6" ] && { P=$(cat "$LOCKV6"); kill -0 "$P" 2>/dev/null && echo "loop_v6_VIVO pid=$P" || echo "loop_v6_MUERTO_LOCK_VIEJO"; } || echo "sin lock v6 — verificar arranque manual"
-echo "--- 2. guardián anti-LMKD activo (re-aplicar por si acaso) ---"
-adb connect 127.0.0.1:5555 >/dev/null 2>&1
-adb -s 127.0.0.1:5555 shell settings put global settings_enable_monitor_phantom_procs false >/dev/null 2>&1 && echo "monitor=false OK"
-adb -s 127.0.0.1:5555 shell device_config set_sync_disabled_for_tests persistent >/dev/null 2>&1
-adb -s 127.0.0.1:5555 shell device_config put activity_manager max_phantom_processes 2147483647 >/dev/null 2>&1 && echo "max_phantom=INT_MAX OK"
-echo "--- 3. reinicio limpio de la sesion (restart49 parcheado mata restos flashback) ---"
-bash "$PREFIX/bin/gnome49" --restart >/dev/null 2>&1
-RC=$?
-echo "gnome49_restart_exit=$RC"
-echo "--- 4. salud del escritorio nuevo ---"
-proot-distro login ubuntu-gnome --shared-tmp -- bash -c '
-export DISPLAY=:0
+echo "--- 1. matar al v5 huérfano (doble loop detectado en A70) ---"
+if kill -0 24468 2>/dev/null; then
+  kill -9 24468 2>/dev/null && echo "V5_MATADO (pid 24468)"
+else
+  echo "v5_pid=24468 ya no existe"
+fi
+sleep 1
+for L in v5 v6; do
+  F="$HOME/substrate/bridge/$L.lock"
+  [ -f "$F" ] && { P=$(cat "$F"); kill -0 "$P" 2>/dev/null && echo "$L: VIVO pid=$P" || echo "$L: lock viejo"; } || echo "$L: ausente"
+done
+echo "--- 2. escritorio: verificar desde dentro del proot ---"
+FP0=$(proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'pgrep -x filmcraft | head -1' 2>/dev/null | tr -d '\r')
+if [ -z "$FP0" ]; then
+  echo filmcraft > "$PREFIX/tmp/launch.fifo"
+  echo "lanzada via fifo del broker — esperando 12 s"
+  sleep 12
+  FP0=$(proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'pgrep -x filmcraft | head -1' 2>/dev/null | tr -d '\r')
+fi
+echo "filmcraft_pid=${FP0:-NO}"
+cat > "$RT/a71.sh" <<'EOS'
+set -u
+export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex HOME=/root
+export DBUS_SESSION_BUS_ADDRESS=$(cat /tmp/rt-dex/session-bus.addr 2>/dev/null)
+echo "== WM =="
 id=$(xprop -root -notype _NET_SUPPORTING_WM_CHECK 2>/dev/null | sed -n "s/.*# //p")
-[ -n "$id" ] && echo "WM_REAL=$(xprop -id "$id" -notype _NET_WM_NAME 2>/dev/null | sed "s/.*= //")" || echo "WM_REAL: sin WM"
-scrot -o /tmp/rt-dex/a70-escritorio.png >/dev/null 2>&1
-echo "colores=$(identify -format %k /tmp/rt-dex/a70-escritorio.png 2>/dev/null)"'
-echo "--- 5. broker nativo ---"
-pgrep -f app-broker-termux >/dev/null && echo "BROKER_VIVO adj=$(cat /proc/$(pgrep -f app-broker-termux | head -1)/oom_score_adj)" || { setsid nohup bash ~/substrate/bridge/app-broker-termux.sh >> ~/substrate/bridge/broker.log 2>&1 & sleep 1; pgrep -f app-broker-termux >/dev/null && echo "BROKER_RELANZADO adj=$(cat /proc/$(pgrep -f app-broker-termux | head -1)/oom_score_adj)" || echo BROKER_MUERTO; }
-echo "--- 6. lanzar FilmCraft via broker (el canal del dock) ---"
-T0=$(date +%s)
-echo filmcraft > "$PREFIX/tmp/launch.fifo"
-sleep 8
+[ -n "$id" ] && echo "WM_REAL=$(xprop -id "$id" -notype _NET_WM_NAME 2>/dev/null | sed 's/.*= //')" || echo "WM_REAL: sin WM"
+scrot -o /tmp/rt-dex/a71.png >/dev/null 2>&1
+echo "colores=$(identify -format %k /tmp/rt-dex/a71.png 2>/dev/null)"
+pgrep -x gnome-shell >/dev/null && echo "SHELL_VIVO pid=$(pgrep -x gnome-shell | head -1)" || echo SHELL_MUERTO
+echo "== FilmCraft desde dentro =="
 FP=$(pgrep -x filmcraft | head -1)
-echo "filmcraft_pid=${FP:-NO_NACIO}"
-if [ -n "$FP" ]; then
-  echo "--- 7. MONITOREO 4 MINUTOS (escenario real: usa el escritorio desde Termux:X11) ---"
+[ -n "$FP" ] && echo "filmcraft_VIVA pid=$FP adj=$(cat /proc/$FP/oom_score_adj 2>/dev/null) rss=$(grep VmRSS /proc/$FP/status | awk '{print $2}')kB" || echo "filmcraft_AUSENTE"
+echo "FIN_PARTE1"
+EOS
+proot-distro login ubuntu-gnome --shared-tmp -- bash /tmp/rt-dex/a71.sh 2>&1
+rm -f "$RT/a71.sh"
+if [ -n "$FP0" ]; then
+  echo "--- 3. MONITOREO 4 MIN (mediciones desde dentro del proot) ---"
+  T0=$(date +%s); ALIVE=""
   for i in 1 2 3 4 5 6 7 8; do
     sleep 30
     EL=$(( $(date +%s) - T0 ))
-    if kill -0 "$FP" 2>/dev/null; then
-      echo "t+${EL}s VIVA adj=$(cat /proc/$FP/oom_score_adj 2>/dev/null) rss=$(grep VmRSS /proc/$FP/status 2>/dev/null | awk '{print $2}')kB"
+    ST=$(proot-distro login ubuntu-gnome --shared-tmp -- bash -c "P=\$(pgrep -x filmcraft | head -1); [ -n \"\$P\" ] && { cat /proc/\$P/oom_score_adj; grep VmRSS /proc/\$P/status | awk '{print \$2}'; }" 2>/dev/null | tr '\r\n' ' ')
+    if [ -n "$ST" ]; then echo "t+${EL}s VIVA [adj rss]=[$ST]"; ALIVE=1
     else
-      echo "t+${EL}s MURIO — firma:"
-      echo "== proot/broker =="; grep -iE "signal|terminat|exit" "$PREFIX/tmp/app-live-filmcraft.log" 2>/dev/null | tail -3
-      echo "== logcat lmkd en la ventana =="; adb -s 127.0.0.1:5555 shell logcat -d -T "$T0" 2>/dev/null | grep -iE "lmkd|phantom" | tail -8
-      break
+      echo "t+${EL}s MURIO — firma:"; grep -iE "signal|exit|terminat" "$PREFIX/tmp/app-live-filmcraft.log" 2>/dev/null | tail -3; ALIVE=""; break
     fi
   done
-  kill -0 "$FP" 2>/dev/null && echo "RESULTADO: FILMCRAFT SOBREVIVIO_4MIN" || echo "RESULTADO: FILMCRAFT MURIO_DURANTE_MONITOREO"
-  echo "== ultima linea de su log propio =="; tail -2 "$PREFIX/tmp/app-live-filmcraft.log" 2>/dev/null
+  [ -n "$ALIVE" ] && echo "RESULTADO: FILMCRAFT SOBREVIVIO_4MIN"
 else
-  echo "== por que no nacio =="; tail -5 "$PREFIX/tmp/app-live-filmcraft.log" 2>/dev/null
+  echo "== por que no nacio =="; tail -6 "$PREFIX/tmp/app-live-filmcraft.log" 2>/dev/null
 fi
-echo "--- 8. logcat lmkd en la ventana completa de la prueba (solo si hubo kills) ---"
-adb -s 127.0.0.1:5555 shell logcat -d 2>/dev/null | grep -iE "lmkd.*kill|phantom.*kill" | grep -E "$(date +%m-%d)" | tail -6 || echo "sin kills de lmkd en logcat"
-echo "--- 9. estado final ---"
-pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO
+echo "--- 4. logcat FRESCO de la ventana ---"
+adb -s 127.0.0.1:5555 shell logcat -d -t 400 2>/dev/null | grep -iE "lmkd|phantom|kill.*termux|termux.*kill" | tail -8 || echo "sin actividad lmkd fresca"
+echo "--- 5. estado final ---"
+P6=$(cat "$HOME/substrate/bridge/v6.lock" 2>/dev/null)
+kill -0 ${P6:-99999} 2>/dev/null && echo "LOOP_V6_VIVO pid=$P6 (unico)" || echo LOOP_V6_MUERTO
+proot-distro login ubuntu-gnome --shared-tmp -- bash -c 'pgrep -x gnome-shell >/dev/null && echo SHELL_VIVO || echo SHELL_MUERTO; pgrep -x filmcraft >/dev/null && echo FILMCRAFT_VIVA || echo FILMCRAFT_NO' 2>/dev/null
 pgrep -f app-broker-termux >/dev/null && echo BROKER_VIVO || echo BROKER_MUERTO
-echo "VEREDICTO: FILMCRAFT SOBREVIVIO_4MIN + adj estable (0 o bajo) + sin kills en logcat = caso LMKD cerrado de verdad. Si murio: la firma de logcat de la ventana dice quien y con que adj mato — siguiente frente identificado."
-echo "=== MISION-A70-REINICIO-LIMPIO-PRUEBA-FILMCRAFT COMPLETE ==="
+echo "VEREDICTO: un solo loop + FilmCraft VIVA con adj estable tras 4 min + sin kills frescos = sistema verificado en su configuracion final y caso cerrado. Si murio, esta ventana es limpia: un solo loop y medicion interna."
+echo "=== MISION-A71-UN-LOOP-PRUEBA-BIEN COMPLETE ==="
 echo "### BRIDGE MARKER ###"
