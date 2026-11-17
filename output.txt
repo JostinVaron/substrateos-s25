@@ -1,17 +1,50 @@
-=== BRIDGE RUN 2026-11-16T23:57:41Z (v4) ===
-=== MISION-A50-ARTCRAFT-CRASH-CATCH — atrapar el panic del usuario en vivo 2026-11-16T23:57:41Z ===
---- 1. dispositivos XInput reales (tus touch/pen/teclado via WTM) ---
-xinput_no_instalado
---- 2. resolucion actual del display ---
-  dimensions:    1080x2340 pixels (285x619 millimeters)
---- 3. wrapper de captura para el dock ---
-wrapper_instalado
---- 4. repuntar icono del dock al wrapper de captura ---
-Exec=/usr/local/bin/artcraft-dock-launch
---- 5. prueba del wrapper (5 s, luego cierre limpio) ---
-log_de_prueba=/tmp/artcraft-session-20261116T235742Z.log
-cierre_limpio_prueba_ok
-FIN_INNER
-VEREDICTO: wrapper activo. PROXIMO PASO HUMANO: abrir el icono del dock normalmente, usarlo hasta que crashee (si crashea), y avisar — el panic exacto estara escrito en /tmp/artcraft-session-*.log.
-=== MISION-A50-ARTCRAFT-CRASH-CATCH COMPLETE ===
+=== BRIDGE RUN 2026-11-17T00:30:11Z (v4) ===
+=== MISION-A51-ARTCRAFT-FORENSE — toolkit, OOM, sw+interaccion 2026-11-17T00:30:11Z ===
+--- 1. cerrar instancias ---
+CERO_INSTANCIAS
+--- 2. logs del wrapper (sesiones del usuario) ---
+-rw-r--r--+ 1 root root 3954 Nov 16 23:57 /tmp/artcraft-session-20261116T235742Z.log
+-rw-r--r--+ 1 root root 3780 Nov 17 00:18 /tmp/artcraft-session-20261117T000628Z.log
+== /tmp/artcraft-session-20261117T000628Z.log ==
+[2026-11-17T00:06:28Z] apertura desde dock, HOME=/root
+[2026-11-17T00:06:28Z INFO  artcraft_launcher] ArtCraft Launcher 0.19.2, log file /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log
+MESA-LOADER: failed to retrieve device information
+== /tmp/artcraft-session-20261116T235742Z.log ==
+[2026-11-16T23:57:42Z] apertura desde dock, HOME=/root
+[2026-11-16T23:57:42Z INFO  artcraft_launcher] ArtCraft Launcher 0.19.2, log file /home/dexuser/.local/share/artcraft-launcher/logs/artcraft-launcher.log
+MESA-LOADER: failed to retrieve device information
+[2026-11-16T23:57:47Z ERROR artcraft_launcher::logging] internal error: panicked at /home/runner/.cargo/git/checkouts/winit-0b02aa607dc0343f/a517b38/src/platform_impl/linux/x11/window.rs:1200:14:
+    called `Result::unwrap()` on an `Err` value: X11(X11Error { error_kind: Window, error_code: 3, sequence: 2344, bad_value: 12582914, minor_opcode: 0, major_opcode: 40, extension_name: None, request_name: Some("TranslateCoordinates") })
+os_same_file_description couldn't determine if two DRM fds reference the same file description. (Function not implemented)
+Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
+[2026-11-16T23:57:47Z] EXIT_CODE=101
+--- 3. toolkit del binario (define la cura) ---
+ldd: /usr/local/bin/artcraft-launcher: No such file or directory
+hints:
+--- 4. flags soportados ---
+[2026-11-17T00:30:13Z INFO  artcraft_launcher] ArtCraft Launcher 0.19.2, log file /root/.local/share/artcraft-launcher/logs/artcraft-launcher.log
+MESA-EGL: warning: DRI3 error: Could not get DRI3 device
+MESA-EGL: warning: Ensure your X server supports DRI3 to get accelerated rendering
+[2026-11-17T00:30:13Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<RecvBody>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<Cleanup>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<Prepare>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<SendRequest>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<RecvResponse>
+[2026-11-17T00:30:14Z DEBUG ureq_proto::client] Call<RecvBody>
+--- 5. dispositivos de entrada reales ---
+⎡ Virtual core pointer                    	id=2	[master pointer  (3)]
+⎜   ↳ Virtual core XTEST pointer              	id=4	[slave  pointer  (2)]
+⎜   ↳ Lorie mouse                             	id=6	[slave  pointer  (2)]
+⎜   ↳ Lorie touch                             	id=7	[slave  pointer  (2)]
+⎣ Virtual core keyboard                   	id=3	[master keyboard (2)]
+    ↳ Virtual core XTEST keyboard             	id=5	[slave  keyboard (3)]
+    ↳ Lorie keyboard                          	id=8	[slave  keyboard (3)]
+--- 6. lanzamiento MONITORIZADO (ruta exacta del dock) 150 s ---
+t=5s rss_kb=MUERTO memlibre_mb=3624
+proot info: vpid 1: terminated with signal 15
+VEREDICTO: con toolkit + exit codes + matriz completa arriba se decide la cura en A52. NO especular.
+=== MISION-A51-ARTCRAFT-FORENSE COMPLETE ===
 === EXIT=0 ===
