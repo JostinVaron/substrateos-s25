@@ -1,248 +1,51 @@
-=== BRIDGE RUN 2026-11-17T01:54:03Z (v5) ===
-=== MISION-A68-DX-CRASHES-USO — diagnostico SOLO LECTURA de crashes durante el uso 2026-11-17T01:54:03Z ===
---- 1. informe de crash de EffectCraft (el que mostro el dialogo) ---
-== contenido completo ==
-EffectCraft unexpected-exit diagnostic
-Version: 0.24.1
-Platform: linux / aarch64
-Session: 25653-1794880223726636206
-The GUI control channel ended without its clean-exit marker.
-The exact cause is not established. GPU fallback, memory pressure and process exit are separate observations, not a proven causal chain.
-This report was saved locally; it was not sent anywhere.
-Detection UTC: 2026-11-17T01:50:28.155Z
-Observer started UTC: 2026-11-17T01:50:23.739Z
-Observed duration: 4421 ms
-Process observation: GUI still present when the control channel ended
-OS exit status: unavailable (not inferred from the control pipe)
-
-Memory evidence (1 s sampling; sampled maxima, not OS peaks):
-Target-present sampling attempts: 6
-GUI uptime at last target-present observation: 0 s
-Last target sampling attempt UTC: 2026-11-17T01:50:28.156Z
-Peak sampled resident bytes: 204292096
-Peak sampled virtual bytes: 2830020608
-Minimum sampled system available RAM bytes: 5471997952
-System total RAM bytes at last sample: 11653079040
-Samples can miss short spikes or retain stale/zero readings when an OS query fails; per-field success is not exposed by sysinfo. Windows private commit is not GPU VRAM; on other platforms virtual memory is not physical RAM. System commit limit/usage and GPU memory budgets were not collected. No memory-pressure threshold establishes the cause of this incident.
-The memory observer does not collect process command lines, environments, documents, native dumps or system event logs. The existing session-log tail below may contain paths or other logged details; review it before sharing.
-
-Retained lifecycle observations (last 32; UTC is helper receipt time):
-2026-11-17T01:50:23.746Z backend source: default
-2026-11-17T01:50:24.067Z actual GPU backend: vulkan
-
-Recorded session log tail (last 65536 bytes at most; logging filters/size caps may omit later events):
-crash-report session 25653-1794880223726636206
-2026-11-17T01:50:23.730Z INFO  [main] effectcraft: effectcraft 0.24.1, log file /home/dexuser/.config/effectcraft/Logs/effectcraft.log
-2026-11-17T01:50:23.745Z INFO  [main] effectcraft::diagnostic_state: diagnostic observation: backend source: default
-2026-11-17T01:50:23.750Z INFO  [main] effectcraft: effectcraft 0.24.1: opening the window
-2026-11-17T01:50:24.066Z INFO  [main] effectcraft: graphics: AdapterInfo { name: "Adreno (TM) 830v1", vendor: 20803, device: 1141178369, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "turnip Mesa driver", driver_info: "Mesa 26.3.0-devel (git-98f3d6229d)", backend: Vulkan, subgroup_min_size: 64, subgroup_max_size: 64, transient_saves_memory: Some(true), limit_bucket: None }
-2026-11-17T01:50:24.066Z INFO  [main] effectcraft::diagnostic_state: diagnostic observation: actual GPU backend: vulkan
-2026-11-17T01:50:24.228Z INFO  [main] effectcraft: app created; the window shows after its first frame
-2026-11-17T01:50:24.288Z INFO  [main] effectcraft: first frame drawn
-2026-11-17T01:50:24.309Z INFO  [main] effectcraft_ui_egui::app::gpu: GPU compositor: Adreno (TM) 830v1 (Vulkan)
---- 2. informes mas recientes de TODAS las apps craft ---
-== /home/dexuser/.config/effectcraft/Logs/Crash Reports/crash-25653-1794880223726636206.txt ==
-EffectCraft unexpected-exit diagnostic
-Version: 0.24.1
-Platform: linux / aarch64
-Session: 25653-1794880223726636206
-The GUI control channel ended without its clean-exit marker.
-The exact cause is not established. GPU fallback, memory pressure and process exit are separate observations, not a proven causal chain.
-This report was saved locally; it was not sent anywhere.
-Detection UTC: 2026-11-17T01:50:28.155Z
-Observer started UTC: 2026-11-17T01:50:23.739Z
-Observed duration: 4421 ms
-Process observation: GUI still present when the control channel ended
-OS exit status: unavailable (not inferred from the control pipe)
-
-Memory evidence (1 s sampling; sampled maxima, not OS peaks):
-Target-present sampling attempts: 6
-GUI uptime at last target-present observation: 0 s
-Last target sampling attempt UTC: 2026-11-17T01:50:28.156Z
-Peak sampled resident bytes: 204292096
-Peak sampled virtual bytes: 2830020608
-Minimum sampled system available RAM bytes: 5471997952
-System total RAM bytes at last sample: 11653079040
-Samples can miss short spikes or retain stale/zero readings when an OS query fails; per-field success is not exposed by sysinfo. Windows private commit is not GPU VRAM; on other platforms virtual memory is not physical RAM. System commit limit/usage and GPU memory budgets were not collected. No memory-pressure threshold establishes the cause of this incident.
-The memory observer does not collect process command lines, environments, documents, native dumps or system event logs. The existing session-log tail below may contain paths or other logged details; review it before sharing.
-
-Retained lifecycle observations (last 32; UTC is helper receipt time):
-
---- 3. stderr capturado por el broker (salida viva de cada app) ---
-== /tmp/app-live-filmcraft.log (ultimas 10 sin ruido GPU) ==
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM oss
-2026-11-17T01:52:39.875Z WARN  [main] filmcraft_ui_egui::app::playback: audio output unavailable: no output device
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM pulse
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM pulse
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM jack
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM jack
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM oss
-ALSA lib pcm.c:2722:(snd_pcm_open_noupdate) [error.pcm] Unknown PCM oss
-2026-11-17T01:52:41.878Z WARN  [main] filmcraft_ui_egui::app::playback: audio output unavailable: no output device
-proot info: vpid 1: terminated with signal 9
-
-== /tmp/app-live-photocraft.log (ultimas 10 sin ruido GPU) ==
-2026-11-17T01:50:03.458Z INFO  [main] photocraft: presentation: autovsync, latency 1
-2026-11-17T01:50:03.458Z INFO  [main] photocraft: GPU startup: Plan { backend: Auto, env: None, reason: None, remember: false } (4.64 ms)
-2026-11-17T01:50:03.743Z INFO  [file dialog probe] photocraft::file_dialog_probe: file dialog backends: Findings { libdbus: Some(true), file_chooser_portal: Some(true), zenity: true }
-2026-11-17T01:50:04.017Z INFO  [main] photocraft_ui_egui::canvas::gpu_canvas: gpu canvas: target Bgra8Unorm, max texture 16384, tile 8192, 16F canvas Budget, video memory unknown
-2026-11-17T01:50:04.228Z WARN  [?] photocraft::monitor_profile::linux: couldn't read X11 display profiles from colord: couldn't connect to the system bus: Failed to connect to address `unix:path=/var/run/dbus/system_bus_socket`: No such file or directory (os error 2)
-2026-11-17T01:50:08.201Z INFO  [main] photocraft_ui_egui::frame_stages: slow frame: 132.2 ms on the gpu path: input 20.1, command 0.0, damage 0.2, composite 93.6, upload 0.0, gpu 4.7, present 2.4; refresh gpu-full 2073600 px
-2026-11-17T01:50:14.374Z INFO  [main] photocraft_ui_egui::frame_stages: slow frame: 89.6 ms on the gpu path: input 0.3, command 87.2 (paint.bucket), damage 0.0, composite 0.0, upload 0.0, gpu 4.7, present 2.1; refresh none 0 px
-2026-11-17T01:50:18.379Z INFO  [main] photocraft_ui_egui::frame_stages: slow frame: 73.0 ms on the gpu path: input 0.3, command 70.9 (paint.bucket), damage 0.0, composite 0.0, upload 0.0, gpu 3.3, present 3.1; refresh none 0 px
-os_same_file_description couldn't determine if two DRM fds reference the same file description. (Function not implemented)
-Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
-
-== /tmp/app-live-lightcraft.log (ultimas 10 sin ruido GPU) ==
-2026-11-17T01:34:32.851Z INFO  [lc-gpu-window] lightcraft: gpu: rendering on the window's device
-2026-11-17T01:51:41.614Z INFO  [main] lightcraft: LightCraft 0.21.1, log file /home/dexuser/.config/lightcraft/logs/lightcraft.log
-2026-11-17T01:51:41.622Z INFO  [main] lightcraft::window_gpu: window: renderer wgpu (order ["vulkan", "gl", "glow"])
-2026-11-17T01:51:41.859Z INFO  [main] lightcraft::session: library /home/dexuser/Pictures/LightCraft Library: 24 photos, 0 log records replayed (18.5 ms)
-2026-11-17T01:51:41.859Z INFO  [main] lightcraft::hdr_display: display: SDR (this windowing system has no HDR output)
-2026-11-17T01:51:41.882Z INFO  [main] lightcraft_engine::lens_profiles: lens database: no finished download in /home/dexuser/.config/lightcraft/lensfun yet; lens profiles are not applied
-2026-11-17T01:51:41.907Z INFO  [lc-gpu-window] lightcraft_gpu::ctx: gpu: Adreno (TM) 830v1 (Vulkan), 50 kernels in 35 ms, buffers ≤ 2047 MiB, the window's device
-2026-11-17T01:51:41.908Z INFO  [lc-gpu-window] lightcraft: gpu: rendering on the window's device
-2026-11-17T01:52:01.345Z WARN  [main] lightcraft_preview::pool: job pool: 2 job(s) still running after 2s; not waiting for them
-2026-11-17T01:52:01.345Z WARN  [main] lightcraft: quit: background work was still running after 2s
-
-== /tmp/app-live-vectorcraft.log (ultimas 10 sin ruido GPU) ==
-2026-11-17T01:33:13.189Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:33:13.233Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-os_same_file_description couldn't determine if two DRM fds reference the same file description. (Function not implemented)
-Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
-2026-11-17T01:49:55.434Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:49:55.677Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:49:55.677Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:49:55.762Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-os_same_file_description couldn't determine if two DRM fds reference the same file description. (Function not implemented)
-Let's just assume that file descriptors for the same file probablyshare the file description instead. This may cause problems whenthat isn't the case.
-
-== /tmp/app-live.log (ultimas 10 sin ruido GPU) ==
-[20:26:29] lanzando vectorcraft
-[20:27:15] lanzando vectorcraft
-[20:33:12] lanzando vectorcraft
-[20:33:32] lanzando photocraft
-[20:34:32] lanzando lightcraft
-[20:49:55] lanzando vectorcraft
-[20:50:03] lanzando photocraft
-[20:51:41] lanzando lightcraft
-[20:51:52] lanzando filmcraft
-[20:52:32] lanzando filmcraft
-
---- 4. logs internos de apps modificados hace <90 min ---
-== /home/dexuser/.config/photocraft/logs/photocraft.log ==
-2026-11-17T01:50:03.743Z INFO  [file dialog probe] photocraft::file_dialog_probe: file dialog backends: Findings { libdbus: Some(true), file_chooser_portal: Some(true), zenity: true }
-2026-11-17T01:50:04.017Z INFO  [main] photocraft_ui_egui::canvas::gpu_canvas: gpu canvas: target Bgra8Unorm, max texture 16384, tile 8192, 16F canvas Budget, video memory unknown
-2026-11-17T01:50:04.228Z WARN  [?] photocraft::monitor_profile::linux: couldn't read X11 display profiles from colord: couldn't connect to the system bus: Failed to connect to address `unix:path=/var/run/dbus/system_bus_socket`: No such file or directory (os error 2)
-2026-11-17T01:50:08.201Z INFO  [main] photocraft_ui_egui::frame_stages: slow frame: 132.2 ms on the gpu path: input 20.1, command 0.0, damage 0.2, composite 93.6, upload 0.0, gpu 4.7, present 2.4; refresh gpu-full 2073600 px
-2026-11-17T01:50:14.374Z INFO  [main] photocraft_ui_egui::frame_stages: slow frame: 89.6 ms on the gpu path: input 0.3, command 87.2 (paint.bucket), damage 0.0, composite 0.0, upload 0.0, gpu 4.7, present 2.1; refresh none 0 px
-2026-11-17T01:50:18.379Z INFO  [main] photocraft_ui_egui::frame_stages: slow frame: 73.0 ms on the gpu path: input 0.3, command 70.9 (paint.bucket), damage 0.0, composite 0.0, upload 0.0, gpu 3.3, present 3.1; refresh none 0 px
-
-== /home/dexuser/.config/photocraft/logs/photocraft.1.log ==
-2026-11-17T01:33:33.110Z INFO  [main] photocraft: presentation: autovsync, latency 1
-2026-11-17T01:33:33.110Z INFO  [main] photocraft: GPU startup: Plan { backend: Auto, env: None, reason: None, remember: false } (10.32 ms)
-2026-11-17T01:33:33.119Z WARN  [main] winit::platform_impl::linux::x11::xdisplay: error setting XSETTINGS; Xft options won't reload automatically
-2026-11-17T01:33:33.413Z INFO  [file dialog probe] photocraft::file_dialog_probe: file dialog backends: Findings { libdbus: Some(true), file_chooser_portal: Some(false), zenity: true }
-2026-11-17T01:33:33.620Z INFO  [main] photocraft_ui_egui::canvas::gpu_canvas: gpu canvas: target Bgra8Unorm, max texture 16384, tile 8192, 16F canvas Budget, video memory unknown
-2026-11-17T01:33:33.907Z WARN  [?] photocraft::monitor_profile::linux: couldn't read X11 display profiles from colord: couldn't connect to the system bus: Failed to connect to address `unix:path=/var/run/dbus/system_bus_socket`: No such file or directory (os error 2)
-
-== /home/dexuser/.config/photocraft/logs/photocraft.2.log ==
-2026-11-17T00:55:18.702Z INFO  [main] photocraft::app_dirs: settings directory (Platform): Some("/home/dexuser/.config/photocraft")
-2026-11-17T00:55:18.707Z INFO  [main] photocraft: PhotoCraft 0.23.1 (45066c482, 2026-11-12), log file /home/dexuser/.config/photocraft/logs/photocraft.log
-2026-11-17T00:55:18.748Z INFO  [main] photocraft: presentation: autovsync, latency 1
-2026-11-17T00:55:18.748Z INFO  [main] photocraft: GPU startup: Plan { backend: Auto, env: None, reason: None, remember: false } (8.66 ms)
-2026-11-17T00:55:19.307Z INFO  [file dialog probe] photocraft::file_dialog_probe: file dialog backends: Findings { libdbus: Some(true), file_chooser_portal: Some(true), zenity: true }
-2026-11-17T00:55:19.678Z INFO  [main] photocraft_ui_egui::canvas::gpu_canvas: gpu canvas: target Bgra8Unorm, max texture 16384, tile 8192, 16F canvas Budget, video memory unknown
-
-== /home/dexuser/.config/vectorcraft/logs/vectorcraft.log ==
-2026-11-17T01:49:55.434Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:49:55.443Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
-2026-11-17T01:49:55.677Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:49:55.677Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:49:55.762Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-
-== /home/dexuser/.config/vectorcraft/logs/vectorcraft.1.log ==
-2026-11-17T01:33:13.037Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:33:13.038Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
-2026-11-17T01:33:13.045Z WARN  [main] winit::platform_impl::linux::x11::xdisplay: error setting XSETTINGS; Xft options won't reload automatically
-2026-11-17T01:33:13.189Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:33:13.189Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:33:13.233Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-
-== /home/dexuser/.config/vectorcraft/logs/vectorcraft.2.log ==
-2026-11-17T01:27:15.836Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:27:15.837Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
-2026-11-17T01:27:16.008Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:27:16.008Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:27:16.058Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-
-== /home/dexuser/.config/effectcraft/Logs/effectcraft.log ==
-2026-11-17T01:50:23.750Z INFO  [main] effectcraft: effectcraft 0.24.1: opening the window
-2026-11-17T01:50:24.066Z INFO  [main] effectcraft: graphics: AdapterInfo { name: "Adreno (TM) 830v1", vendor: 20803, device: 1141178369, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "turnip Mesa driver", driver_info: "Mesa 26.3.0-devel (git-98f3d6229d)", backend: Vulkan, subgroup_min_size: 64, subgroup_max_size: 64, transient_saves_memory: Some(true), limit_bucket: None }
-2026-11-17T01:50:24.066Z INFO  [main] effectcraft::diagnostic_state: diagnostic observation: actual GPU backend: vulkan
-2026-11-17T01:50:24.228Z INFO  [main] effectcraft: app created; the window shows after its first frame
-2026-11-17T01:50:24.288Z INFO  [main] effectcraft: first frame drawn
-2026-11-17T01:50:24.309Z INFO  [main] effectcraft_ui_egui::app::gpu: GPU compositor: Adreno (TM) 830v1 (Vulkan)
-
-== /home/dexuser/.config/effectcraft/Logs/effectcraft.1.log ==
-2026-11-17T01:34:08.412Z INFO  [main] effectcraft::diagnostic_state: diagnostic observation: actual GPU backend: vulkan
-2026-11-17T01:34:08.448Z INFO  [main] effectcraft: app created; the window shows after its first frame
-2026-11-17T01:34:08.500Z INFO  [main] effectcraft: first frame drawn
-2026-11-17T01:34:08.525Z INFO  [main] effectcraft_ui_egui::app::gpu: GPU compositor: Adreno (TM) 830v1 (Vulkan)
-2026-11-17T01:34:28.266Z INFO  [main] effectcraft_ui_egui::panels::unsaved: the window was asked to close
-2026-11-17T01:34:28.281Z INFO  [main] effectcraft: the window is closing
-
-== /home/dexuser/.config/effectcraft/Logs/effectcraft.2.log ==
-2026-11-17T00:55:23.143Z INFO  [main] effectcraft: effectcraft 0.24.1: opening the window
-2026-11-17T00:55:23.614Z INFO  [main] effectcraft: graphics: AdapterInfo { name: "Adreno (TM) 830v1", vendor: 20803, device: 1141178369, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "turnip Mesa driver", driver_info: "Mesa 26.3.0-devel (git-98f3d6229d)", backend: Vulkan, subgroup_min_size: 64, subgroup_max_size: 64, transient_saves_memory: Some(true), limit_bucket: None }
-2026-11-17T00:55:23.614Z INFO  [main] effectcraft::diagnostic_state: diagnostic observation: actual GPU backend: vulkan
-2026-11-17T00:55:23.689Z INFO  [main] effectcraft: app created; the window shows after its first frame
-2026-11-17T00:55:23.767Z INFO  [main] effectcraft: first frame drawn
-2026-11-17T00:55:24.657Z INFO  [main] effectcraft_ui_egui::app::gpu: GPU compositor: Adreno (TM) 830v1 (Vulkan)
-
-== /home/dexuser/.config/lightcraft/logs/lightcraft.log ==
-2026-11-17T01:51:41.859Z INFO  [main] lightcraft::hdr_display: display: SDR (this windowing system has no HDR output)
-2026-11-17T01:51:41.882Z INFO  [main] lightcraft_engine::lens_profiles: lens database: no finished download in /home/dexuser/.config/lightcraft/lensfun yet; lens profiles are not applied
-2026-11-17T01:51:41.907Z INFO  [lc-gpu-window] lightcraft_gpu::ctx: gpu: Adreno (TM) 830v1 (Vulkan), 50 kernels in 35 ms, buffers ≤ 2047 MiB, the window's device
-2026-11-17T01:51:41.908Z INFO  [lc-gpu-window] lightcraft: gpu: rendering on the window's device
-2026-11-17T01:52:01.345Z WARN  [main] lightcraft_preview::pool: job pool: 2 job(s) still running after 2s; not waiting for them
-2026-11-17T01:52:01.345Z WARN  [main] lightcraft: quit: background work was still running after 2s
-
-== /home/dexuser/.config/lightcraft/logs/lightcraft.1.log ==
-2026-11-17T01:34:32.571Z WARN  [main] winit::platform_impl::linux::x11::xdisplay: error setting XSETTINGS; Xft options won't reload automatically
-2026-11-17T01:34:32.799Z INFO  [main] lightcraft::session: library /home/dexuser/Pictures/LightCraft Library: 24 photos, 0 log records replayed (17.0 ms)
-2026-11-17T01:34:32.800Z INFO  [main] lightcraft::hdr_display: display: SDR (this windowing system has no HDR output)
-2026-11-17T01:34:32.829Z INFO  [main] lightcraft_engine::lens_profiles: lens database: no finished download in /home/dexuser/.config/lightcraft/lensfun yet; lens profiles are not applied
-2026-11-17T01:34:32.851Z INFO  [lc-gpu-window] lightcraft_gpu::ctx: gpu: Adreno (TM) 830v1 (Vulkan), 50 kernels in 31 ms, buffers ≤ 2047 MiB, the window's device
-2026-11-17T01:34:32.851Z INFO  [lc-gpu-window] lightcraft: gpu: rendering on the window's device
-
-== /home/dexuser/.config/lightcraft/logs/lightcraft.2.log ==
-2026-11-17T00:55:40.796Z INFO  [main] lightcraft::window_gpu: window: renderer wgpu (order ["vulkan", "gl", "glow"])
-2026-11-17T00:55:41.132Z INFO  [main] lightcraft::session: library /home/dexuser/Pictures/LightCraft Library: 24 photos, 0 log records replayed (24.6 ms)
-2026-11-17T00:55:41.132Z INFO  [main] lightcraft::hdr_display: display: SDR (this windowing system has no HDR output)
-2026-11-17T00:55:41.182Z INFO  [main] lightcraft_engine::lens_profiles: lens database: no finished download in /home/dexuser/.config/lightcraft/lensfun yet; lens profiles are not applied
-2026-11-17T00:55:41.472Z INFO  [lc-gpu-window] lightcraft_gpu::ctx: gpu: Adreno (TM) 830v1 (Vulkan), 50 kernels in 302 ms, buffers ≤ 2047 MiB, the window's device
-2026-11-17T00:55:41.473Z INFO  [lc-gpu-window] lightcraft: gpu: rendering on the window's device
-
-== /home/dexuser/.config/craft-anything/desktop.log ==
-1794876962 [INFO] craft_anything_ui_egui: Found 4 AI option(s) on this computer
-1794880282 [INFO] craft_anything: starting 0.6.1 (pid 26239)
-1794880282 [INFO] craft_anything: engine and AI ready; opening the window
-1794880282 [INFO] craft_anything::linux_gpu: drawing with AdapterInfo { name: "Adreno (TM) 830v1", vendor: 20803, device: 1141178369, device_type: IntegratedGpu, device_pci_bus_id: "", driver: "turnip Mesa driver", driver_info: "Mesa 26.3.0-devel (git-98f3d6229d)", backend: Vulkan, subgroup_min_size: 64, subgroup_max_size: 64, transient_saves_memory: Some(true), limit_bucket: None } (Fallback); displays: []
-1794880282 [INFO] craft_anything: window open
-1794880282 [INFO] craft_anything_ui_egui: Found 4 AI option(s) on this computer
-
---- 5. procesos craft vivos AHORA y su oom_score_adj ---
---- 6. memoria y swap ---
-               total        used        free      shared  buff/cache   available
-Mem:           11113        6012        2450          58        2894        5100
-MemAvailable:    5222400 kB
-SwapTotal:       4194300 kB
-SwapFree:        1493020 kB
---- 7. salud del escritorio ---
+=== BRIDGE RUN 2026-11-17T02:01:29Z (v5) ===
+=== MISION-A69-PHANTOM-KILLER — identificar y desactivar al asesino de procesos hijos 2026-11-17T02:01:29Z ===
+--- 1. adb disponible? ---
+adb_ok
+connected to 127.0.0.1:5555
+--- 2. FORENSE: ha actuado el phantom killer? ---
+== estado actual del vigilante ==
+monitor_phantom_procs = 0
+max_phantom_processes  = 2147483647
+== logcat: muertes phantom y lmkd recientes ==
+11-16 20:57:49.630  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:49.642  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:49.654  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:49.679  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:49.691  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:49.703  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:49.715  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:49.725  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:51.034  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:51.046  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:51.058  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:51.071  1145  1145 D lmkd    : No processes to kill with adj score >= 850
+11-16 20:57:54.933  1145  1145 I lmkd    : 0(delay), 0(swap), 100(freelimit), 0(reentrymode) memory pressure events were skipped after a kill!
+11-16 21:01:30.603 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:settings get global settings_enable_monitor_phantom_procs'
+11-16 21:01:30.640 16714 16714 I adbd    : adbd service requested 'shell,v2,TERM=xterm-256color,raw:device_config get activity_manager max_phantom_processes'
+== dumpsys: procstate y adj de termux AHORA ==
+  *APP* UID 10354 ProcessRecord{b1b18b9 15911:com.termux.x11/u0a354}
+    class=com.termux.x11.LorieApp
+    dir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk publicDir=/data/app/~~hsnF2NPNxDwjnQBL8Q6Uuw==/com.termux.x11-PYUm3ZSGkW8M-DimBJTKLA==/base.apk data=/data/user/0/com.termux.x11
+    packageList={com.termux.x11}
+        -> ContentProviderRecord{fcb21c7 u0 com.termux.x11/androidx.startup.InitializationProvider}
+      - 412fe2c/com.android.providers.settings/.SettingsProvider->15911:com.termux.x11/u0a354 s1/1 u0/0 +1h37m5s939ms
+      - ActivityRecord{225114455 u0 com.termux.x11/.MainActivity t3254}
+  *APP* UID 10345 ProcessRecord{2262afa 16971:com.termux/u0a345}
+    class=com.termux.app.TermuxApplication
+    dir=/data/app/~~CFEguzB5nIO-EFvUHGNeVA==/com.termux-xPrwG-E866Hksmqkvi9wzw==/base.apk publicDir=/data/app/~~CFEguzB5nIO-EFvUHGNeVA==/com.termux-xPrwG-E866Hksmqkvi9wzw==/base.apk data=/data/user/0/com.termux
+    packageList={com.termux}
+      - ServiceRecord{e55fe40 u0 com.termux/.app.TermuxService c:com.termux}
+--- 3. DESACTIVAR el phantom process killer (persistente) ---
+monitor_phantom_procs=false OK
+device_config sync off OK
+max_phantom_processes=2147483647 OK
+--- 4. VERIFICACION de los cambios ---
+monitor_phantom_procs = false
+max_phantom_processes  = 2147483647
+--- 5. salud del escritorio (no se toco nada del escritorio) ---
+BROKER_VIVO
 SHELL_VIVO
-FIN_INNER
---- 8. logcat Android: LMKD o kgsl/GPU hablando de tus procesos ---
-VEREDICTO: firma de cada informe decide el frente: exit 137 = LMKD persiste (broker no cubrio ese caso); SIGSEGV/abort en render = GPU Adreno bajo carga sostenida; panic runtime = bug de app o syscall no soportada por proot. Solo lectura — ningun cambio aplicado.
-=== MISION-A68-DX-CRASHES-USO COMPLETE ===
+VEREDICTO: si el forense (paso 2) muestra muertes phantom en logcat, asesino confirmado y ya desactivado. El usuario debe probar: abrir EffectCraft desde el dock, USARLA varios minutos desde Termux:X11 (escenario exacto donde moria), y ver si sobrevive. Nota: tras un REINICIO del telefono el flag de settings persiste, pero device_config puede requerir re-aplicar — si los kills vuelven tras reinicio, despachar solo el paso 3 de nuevo.
+=== MISION-A69-PHANTOM-KILLER COMPLETE ===
 === EXIT=0 ===
