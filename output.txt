@@ -1,29 +1,38 @@
-=== BRIDGE RUN 2026-11-17T01:06:29Z (v4) ===
-=== MISION-A57-FIRMA-VECTORCRAFT — leer la firma del crash capturado 2026-11-17T01:06:29Z ===
---- 1. todos los logs de sesiones de app (mas recientes primero) ---
--rw-r--r--+ 1 root root 1020 Nov 17 01:05 /tmp/app-session-20261117T010547Z.log
--rw-r--r--+ 1 root root  802 Nov 17 00:58 /tmp/app-session-20261117T005810Z.log
---- 2. FIRMA COMPLETA del ultimo crash: /tmp/app-session-20261117T010547Z.log ---
-[2026-11-17T01:05:47Z] app=vectorcraft pid_inicio
-2026-11-17T01:05:47.355Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
-2026-11-17T01:05:47.363Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
-ATTENTION: default value of option vblank_mode overridden by environment.
-MESA-LOADER: failed to retrieve device information
-2026-11-17T01:05:47.711Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
-2026-11-17T01:05:47.711Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
-2026-11-17T01:05:47.798Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
-[2026-11-17T01:05:50Z] rss_kb=189220 memavail_kb=4645256
-[2026-11-17T01:05:50Z] EXIT_CODE=137
---- 3. interpretacion de la firma ---
-exit_code=137
-FIRMA: SIGKILL — matado por memoria (OOM) o por gestion de Android. Ver memavail en los ultimos samples.
---- 4. RAM justo antes de morir (ultimos 3 samples) ---
-[2026-11-17T01:05:50Z] rss_kb=189220 memavail_kb=4645256
---- 5. si el launcher o algo la relanzo, salud general ---
+=== BRIDGE RUN 2026-11-17T01:07:08Z (v4) ===
+=== MISION-A58-CAZADOR-SIGKILL — quien dispara el SIGKILL 2026-11-17T01:07:08Z ===
+--- 1. arbol de procesos y oom_score_adj de cada nivel (la huella del asesino) ---
+== Termux base (la raiz de todo) ==
+pid=14539 adj=935 name=com.termux.widget                                           
+pid=16971 adj=200 name=com.termux                                                  
+== proot (el contenedor) ==
+pid=18205 adj=0
+pid=18206 adj=0
+pid=21734 adj=0
+== gnome-shell y x11 ==
+pid=18569 adj=0 gnome-shell
+pid=17418 adj=0 main
+--- 2. logcat: LMKD al acecho (lo que Android piensa de tus procesos) ---
+--- 3. PRUEBA A/B: vectorcraft CON proteccion anti-kill ---
+== intento de blindaje: oom_score_adj=-1000 en todo el arbol ==
+pid=21781 NO_blindable (permiso)
+pid=21781 NO_blindable (permiso)
+oom_score_adj_final=0
+--- 4. monitoreo 45 s (sin tocar el foco — solo ver si muere espontaneamente) ---
+t=9s vivo rss_kb=119448
+t=18s vivo rss_kb=119448
+t=27s vivo rss_kb=119448
+t=36s vivo rss_kb=119448
+t=45s vivo rss_kb=119448
+SOBREVIVIO_45s_BLINDADA
+--- 5. firma del test ---
+2026-11-17T01:07:09.457Z INFO  [main] vectorcraft: VectorCraft 0.24.1, log file /home/dexuser/.config/vectorcraft/logs/vectorcraft.log
+2026-11-17T01:07:09.457Z INFO  [main] vectorcraft: display GPUs (PCI vendor:device): unknown
+2026-11-17T01:07:09.604Z INFO  [main] vectorcraft::gpu: graphics adapters: Adreno (TM) 830v1 (Vulkan, IntegratedGpu, Vulkan:5143:44050001); llvmpipe (LLVM 21.1.8, 128 bits) (Vulkan, Cpu, Vulkan:10005:0000); Adreno (TM) 830v1 (Gl, Other, Gl:Adreno (TM) 830v1)
+2026-11-17T01:07:09.604Z INFO  [main] vectorcraft::gpu: drawing on Adreno (TM) 830v1 (Vulkan, IntegratedGpu): power preference None
+2026-11-17T01:07:09.651Z INFO  [main] vectorcraft: rendering with Adreno (TM) 830v1 (Vulkan, IntegratedGpu) (power preference None)
+--- 6. salud ---
 SHELL_VIVO
-               total        used        free      shared  buff/cache   available
-Mem:           11113        6485        2166         108        2669        4627
 FIN_INNER
-VEREDICTO: la firma capturada decide la cura. PANIC winit (101) = mismos workarounds que el launcher. SIGKILL (137) con memavail caido = disciplina de memoria. SIGSEGV (139) = frente nuevo: driver Vulkan/Adreno bajo proot.
-=== MISION-A57-FIRMA-VECTORCRAFT COMPLETE ===
+VEREDICTO: si vectorcraft BLINDADA sobrevive y la desprotegida murio en 3s (A57), el asesino es LMKD por oom_score_adj y la cura es blindar el arbol en el wrapper de apps (una linea en artcraft-app-launch). Si la blindada TAMBIEN muere, el asesino no es LMKD sino gestion Samsung/cgroup y el frente cambia (termux-wake-lock + foreground service o mover el proot a foreground).
+=== MISION-A58-CAZADOR-SIGKILL COMPLETE ===
 === EXIT=0 ===
