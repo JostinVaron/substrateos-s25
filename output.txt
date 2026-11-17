@@ -1,29 +1,57 @@
-=== BRIDGE RUN 2026-11-17T01:31:56Z (v5) ===
-=== MISION-A65-SHELL-COMPACTO — completar el levantamiento del Shell 2026-11-17T01:31:56Z ===
---- 0. esperar asentamiento extra del arranque A64 (30 s) ---
-== estado del shell ==
+=== BRIDGE RUN 2026-11-17T01:33:19Z (v5) ===
+=== MISION-A66-SESSION-BUS-HUNT — encontrar el bus de la sesion nueva y levantar el Shell 2026-11-17T01:33:19Z ===
+--- 1. log completo del arranque (que paso en la sesion relanzada) ---
+[1/4] X server
+  X OK en :0
+[2/4] sesion persistente del escritorio
+  lanzando sesion completa en proot persistente...
+  esperando que levante (50s)...
+[3/4] verificacion
+  METACITY=1 FLASHBACK=1 PANEL=1 PLANK=1 NM=1 XPM=5
+  GPU:     GLX_MESA_copy_sub_buffer, GLX_MESA_gl_interop, GLX_MESA_query_renderer, 
+  ventanas:
+    0x00c00002  0 localhost VectorCraft
+    0x00a00007 -1 localhost Top Expanded Edge Panel
+    0x00e00003 -1 localhost Desktop
+    0x02000003 -1 localhost plank
+[4/4] captura
+  COLORES=5098
+  copia: ~/BOOT-escritorio.png
+=== ARRANQUE TERMINADO ===
+--- 2. donde quedo el bus de sesion? ---
+== lado Termux (tmp compartido) ==
+total 144546
+drwx------. 22 u0_a345 u0_a345    20480 Nov 16 20:31 .
+drwxrwxrwt. 92 u0_a345 u0_a345    57344 Nov 16 20:33 ..
+-rw-rw-rw-.  1 u0_a345 u0_a345     2907 Nov 15 03:57 FINAL-STATUS.txt
+-rw-rw-rw-.  1 u0_a345 u0_a345 44675763 Nov 16 14:02 adb-all-1901.txt
+== lado proot (tmp privado del contenedor) ==
+--- 3. procesos gnome/dbus vivos ---
+31257 dbus-daemon --config-file=/tmp/rt-dex/system-dbus.conf --fork
+31276 /usr/bin/dbus-daemon --syslog-only --fork --print-pid 5 --print-address 7 --session
+31326 /usr/bin/dbus-daemon --config-file=/usr/share/defaults/at-spi2/accessibility.conf --nofork --print-address 11 --address=unix:path=/tmp/rt-dex/at-spi/bus_0
+--- 4. relanzamiento del Shell con el bus correcto (buscando la dir en ambos lados) ---
+BUS_NO_ENCONTRADO — enumerando candidatos
+OSL_PIPE_0_SingleOfficeIPC_4fa7c4171fbc114e957e8fa6905dc2
+a47-gui.log
+a47-sw.log
+a49-err.log
+a49-out.log
+a64-arranque.log
+a66.sh
+ab-test-20261117T010709Z.log
+ac-deps.log
+adb.10345.log
+--- 5. verificacion final ---
 SHELL_MUERTO
-== relanzando con la receta canonica (gnome49) ==
-/data/data/com.termux/files/usr/bin/gnome49
-/data/data/com.termux/files/usr/bin/gnome49: line 9: PREFIX: unbound variable
-== relanzamiento directo como dexuser ==
-SHELL_NO_NACIO
-libmutter-Message: 01:32:27.163: Running GNOME Shell (using mutter 49.0) as a X11 window and compositing manager
-Xlib:  extension "DPMS" missing on display ":0".
-Xlib:  extension "DPMS" missing on display ":0".
-Failed to connect to session bus: The given address is empty
-== verificacion final: ventanas y activa ==
-0x00c00002  0 localhost VectorCraft
+APP_VIVA
 0x00a00007 -1 localhost Top Expanded Edge Panel
 0x00e00003 -1 localhost Desktop
 0x02000003 -1 localhost plank
-vectorcraft_activada_al_frente
-== salud ==
-SHELL_MUERTO
-APP_VIVA
+0x00c00002  0 localhost Untitled-1 — VectorCraft
 FIN_INNER
---- broker ---
+--- 6. broker ---
 BROKER_VIVO
-VEREDICTO: si SHELL_VIVO + APP_VIVA + vectorcraft al frente, el ciclo completo esta cerrado: escritorio arriba, app visible e inmune. El usuario deberia VER la ventana de VectorCraft ahora mismo en su pantalla.
-=== MISION-A65-SHELL-COMPACTO COMPLETE ===
+VEREDICTO: con el bus correcto el Shell deberia nacer. Si BUS_NO_ENCONTRADO en ambos lados, la sesion de arranque nunca completo su dbus — el siguiente paso sera relanzar todo con el script canonico del usuario en Termux (bash ~/arranque-escritorio.sh) y capturar su salida completa.
+=== MISION-A66-SESSION-BUS-HUNT COMPLETE ===
 === EXIT=0 ===
