@@ -1,7 +1,15 @@
 # PLAN DE ESTABILIZACIÓN ONE-SHOT — SubstrateOS S25 (Ubuntu 26.04 + GNOME Shell 49 + Adreno 830 Zink/Turnip)
 
 > **DESTINATARIO:** Agente ejecutor de bajo coste (ejecución lineal, cero criterio propio).
-> **REGLA SUPREMA DE EJECUCIÓN:** Ejecuta cada comando exactamente como está escrito, en el orden numérico estricto de las fases (`Fase 0` → `Fase 7`). No inventes variantes, no uses jamás `pkill -f`, y no avances de una fase a la siguiente sin que el bloque **GATE** de esa fase imprima explícitamente `GATE_PASS: FASE N COMPLETADA`. Toda la salida de cada fase `N` se guarda automáticamente en `/data/data/com.termux/files/usr/tmp/rt-dex/phase-N.log` (que dentro del proot es `/tmp/rt-dex/phase-N.log`).
+> **REGLA SUPREMA DE EJECUCIÓN:** Ejecuta cada comando exactamente como está escrito, en el orden numérico estricto de las fases (`Fase 0` → `Fase 7`, incluyendo `Fase 4.1` y `Fase 4.2`). No inventes variantes, no uses jamás `pkill -f`, y no avances de una fase a la siguiente sin que el bloque **GATE** de esa fase imprima explícitamente `GATE_PASS: FASE N COMPLETADA`. Toda la salida de cada fase `N` se guarda automáticamente en `/data/data/com.termux/files/usr/tmp/rt-dex/phase-N.log` (que dentro del proot es `/tmp/rt-dex/phase-N.log`).
+
+### Regla de decisión global (determinista, sin criterio del ejecutor)
+
+- **SI** el GATE de la fase imprime exactamente `GATE_PASS: FASE N COMPLETADA` (N puede ser `4.1` o `4.2`) **ENTONCES** ejecuta la fase siguiente.
+- **SI** el GATE no lo imprime, o un comando devuelve código distinto de `0` **ENTONCES** ejecuta la sección **Cómo revertir** de esa fase, conserva `phase-N.log` y **DETENTE**. No avances.
+- **SI** el fallo es de display (`DISPLAY=:0 xdpyinfo` ≠ `0`) **ENTONCES** ejecuta el bloque `### [HUMANO]` y espera confirmación.
+- **SI** aparece `SHELL_EXIT=137` o el censo fantasma supera `32` **ENTONCES** ejecuta las Fases 4.1 y 4.2 completas antes de reintentar.
+- **SI** `glmark2` falla **ENTONCES** continúa: es no bloqueante; el gate real es el soak de la Fase 7.
 
 ---
 
@@ -1184,7 +1192,7 @@ echo "[GATE-4B] pid=$SPID kgsl_fds=$KGSL_FDS zink_maps=$ZINK_MAPS sw_maps=$SW_MA
 SER=$(adb devices 2>/dev/null | awk 'NR>1 && $2=="device"{print $1; exit}')
 PHANTOM=$(adb -s "${SER:-none}" shell "dumpsys activity processes | grep -c 'proc #'" 2>/dev/null | tr -d '\r' || true)
 echo "[GATE-4B] phantom_count=${PHANTOM:-unknown}"
-[ -z "$PHANTOM" ] || [ "$PHANTOM" -lt 32 ]
+[ -z "$PHANTOM" ] || [ "$PHANTOM" -le 32 ]
 
 proot-distro login ubuntu-gnome --shared-tmp -- bash -c '
   export DISPLAY=:0 XDG_RUNTIME_DIR=/tmp/rt-dex
